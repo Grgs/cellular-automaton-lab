@@ -56,4 +56,46 @@ describe("app-view selection inspector integration", () => {
         );
         expect(renderControls).toHaveBeenCalledTimes(1);
     });
+
+    it("keeps the current presentation scale while a pointer gesture is active", async () => {
+        const { createAppState } = await import("./state/simulation-state.js");
+        const { createAppView } = await import("./app-view.js");
+
+        const state = createAppState();
+        state.width = 10;
+        state.height = 10;
+        state.cellSize = 12;
+        state.renderCellSize = 12;
+        const viewport = document.createElement("div");
+        Object.defineProperties(viewport, {
+            clientWidth: { configurable: true, value: 200 },
+            clientHeight: { configurable: true, value: 200 },
+        });
+        const gridView = {
+            render: vi.fn(),
+            setPreviewCells: vi.fn(),
+            clearPreview: vi.fn(),
+            setHoveredCell: vi.fn(),
+            setSelectedCells: vi.fn(),
+            getSelectedCells: vi.fn(() => []),
+            setGestureOutline: vi.fn(),
+            flashGestureOutline: vi.fn(),
+            clearGestureOutline: vi.fn(),
+        } as Parameters<typeof createAppView>[0]["gridView"];
+        const appView = createAppView({
+            state,
+            elements: {
+                gridViewport: viewport,
+            } as unknown as Parameters<typeof createAppView>[0]["elements"],
+            gridView,
+        });
+
+        appView.setPointerGestureActiveResolver(() => true);
+        appView.renderGrid();
+        expect(state.renderCellSize).toBe(12);
+
+        appView.setPointerGestureActiveResolver(() => false);
+        appView.renderGrid();
+        expect(state.renderCellSize).toBeGreaterThan(12);
+    });
 });

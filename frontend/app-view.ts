@@ -73,6 +73,12 @@ export function createAppView({
     gridView: GridView | null;
     getSyncState?: () => ConfigSyncViewState;
 }): AppView {
+    let isPointerGestureActive = () => false;
+
+    function setPointerGestureActiveResolver(resolver: () => boolean): void {
+        isPointerGestureActive = resolver;
+    }
+
     function syncInspectorOcclusion() {
         const mainStage = elements.mainStage;
         const grid = elements.grid;
@@ -156,7 +162,9 @@ export function createAppView({
             return;
         }
         const topologyVariantKey = currentTopologyVariantKey(state);
-        setRenderCellSize(state, fittedRenderCellSize());
+        if (!isPointerGestureActive()) {
+            setRenderCellSize(state, fittedRenderCellSize());
+        }
         gridView.render(
             topologyRenderPayload(state),
             state.renderCellSize,
@@ -226,6 +234,7 @@ export function createAppView({
         renderAll,
         renderGrid,
         renderControlsPanel,
+        setPointerGestureActiveResolver,
         viewportDimensionsFor,
         applyViewportPreview,
     };

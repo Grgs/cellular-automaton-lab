@@ -195,9 +195,12 @@ describe("interactions/surface-bindings", () => {
         handlers.onPointerDown(createEventStub(), deadCell);
 
         expect(beginPointerSession).not.toHaveBeenCalled();
-        expect(prepareDirectGridInteraction).toHaveBeenCalledTimes(1);
+        expect(prepareDirectGridInteraction).not.toHaveBeenCalled();
         expect(legacyBegin).toHaveBeenCalledWith(deadCell, 1, 2);
         expect(armEditingFromGrid).not.toHaveBeenCalled();
+
+        handlers.onPointerUp(createEventStub());
+        expect(prepareDirectGridInteraction).toHaveBeenCalledTimes(1);
     });
 
     it("applies the selected paint state on unarmed left click", () => {

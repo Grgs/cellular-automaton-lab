@@ -15,10 +15,18 @@ export function createViewportController({
     getViewportDimensions,
     collectConfig,
     applyPreview,
+    renderPresentation = () => {},
+    isPointerGestureActive = () => false,
     sendControl,
     sameDimensions,
     setTimeoutFn = (callback, delay) => window.setTimeout(callback, delay),
     clearTimeoutFn = (timerId) => window.clearTimeout(timerId),
+    createResizeObserver = (callback) => {
+        if (typeof ResizeObserver === "undefined") {
+            return null;
+        }
+        return new ResizeObserver(callback);
+    },
     addWindowResizeListener = (listener) => {
         window.addEventListener("resize", listener);
         return () => window.removeEventListener("resize", listener);
@@ -27,13 +35,38 @@ export function createViewportController({
 }: ViewportControllerDependencies & {
     setTimeoutFn?: BrowserSetTimeout;
     clearTimeoutFn?: BrowserClearTimeout;
+    createResizeObserver?: (callback: ResizeObserverCallback) => ResizeObserver | null;
     addWindowResizeListener?: (listener: () => void) => (() => void) | null;
 }): ViewportController {
     let viewportSyncTimer: BrowserTimerId | null = null;
+    let presentationResizeTimer: BrowserTimerId | null = null;
     let pendingViewportDimensions: ViewportDimensions | null = null;
+    let resizeObserver: ResizeObserver | null = null;
     let removeWindowResizeListener: (() => void) | null = null;
     let suppressAutoSyncUntil = 0;
     let lastObservedViewportDimensions: ViewportDimensions | null = null;
+    let lastPresentationViewportDimensions: ViewportDimensions | null = null;
+
+    function presentationViewportDimensions(viewportElement: HTMLElement): ViewportDimensions {
+        return {
+            width: Math.max(0, viewportElement.clientWidth),
+            height: Math.max(0, viewportElement.clientHeight),
+        };
+    }
+
+    function schedulePresentationResize(): void {
+        if (presentationResizeTimer !== null) {
+            clearTimeoutFn(presentationResizeTimer);
+        }
+        presentationResizeTimer = setTimeoutFn(() => {
+            presentationResizeTimer = null;
+            if (isPointerGestureActive()) {
+                schedulePresentationResize();
+                return;
+            }
+            renderPresentation();
+        }, 32);
+    }
 
     function isAutoSyncSuppressed(): boolean {
         return Date.now() < suppressAutoSyncUntil;
@@ -184,10 +217,21 @@ export function createViewportController({
         };
 
         // Internal chrome changes (arming the editor, hiding the inspector when
-        // a run starts) also resize the viewport element. Those must only
-        // change canvas presentation, not rebuild the simulation topology.
-        // A real browser resize remains the explicit auto-sizing trigger.
-        void viewportElement;
+        // a run starts) resize only the canvas presentation. Observe that box
+        // separately from the window-only topology sync above, and never move
+        // the canvas beneath an active pointer gesture.
+        if (viewportElement) {
+            lastPresentationViewportDimensions = presentationViewportDimensions(viewportElement);
+            resizeObserver = createResizeObserver(() => {
+                const dimensions = presentationViewportDimensions(viewportElement);
+                if (sameDimensions(dimensions, lastPresentationViewportDimensions)) {
+                    return;
+                }
+                lastPresentationViewportDimensions = dimensions;
+                schedulePresentationResize();
+            });
+            resizeObserver?.observe(viewportElement);
+        }
         removeWindowResizeListener = addWindowResizeListener(onResize);
     }
 
@@ -196,6 +240,12 @@ export function createViewportController({
             clearTimeoutFn(viewportSyncTimer);
             viewportSyncTimer = null;
         }
+        if (presentationResizeTimer !== null) {
+            clearTimeoutFn(presentationResizeTimer);
+            presentationResizeTimer = null;
+        }
+        resizeObserver?.disconnect();
+        resizeObserver = null;
         if (typeof removeWindowResizeListener === "function") {
             removeWindowResizeListener();
             removeWindowResizeListener = null;

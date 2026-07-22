@@ -30,6 +30,7 @@ export interface AppView {
     renderAll(): void;
     renderGrid(): void;
     renderControlsPanel(): void;
+    setPointerGestureActiveResolver(resolver: () => boolean): void;
     viewportDimensionsFor(
         geometry?: string,
         ruleName?: string | null,
@@ -60,6 +61,7 @@ export interface InteractionController {
     undo?(): Promise<SimulationSnapshot | null>;
     redo?(): Promise<SimulationSnapshot | null>;
     cancelActivePreview?(): Promise<void>;
+    isPointerGestureActive?(): boolean;
 }
 
 export interface ViewportController {
@@ -106,6 +108,8 @@ export interface ViewportControllerDependencies {
     collectConfig(): { speed: number; rule: string };
     unsafeSizeOverrideEnabled?(): boolean;
     applyPreview(dimensions: ViewportDimensions): void;
+    renderPresentation?(): void;
+    isPointerGestureActive?(): boolean;
     sendControl(
         path: "/api/config",
         body: ConfigSyncBody,

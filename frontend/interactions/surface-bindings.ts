@@ -50,7 +50,7 @@ export function createInteractionSurfaceBindings({
     resolveDirectGestureTargetState: (cell: PaintableCell) => number;
     bindGridInteractionsFn?: ((options: GridInteractionBindings) => void) | undefined;
     setTimeoutFn?: ((callback: () => void, delay: number) => number) | undefined;
-}): { bindGridInteractions(): void } {
+}): { bindGridInteractions(): void; isPointerGestureActive(): boolean } {
     const gestureRouter = createPointerGestureRouter({
         surfaceElement,
         editPolicy,
@@ -68,6 +68,7 @@ export function createInteractionSurfaceBindings({
     });
 
     return {
+        isPointerGestureActive: gestureRouter.isActive,
         bindGridInteractions() {
             bindGridInteractionsFn({
                 surfaceElement,

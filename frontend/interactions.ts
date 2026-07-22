@@ -150,6 +150,7 @@ export function createInteractionController({
         undo: () => sessionRuntime.historyCommands.undo(),
         redo: () => sessionRuntime.historyCommands.redo(),
         cancelActivePreview: () => sessionRuntime.editorSession.cancelActivePreview(),
+        isPointerGestureActive: surfaceBindings.isPointerGestureActive,
         runSerialized: commandDispatch.runSerialized,
     };
 }

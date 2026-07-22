@@ -71,6 +71,8 @@ export function createViewportControllerDependencies({
         collectConfig: () => collectConfig(elements),
         unsafeSizeOverrideEnabled: () => Boolean(state.unsafeSizingEnabled),
         applyPreview: (dimensions) => appView.applyViewportPreview(dimensions),
+        renderPresentation: () => appView.renderGrid(),
+        isPointerGestureActive: () => Boolean(interactions.isPointerGestureActive?.()),
         sendControl: (path, body, options = {}) => interactions.sendControl(path, body, options),
         sameDimensions,
     };
