@@ -17,6 +17,8 @@ interface LatestConfigSchedulerOptions<TConfig> {
 export interface LatestConfigScheduler<TConfig> {
     schedule(config: TConfig): void;
     runNow(config: TConfig): Promise<void>;
+    /** Cancel matching queued/active work without disturbing other configurations. */
+    cancel(predicate: (config: TConfig) => boolean): boolean;
     retry(): Promise<void>;
     whenIdle(): Promise<void>;
     dispose(): void;
@@ -152,6 +154,50 @@ export function createLatestConfigScheduler<TConfig>(
             if (setPending(config, true)) {
                 await this.whenIdle();
             }
+        },
+        cancel(predicate): boolean {
+            if (disposed) {
+                return false;
+            }
+            let cancelled = false;
+            const cancelledPending = pending !== null && predicate(pending);
+            const cancelledActive = active !== null && predicate(active.config);
+            if (cancelledPending) {
+                clearTimer();
+                pending = null;
+                pendingReady = false;
+                cancelled = true;
+                // Scheduling the now-cancelled pending config made an older
+                // active run stale. Restore that non-matching run as current.
+                if (active && !cancelledActive) {
+                    revision = active.revision;
+                }
+            }
+            if (active && cancelledActive) {
+                if (active.revision === revision) {
+                    revision += 1;
+                }
+                active.controller.abort();
+                cancelled = true;
+            }
+            if (lastFailed !== null && predicate(lastFailed)) {
+                lastFailed = null;
+                failed = false;
+                cancelled = true;
+            }
+            if (!cancelled) {
+                return false;
+            }
+            if (pending) {
+                emit("pending", pending);
+            } else if (active && !active.controller.signal.aborted) {
+                emit("updating", active.config);
+            } else {
+                failed = false;
+                emit("idle", null);
+            }
+            settleIdle();
+            return true;
         },
         async retry(): Promise<void> {
             const config = pending ?? lastFailed;

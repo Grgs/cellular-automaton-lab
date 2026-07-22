@@ -246,6 +246,7 @@ export function createComparePanelContent(
     // True while the stage-wide analysis overlay is open; gates the analysis
     // scheduling that used to be tied to the (now removed) analysis config tab.
     let analysisOverlayOpen = false;
+    let analysisFocusReturn: HTMLElement | null = null;
 
     // Rule and seed live in the always-visible quick strip (one authoritative
     // control each), so they carry the strip styling and the accessible names
@@ -3491,7 +3492,10 @@ export function createComparePanelContent(
         if (analysisOverlayOpen) {
             return;
         }
+        analysisFocusReturn =
+            document.activeElement instanceof HTMLElement ? document.activeElement : analysisButton;
         analysisOverlayOpen = true;
+        workspaceLayout.element.setAttribute("inert", "");
         analysisOverlay.hidden = false;
         analysisOverlay.removeAttribute("inert");
         analysisButton.setAttribute("aria-expanded", "true");
@@ -3504,16 +3508,63 @@ export function createComparePanelContent(
         }
         analysisCloseButton.focus();
     }
-    function closeAnalysisOverlayIfOpen(): boolean {
+    function closeAnalysisOverlayIfOpen(options: { restoreFocus?: boolean } = {}): boolean {
         if (!analysisOverlayOpen) {
             return false;
+        }
+        const restoreFocus = options.restoreFocus ?? true;
+        workspaceScheduler.cancel((scheduled) => scheduled.kind === "analysis");
+        if (activeOperation?.kind === "analysis") {
+            activeOperation = null;
+            setRunning(false);
+            statusLine.textContent = workspaceStore.getState().results.filmstrip
+                ? filmstripReadyStatus(workspaceStore.getState().playback.playing)
+                : "Analysis cancelled.";
         }
         analysisOverlayOpen = false;
         analysisOverlay.setAttribute("inert", "");
         analysisOverlay.hidden = true;
+        workspaceLayout.element.removeAttribute("inert");
         analysisButton.setAttribute("aria-expanded", "false");
-        analysisButton.focus();
+        const focusReturn = analysisFocusReturn;
+        analysisFocusReturn = null;
+        if (restoreFocus) {
+            const target = focusReturn?.isConnected ? focusReturn : analysisButton;
+            target.focus();
+        }
         return true;
+    }
+
+    function trapAnalysisFocus(event: KeyboardEvent): void {
+        if (!analysisOverlayOpen || event.key !== "Tab") {
+            return;
+        }
+        const focusable = [
+            ...analysisOverlay.querySelectorAll<HTMLButtonElement>(
+                'button:not([disabled]):not([tabindex="-1"])',
+            ),
+        ];
+        const first = focusable[0];
+        const last = focusable.at(-1);
+        if (!first || !last) {
+            event.preventDefault();
+            analysisCloseButton.focus();
+            return;
+        }
+        const activeElement = document.activeElement;
+        if (
+            event.shiftKey &&
+            (activeElement === first || !analysisOverlay.contains(activeElement))
+        ) {
+            event.preventDefault();
+            last.focus();
+        } else if (
+            !event.shiftKey &&
+            (activeElement === last || !analysisOverlay.contains(activeElement))
+        ) {
+            event.preventDefault();
+            first.focus();
+        }
     }
 
     // The tilings shortcut lands ready to type: sheet open, Tilings disclosure
@@ -3577,8 +3628,9 @@ export function createComparePanelContent(
             openAnalysisOverlay();
         }
     });
-    analysisCloseButton.addEventListener("click", closeAnalysisOverlayIfOpen);
-    analysisBackdrop.addEventListener("click", closeAnalysisOverlayIfOpen);
+    analysisCloseButton.addEventListener("click", () => closeAnalysisOverlayIfOpen());
+    analysisBackdrop.addEventListener("click", () => closeAnalysisOverlayIfOpen());
+    analysisOverlay.addEventListener("keydown", trapAnalysisFocus);
     setupTilingsItem.addEventListener("click", openTilingsSheet);
     tilingsButton.addEventListener("click", openTilingsSheet);
     configSheetCloseButton.addEventListener("click", workspaceLayout.closeSetup);
@@ -3601,7 +3653,7 @@ export function createComparePanelContent(
         deactivate(): void {
             filmstripTransport.pause();
             disposeAllForkedBoards();
-            closeAnalysisOverlayIfOpen();
+            closeAnalysisOverlayIfOpen({ restoreFocus: false });
             root.querySelector(".compare-action-menu[open]")?.removeAttribute("open");
         },
         applyRunConfig,

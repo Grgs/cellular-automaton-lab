@@ -971,6 +971,120 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("contains focus in the analysis dialog and restores its opener", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+        const opener = document.querySelector<HTMLButtonElement>(".compare-analysis-open");
+        const workspace = document.querySelector<HTMLElement>(".compare-workspace");
+        opener?.focus();
+        opener?.click();
+
+        const close = document.querySelector<HTMLButtonElement>(".compare-analysis-close");
+        const run = document.querySelector<HTMLButtonElement>(".compare-run-secondary");
+        expect(workspace?.hasAttribute("inert")).toBe(true);
+        expect(document.activeElement).toBe(close);
+
+        run?.focus();
+        run?.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+        expect(document.activeElement).toBe(close);
+        close?.dispatchEvent(
+            new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true }),
+        );
+        expect(document.activeElement).toBe(run);
+
+        close?.click();
+        expect(workspace?.hasAttribute("inert")).toBe(false);
+        expect(document.activeElement).toBe(opener);
+        handle.dispose();
+    });
+
+    it("cancels analysis closed during its debounce without cancelling the wall rebuild", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend, compareSeed } = fakeBackend();
+        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, compareSeed, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-analysis-open")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-analysis-close")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1), {
+            timeout: 1_000,
+        });
+        await new Promise((resolve) => window.setTimeout(resolve, 450));
+
+        expect(compareSeed).not.toHaveBeenCalled();
+        handle.dispose();
+    });
+
+    it("aborts active analysis on close and does not publish its eventual result", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const analysis = deferred<SeedComparisonResult>();
+        let analysisSignal: AbortSignal | undefined;
+        const compareSeed = vi.fn<SimulationBackend["compareSeed"]>((_request, options) => {
+            analysisSignal = options?.signal;
+            return analysis.promise;
+        });
+        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, compareSeed, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        document.querySelector<HTMLButtonElement>(".compare-analysis-open")?.click();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1), { timeout: 1_000 });
+
+        document.querySelector<HTMLButtonElement>(".compare-analysis-close")?.click();
+        expect(analysisSignal?.aborted).toBe(true);
+        analysis.resolve(comparisonResult());
+        await Promise.resolve();
+        await Promise.resolve();
+
+        expect(document.querySelector(".compare-row-actions")).toBeNull();
+        expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).not.toContain(
+            "Done",
+        );
+        handle.dispose();
+    });
+
+    it("aborts active analysis when the wall route deactivates", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const analysis = deferred<SeedComparisonResult>();
+        let analysisSignal: AbortSignal | undefined;
+        const compareSeed = vi.fn<SimulationBackend["compareSeed"]>((_request, options) => {
+            analysisSignal = options?.signal;
+            return analysis.promise;
+        });
+        const requestFilmstrip = vi.fn(async () => twoBoardFilmstrip());
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend: { ...backend, compareSeed, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        document.querySelector<HTMLButtonElement>(".compare-analysis-open")?.click();
+        await vi.waitFor(() => expect(compareSeed).toHaveBeenCalledTimes(1), { timeout: 1_000 });
+
+        handle.close();
+        expect(analysisSignal?.aborted).toBe(true);
+        analysis.resolve(comparisonResult());
+        await Promise.resolve();
+        expect(document.querySelector(".compare-row-actions")).toBeNull();
+        handle.dispose();
+    });
+
     it("only highlights the setup run action when the wall is stale", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();

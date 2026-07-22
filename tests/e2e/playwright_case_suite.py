@@ -682,6 +682,48 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         ]
         case.assertEqual(unexpected_console, [])
 
+    def test_wall_analysis_modal_contains_focus_and_restores_its_opener(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        opener = case.page.locator(".compare-analysis-open")
+        close = case.page.locator(".compare-analysis-close")
+        workspace = case.page.locator(".compare-workspace")
+        dialog = case.page.get_by_role("dialog", name="Statistical analysis")
+
+        for width in (1280, 820):
+            case.page.set_viewport_size({"width": width, "height": 900})
+            opener.click()
+            expect(dialog).to_be_visible()
+            expect(workspace).to_have_attribute("inert", "")
+            expect(close).to_be_focused()
+
+            # Shift+Tab wraps to the dialog's last control, and Tab wraps back
+            # to the close button instead of entering the inert wall beneath.
+            case.page.keyboard.press("Shift+Tab")
+            case.assertTrue(
+                case.page.evaluate(
+                    """() => document.querySelector('.compare-analysis-overlay')
+                        ?.contains(document.activeElement) === true"""
+                )
+            )
+            case.page.keyboard.press("Tab")
+            expect(close).to_be_focused()
+
+            case.page.keyboard.press("Escape")
+            expect(dialog).to_be_hidden()
+            expect(workspace).not_to_have_attribute("inert", "")
+            expect(opener).to_be_focused()
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
     def test_wall_analysis_begin_end_round_trips_preserve_the_workspace(self) -> None:
         case = self._case()
         self._mark_compare_demo_seen()
