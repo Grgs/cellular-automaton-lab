@@ -22,7 +22,7 @@
 import { buildPatternPayload } from "./pattern-io.js";
 import { PatternValidationError } from "./parsers/pattern.js";
 import { buildHashFragmentForReplaceState, clearShareFragment } from "./share-link.js";
-import { resolveShellRoute } from "./compare/compare-route.js";
+import { hashWithLabRoute, resolveShellRoute } from "./compare/compare-route.js";
 import type { AppState } from "./types/state.js";
 
 export interface ShareLinkSyncOptions {
@@ -58,7 +58,7 @@ export function syncShareLinkUrlFromState(
     // an empty board keeps the canonical lab hash. replaceState fires no
     // hashchange, so this rewrite never re-routes or reloads.
     const nextHash = isEmptyBoard
-        ? clearShareFragment(locationApi.hash) || "#/lab"
+        ? hashWithLabRoute(clearShareFragment(locationApi.hash))
         : buildHashFragmentForReplaceState(payload, locationApi.hash);
     if (nextHash === locationApi.hash) {
         return;

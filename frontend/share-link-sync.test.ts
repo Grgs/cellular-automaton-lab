@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { resolveShellRoute } from "./compare/compare-route.js";
 import type { AppState } from "./types/state.js";
 
 // The sync logic under test only branches on whether the payload has cells, so
@@ -49,16 +50,17 @@ describe("syncShareLinkUrlFromState", () => {
         expect(url).toContain("/lab");
     });
 
-    it("drops the share slot when a loaded board is erased back to empty", () => {
-        const replaceState = sync("#share=v1.abc&/lab", {});
+    it.each([
+        ["#share=v1.abc", "#/lab"],
+        ["#/lab&share=v1.abc", "#/lab"],
+        ["#share=v1.abc&run=v1.def", "#/lab&run=v1.def"],
+        ["#/lab&share=v1.abc&run=v1.def", "#/lab&run=v1.def"],
+    ])("keeps an emptied shared board on the Lab route for %s", (hash, expectedHash) => {
+        const replaceState = sync(hash, {});
         expect(replaceState).toHaveBeenCalledTimes(1);
-        expect(replaceState.mock.calls[0]![2]).toBe("/#/lab");
-    });
-
-    it("keeps an emptied bare share link on the canonical lab hash, not the wall", () => {
-        const replaceState = sync("#share=v1.abc", {});
-        expect(replaceState).toHaveBeenCalledTimes(1);
-        expect(replaceState.mock.calls[0]![2]).toBe("/#/lab");
+        const url = replaceState.mock.calls[0]![2] as string;
+        expect(url).toBe(`/${expectedHash}`);
+        expect(resolveShellRoute(expectedHash)).toBe("lab");
     });
 
     it("never mirrors while the hash addresses the wall", () => {
