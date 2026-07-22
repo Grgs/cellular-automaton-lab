@@ -62,6 +62,44 @@ export interface CompareWorkspaceStore {
     subscribe(listener: (state: CompareWorkspaceState) => void): () => void;
 }
 
+export interface LocalBoardRemoval {
+    readonly geometry: string;
+    readonly configuration: CompareRunConfig;
+    readonly filmstripKey: string;
+}
+
+/**
+ * Apply the store half of an instant wall removal as one immutable transition.
+ * The mutable picker selection is updated by the panel immediately before this
+ * runs; this keeps the canonical configuration, display order, result payload,
+ * and result key on that same survivor set.
+ */
+export function removeWorkspaceBoard(
+    state: CompareWorkspaceState,
+    removal: LocalBoardRemoval,
+): CompareWorkspaceState {
+    const { geometry, configuration, filmstripKey } = removal;
+    const filmstrip = state.results.filmstrip;
+    return {
+        ...state,
+        configuration,
+        orderedBoards: configuration.geometries,
+        selectedBoard: state.selectedBoard === geometry ? null : state.selectedBoard,
+        focusedBoard: state.focusedBoard === geometry ? null : state.focusedBoard,
+        results: {
+            ...state.results,
+            filmstrip:
+                filmstrip === null
+                    ? null
+                    : {
+                          ...filmstrip,
+                          tilings: filmstrip.tilings.filter((entry) => entry.geometry !== geometry),
+                      },
+            filmstripKey,
+        },
+    };
+}
+
 function copyConfig(config: CompareRunConfig): CompareRunConfig {
     return Object.freeze({ ...config, geometries: Object.freeze([...config.geometries]) });
 }

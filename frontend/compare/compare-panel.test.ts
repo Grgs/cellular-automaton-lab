@@ -3123,9 +3123,15 @@ describe("mountComparePanel", () => {
             bootstrapData: bootstrapData(),
         });
         handle.open();
-        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "Run comparison")
-            ?.click();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 16,
+            geometries: ["square", "hex", "kagome"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
         });
@@ -3139,9 +3145,91 @@ describe("mountComparePanel", () => {
 
         expect(document.querySelector(".compare-status")?.textContent).toContain("Removed");
         expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        expect(document.querySelector(".compare-stage-caption")?.textContent).toContain(
+            "2 tilings",
+        );
+        expect(document.querySelector(".compare-status")?.textContent).toContain(
+            "Filmstrip ready — 2 tilings",
+        );
+        document
+            .querySelector<HTMLButtonElement>('.compare-filmstrip-btn[aria-label="Play / pause"]')
+            ?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelector(".compare-status")?.textContent).toContain(
+                "Playing 2 tilings",
+            );
+        });
+        expect(document.querySelector(".compare-status")?.textContent).not.toContain("Removed");
         // Give any (unwanted) debounced rerun its window, then confirm none fired.
         await new Promise((resolve) => window.setTimeout(resolve, 900));
         expect(requestFilmstrip).toHaveBeenCalledTimes(1);
+        handle.dispose();
+    });
+
+    it("rebases a pending wall rerun onto the survivors of a local removal", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const template = twoBoardFilmstrip().tilings[0]!;
+        const requestFilmstrip = vi.fn(async (request: FilmstripRequest) => ({
+            ...threeBoardFilmstrip(),
+            frame_count: request.frames ?? 12,
+            tilings: request.geometries.map((geometry) => ({
+                ...template,
+                geometry,
+                tiling_family: geometry,
+            })),
+        }));
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 16,
+            geometries: ["square", "hex", "kagome"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(1));
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        await vi.waitFor(() => {
+            expect(
+                document.querySelector<HTMLButtonElement>(".compare-filmstrip-remove")?.disabled,
+            ).toBe(false);
+        });
+
+        const wallGenerations = [...document.querySelectorAll<HTMLLabelElement>("label")]
+            .find((label) => label.textContent?.includes("Wall generations"))
+            ?.querySelector<HTMLInputElement>('input[type="number"]');
+        if (!wallGenerations) throw new Error("missing wall generations input");
+        wallGenerations.value = "13";
+        wallGenerations.dispatchEvent(new Event("input", { bubbles: true }));
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-remove")?.click();
+
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2), {
+            timeout: 1_500,
+        });
+        expect(requestFilmstrip.mock.calls[1]?.[0]).toMatchObject({
+            frames: 13,
+            geometries: ["hex", "kagome"],
+        });
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        });
+        expect(
+            [...document.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-label")].map(
+                (label) => label.textContent,
+            ),
+        ).toEqual(["hex", "kagome"]);
+        expect(document.querySelector(".compare-stage-caption")?.textContent).toContain(
+            "2 tilings",
+        );
         handle.dispose();
     });
 

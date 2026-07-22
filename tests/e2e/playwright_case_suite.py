@@ -1011,7 +1011,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         # Boards carry their friendly catalog label (not the raw geometry
         # key), replacing a named board preserves its wall position, the dock's
         # ⊞ jumps straight to the searchable tiling checklist, and a board's
-        # persistent upper-right × drops it with one debounced re-run.
+        # persistent upper-right × drops it instantly without rebuilding.
         case = self._case()
         case.page.add_init_script(
             "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
@@ -1138,6 +1138,88 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         expect(dense_board.locator(".compare-thumb")).to_be_visible(timeout=60_000)
         expect(dense_board.locator(".compare-filmstrip-slot")).not_to_have_text("too large")
 
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
+    def test_wall_local_removal_reconciles_pending_setup_and_keyboard_state(self) -> None:
+        # A setup edit queued inside the scheduler must be rebased onto the
+        # survivor set, never restore a board removed during the debounce. The
+        # same local transaction closes stale pickers and restores keyboard
+        # focus to a useful surviving control.
+        case = self._case()
+        case.page.add_init_script(
+            "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
+        )
+        case.reload_page(wait_until="load")
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        expect(case.page.locator(".compare-filmstrip-remove").first).to_be_enabled(timeout=60_000)
+        labels_before = case.page.locator(".compare-filmstrip-label").all_text_contents()
+
+        # Reach the setup field through the visible sheet, then dispatch the
+        # input and keyboard-focused removal in one task to pin the debounce
+        # ordering deterministically.
+        case.page.click('.compare-dock-icon[aria-label="Configure the run"]')
+        self._expect(".compare-config-sheet.is-open").to_be_visible()
+        wall_generations = case.page.locator(
+            ".compare-form label", has_text="Wall generations"
+        ).locator("input")
+        expect(wall_generations).to_be_visible()
+        removal_state = case.page.evaluate(
+            """() => {
+                const generations = [...document.querySelectorAll('.compare-form label')]
+                    .find((label) => label.textContent?.includes('Wall generations'))
+                    ?.querySelector('input');
+                const remove = document.querySelector('.compare-filmstrip-remove');
+                if (!(generations instanceof HTMLInputElement) || !(remove instanceof HTMLButtonElement)) {
+                    throw new Error('missing pending-removal controls');
+                }
+                generations.value = String(Number(generations.value) + 1);
+                generations.dispatchEvent(new Event('input', { bubbles: true }));
+                remove.focus();
+                remove.click();
+                return {
+                    count: document.querySelectorAll('.compare-filmstrip-board').length,
+                    activeLabel: document.activeElement?.getAttribute('aria-label'),
+                };
+            }"""
+        )
+        case.assertEqual(removal_state["count"], 3)
+        case.assertEqual(removal_state["activeLabel"], f"Remove {labels_before[1]} from the wall")
+        case.page.click(".compare-config-sheet-close")
+
+        # The queued run settles with the setup change and the same three
+        # survivors. A stale four-board completion would fail both count/order
+        # and leave the setup action stale rather than Up to date.
+        expect(case.page.locator(".compare-setup-run")).to_have_text("Up to date", timeout=60_000)
+        self._expect(".compare-filmstrip-board").to_have_count(3)
+        case.assertEqual(
+            case.page.locator(".compare-filmstrip-label").all_text_contents(), labels_before[1:]
+        )
+        self._expect(".compare-stage-caption").to_contain_text("3 tilings")
+
+        # Removing while the Add search owns focus closes and clears the picker,
+        # focuses the stable Add button, and the next Enter reopens immediately.
+        add_button = case.page.locator(".compare-filmstrip-add")
+        add_button.press("Enter")
+        self._expect(".compare-board-tiling-picker-search").to_be_focused()
+        case.page.evaluate("() => document.querySelector('.compare-filmstrip-remove')?.click()")
+        self._expect(".compare-filmstrip-board").to_have_count(2)
+        case.assertEqual(case.page.locator(".compare-board-tiling-picker").count(), 0)
+        expect(add_button).to_be_focused()
+        add_button.press("Enter")
+        self._expect(".compare-board-tiling-picker").to_be_visible()
+        self._expect(".compare-board-tiling-picker-search").to_be_focused()
+        case.page.click(".compare-board-tiling-picker-close")
+
+        case.page.click('.compare-filmstrip-btn[aria-label="Play / pause"]')
+        self._expect(".compare-status").to_contain_text("Playing 2 tilings")
         unexpected_console = [
             message
             for message in case.console_messages

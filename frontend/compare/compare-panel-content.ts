@@ -93,7 +93,11 @@ import {
     MIN_COMPARE_GRID_SIZE,
     MIN_COMPARE_STEPS,
 } from "./compare-limits.js";
-import { createCompareWorkspaceStore, inspectedBoard } from "./compare-workspace-store.js";
+import {
+    createCompareWorkspaceStore,
+    inspectedBoard,
+    removeWorkspaceBoard,
+} from "./compare-workspace-store.js";
 import { subscribeSelector } from "./compare-workspace-subscriptions.js";
 import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
 import { createCompareWorkspaceLayout } from "./compare-workspace-layout.js";
@@ -956,8 +960,9 @@ export function createComparePanelContent(
     }
 
     // Selection editing from the wall itself: a board's × chrome drops that
-    // tiling from the run (the filmstrip view disables it at the two-board
-    // minimum), with removals coalescing into one debounced re-run.
+    // tiling instantly (the filmstrip view disables it at the two-board
+    // minimum). If setup work is already queued, replace that pending run with
+    // the same latest settings applied to the survivor set.
     function removeBoardFromWall(geometry: string): void {
         if (!selected.has(geometry)) {
             return;
@@ -971,43 +976,43 @@ export function createComparePanelContent(
             filmstripView?.setBoardsRemovable(false);
             return;
         }
-        const tiling = workspaceStore
-            .getState()
-            .results.filmstrip?.tilings.find((entry) => entry.geometry === geometry);
+        const beforeRemoval = workspaceStore.getState();
+        const tiling = beforeRemoval.results.filmstrip?.tilings.find(
+            (entry) => entry.geometry === geometry,
+        );
+        const pendingKind =
+            beforeRemoval.operation.status === "pending" ||
+            (beforeRemoval.operation.status === "updating" && !beforeRemoval.operation.executing)
+                ? beforeRemoval.operation.kind
+                : null;
         selected.delete(geometry);
         disposeForkedBoard(geometry);
-        // Drop the board from the client-side result and re-key the run to the
-        // reduced selection, so the wall stays "up to date" without a server
-        // rebuild -- every survivor's frames are already here.
-        workspaceStore.update((state) => {
-            const filmstrip = state.results.filmstrip;
-            return {
-                ...state,
-                orderedBoards: state.orderedBoards.filter((entry) => entry !== geometry),
-                selectedBoard: state.selectedBoard === geometry ? null : state.selectedBoard,
-                focusedBoard: state.focusedBoard === geometry ? null : state.focusedBoard,
-                results: {
-                    ...state.results,
-                    filmstrip:
-                        filmstrip === null
-                            ? null
-                            : {
-                                  ...filmstrip,
-                                  tilings: filmstrip.tilings.filter(
-                                      (entry) => entry.geometry !== geometry,
-                                  ),
-                              },
-                    filmstripKey: runConfigKey(currentRunConfig()),
-                },
-            };
-        });
+        const nextConfig = currentRunConfig();
+        // Drop the board from every canonical workspace representation in one
+        // immutable transition. Every survivor's current frames are already on
+        // the client, so an otherwise-idle wall remains up to date with no
+        // server rebuild.
+        workspaceStore.update((state) =>
+            removeWorkspaceBoard(state, {
+                geometry,
+                configuration: nextConfig,
+                filmstripKey: runConfigKey(nextConfig),
+            }),
+        );
         filmstripView?.removeBoard(geometry);
-        filmstripView?.setBoardsRemovable(selected.size > MIN_WALL_TILINGS);
-        filmstripView?.refreshAddControl();
-        statusLine.textContent = `Removed ${tiling?.label || geometry}.`;
+        updateStageCaption(nextConfig);
+        statusLine.textContent = `Removed ${tiling?.label || geometry}. ${filmstripReadyStatus(
+            workspaceStore.getState().playback.playing,
+        )}`;
         renderTilingChecklist();
         refreshPreview();
         updateSummary();
+
+        if (pendingKind === "filmstrip") {
+            scheduleWallRerun();
+        } else if (pendingKind === "analysis") {
+            scheduleAnalysis();
+        }
     }
 
     function replaceBoardOnWall(previousGeometry: string, nextGeometry: string): void {
@@ -1705,9 +1710,11 @@ export function createComparePanelContent(
             workspaceStore,
             (state) => state.playback.playing,
             (playing) => {
+                const currentStatus = statusLine.textContent ?? "";
                 const showingReadyLine =
-                    statusLine.textContent === filmstripReadyStatus(true) ||
-                    statusLine.textContent === filmstripReadyStatus(false);
+                    currentStatus.startsWith("Filmstrip ready — ") ||
+                    currentStatus.startsWith("Playing ") ||
+                    currentStatus.startsWith("Removed ");
                 if (showingReadyLine) {
                     statusLine.textContent = filmstripReadyStatus(playing);
                 }

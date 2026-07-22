@@ -458,6 +458,26 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         search.focus();
     }
 
+    function updateAddControlState(addButton: HTMLButtonElement): void {
+        const disabledReason = managementDisabledReason();
+        const hasCapacity = disabledReason === null && options.canAddBoard?.() !== false;
+        const hasAvailableTiling =
+            hasCapacity &&
+            (options.tilingOptions ?? []).some(
+                (option) =>
+                    !boards.some((board) => board.tiling.geometry === option.value) &&
+                    options.isTilingAvailable?.(option.value) !== false,
+            );
+        addButton.disabled = !hasAvailableTiling;
+        addButton.title = disabledReason
+            ? disabledReason
+            : hasAvailableTiling
+              ? "Add another tiling to the wall"
+              : hasCapacity
+                ? "All compatible tilings are already on the wall"
+                : (options.addBoardDisabledReason?.() ?? "The wall is at its tiling limit");
+    }
+
     function createAddControl(): void {
         if (!options.tilingOptions || !options.onAddBoard) {
             return;
@@ -476,23 +496,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             }),
             element("span", { textContent: "Add tiling" }),
         );
-        const disabledReason = managementDisabledReason();
-        const hasCapacity = disabledReason === null && options.canAddBoard?.() !== false;
-        const hasAvailableTiling =
-            hasCapacity &&
-            options.tilingOptions.some(
-                (option) =>
-                    !boards.some((board) => board.tiling.geometry === option.value) &&
-                    options.isTilingAvailable?.(option.value) !== false,
-            );
-        addButton.disabled = !hasAvailableTiling;
-        addButton.title = disabledReason
-            ? disabledReason
-            : hasAvailableTiling
-              ? "Add another tiling to the wall"
-              : hasCapacity
-                ? "All compatible tilings are already on the wall"
-                : (options.addBoardDisabledReason?.() ?? "The wall is at its tiling limit");
+        updateAddControlState(addButton);
         addButton.addEventListener("click", (event) => {
             event.stopPropagation();
             openBoardTilingPicker(anchor);
@@ -518,8 +522,12 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                   ? "Remove from the wall"
                   : "Keep at least two tilings on the wall";
         }
-        wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
-        createAddControl();
+        const addButton = wallActions.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
+        if (addButton) {
+            updateAddControlState(addButton);
+        } else {
+            createAddControl();
+        }
     }
 
     function createBoardEntry(tiling: TopologyFilmstrip, removable: boolean): BoardEntry {
@@ -724,8 +732,13 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             refreshManagementControls();
         },
         refreshAddControl(): void {
-            wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
-            createAddControl();
+            const addButton =
+                wallActions.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
+            if (addButton) {
+                updateAddControlState(addButton);
+            } else {
+                createAddControl();
+            }
         },
         setBoardsRemovable(removable: boolean): void {
             for (const removeButton of root.querySelectorAll<HTMLButtonElement>(
@@ -747,12 +760,23 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             if (index < 0) {
                 return false;
             }
+            const removedEntry = boards[index]!;
+            const activeElement =
+                document.activeElement instanceof HTMLElement ? document.activeElement : null;
+            const restoreBoardFocus =
+                activeElement !== null && removedEntry.cell.contains(activeElement);
+            const restoreAddFocus =
+                activeElement !== null && openTilingPicker?.contains(activeElement) === true;
+            // Management refreshes must never leave a detached picker in the
+            // controller. The stable Add anchor remains in place and can reopen
+            // the picker on the very next activation.
+            closeTilingPicker();
             // Dropping the hero returns to the gallery before its slot vanishes.
             if (focusedGeometry === geometry) {
                 focus(null);
             }
-            const [removed] = boards.splice(index, 1);
-            removed?.cell.remove();
+            boards.splice(index, 1);
+            removedEntry.cell.remove();
             // Survivors keep their frames and the clock keeps ticking; just
             // refresh the floor/capacity affordances for the new count and
             // re-lay-out the (possibly speaker) stage.
@@ -764,6 +788,19 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             }
             refreshManagementControls();
             applyFocusLayout();
+            if (restoreBoardFocus) {
+                const successor = boards[Math.min(index, boards.length - 1)];
+                const successorRemove = successor?.cell.querySelector<HTMLButtonElement>(
+                    ".compare-filmstrip-remove",
+                );
+                if (successorRemove && !successorRemove.disabled) {
+                    successorRemove.focus();
+                } else {
+                    successor?.cell.focus();
+                }
+            } else if (restoreAddFocus) {
+                wallActions.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.focus();
+            }
             return true;
         },
         currentFrameIndex: () => player.index,

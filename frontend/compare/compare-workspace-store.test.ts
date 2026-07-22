@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { createCompareWorkspaceStore, inspectedBoard } from "./compare-workspace-store.js";
+import type { SeedFilmstripResult } from "../types/domain.js";
+import {
+    createCompareWorkspaceStore,
+    inspectedBoard,
+    removeWorkspaceBoard,
+} from "./compare-workspace-store.js";
 
 describe("compare workspace store", () => {
     it("publishes immutable replacements without exposing mutable config arrays", () => {
@@ -92,5 +97,51 @@ describe("compare workspace store", () => {
         // Leaving speaker view falls back to the selection.
         store.update((state) => ({ ...state, focusedBoard: null }));
         expect(inspectedBoard(store.getState())).toBe("square");
+    });
+
+    it("removes a board from every canonical workspace representation atomically", () => {
+        const configuration = {
+            seed: "1",
+            rule: "conway",
+            traversal: "bfs",
+            grid_size: 16,
+            frames: 50,
+            geometries: ["square", "hex", "tri"],
+        };
+        const store = createCompareWorkspaceStore(configuration);
+        const filmstrip = {
+            rule_name: "conway",
+            seed: "1",
+            traversal: "bfs",
+            frame_count: 1,
+            grid_size: 16,
+            tilings: configuration.geometries.map((geometry) => ({ geometry })),
+        } as SeedFilmstripResult;
+        store.update((state) => ({
+            ...state,
+            focusedBoard: "hex",
+            selectedBoard: "hex",
+            results: { ...state.results, filmstrip, filmstripKey: "three" },
+        }));
+
+        const nextConfiguration = { ...configuration, geometries: ["square", "tri"] };
+        store.update((state) =>
+            removeWorkspaceBoard(state, {
+                geometry: "hex",
+                configuration: nextConfiguration,
+                filmstripKey: "two",
+            }),
+        );
+
+        const state = store.getState();
+        expect(state.configuration.geometries).toEqual(["square", "tri"]);
+        expect(state.orderedBoards).toEqual(state.configuration.geometries);
+        expect(state.results.filmstrip?.tilings.map((tiling) => tiling.geometry)).toEqual([
+            "square",
+            "tri",
+        ]);
+        expect(state.results.filmstripKey).toBe("two");
+        expect(state.focusedBoard).toBeNull();
+        expect(state.selectedBoard).toBeNull();
     });
 });
