@@ -501,9 +501,19 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         case.page.click("#reset-btn")
         self._wait_for_exported_pattern_payload(expected_rule="conway", expected_cells_by_id={})
-        case.page.click("#canvas-toolbar-arm-btn")
-        case.page.click('[data-brush-size="1"]')
-        case.page.click('[data-state-value="1"]')
+        arm_button = case.page.locator("#canvas-toolbar-arm-btn")
+        if arm_button.get_attribute("aria-pressed") != "true":
+            arm_button.click()
+        self._expect("#canvas-toolbar-controls").to_be_visible()
+        brush_button = case.page.locator('[data-editor-tool="brush"]')
+        if brush_button.get_attribute("aria-pressed") != "true":
+            brush_button.click()
+        brush_size_button = case.page.locator('[data-brush-size="1"]')
+        if brush_size_button.get_attribute("aria-pressed") != "true":
+            brush_size_button.click()
+        state_button = case.page.locator('[data-state-value="1"]')
+        if state_button.get_attribute("aria-pressed") != "true":
+            state_button.click()
         self._ensure_drawer_open()
         before_pointer = wait_for_fitted_canvas()
         canvas_box = case.page.locator("#grid").bounding_box()
