@@ -6,6 +6,8 @@ export type ThemeName = "dark" | "light";
 export const DEFAULT_THEME: ThemeName =
     FRONTEND_DEFAULTS.theme.default === "light" ? "light" : "dark";
 
+export type ThemeMediaResolver = (query: string) => Pick<MediaQueryList, "matches">;
+
 export function isThemeName(value: string | null | undefined): value is ThemeName {
     return value === "dark" || value === "light";
 }
@@ -23,6 +25,28 @@ export function currentTheme(root: HTMLElement = document.documentElement): Them
 
 export function nextTheme(theme: ThemeName): ThemeName {
     return theme === "dark" ? "light" : "dark";
+}
+
+export function preferredTheme(
+    media: ThemeMediaResolver | undefined = typeof window !== "undefined" &&
+    typeof window.matchMedia === "function"
+        ? window.matchMedia.bind(window)
+        : undefined,
+): ThemeName {
+    if (!media) {
+        return DEFAULT_THEME;
+    }
+    try {
+        if (media("(prefers-color-scheme: dark)").matches) {
+            return "dark";
+        }
+        if (media("(prefers-color-scheme: light)").matches) {
+            return "light";
+        }
+    } catch (error) {
+        void error;
+    }
+    return DEFAULT_THEME;
 }
 
 export function applyTheme(
@@ -60,11 +84,15 @@ export function toggleTheme({
 export function resetThemeToDefault({
     root = document.documentElement,
     storage = window.localStorage,
+    media = typeof window !== "undefined" && typeof window.matchMedia === "function"
+        ? window.matchMedia.bind(window)
+        : undefined,
 }: {
     root?: HTMLElement;
     storage?: Storage;
+    media?: ThemeMediaResolver | undefined;
 } = {}): ThemeName {
-    const nextTheme = DEFAULT_THEME;
+    const nextTheme = preferredTheme(media);
     root.dataset.theme = nextTheme;
     try {
         storage.removeItem(THEME_STORAGE_KEY);

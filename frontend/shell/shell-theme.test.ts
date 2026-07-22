@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { wireShellThemeToggle } from "./shell-theme.js";
-import { THEME_STORAGE_KEY } from "../theme.js";
+import { resetThemeToDefault, THEME_STORAGE_KEY } from "../theme.js";
 import type { DomElements } from "../types/dom.js";
 
 function fakeStorage(): Storage {
@@ -80,6 +80,18 @@ describe("wireShellThemeToggle", () => {
         // An explicit choice wins from then on.
         storage.setItem(THEME_STORAGE_KEY, "light");
         mediaCtl.emit(true);
+        expect(root.dataset.theme).toBe("light");
+    });
+
+    it("resets immediately to the OS scheme and resumes following it", () => {
+        const { root, storage, mediaCtl } = setup("light");
+        storage.setItem(THEME_STORAGE_KEY, "light");
+
+        expect(resetThemeToDefault({ root, storage, media: mediaCtl.media })).toBe("dark");
+        expect(root.dataset.theme).toBe("dark");
+        expect(storage.getItem(THEME_STORAGE_KEY)).toBeNull();
+
+        mediaCtl.emit(false);
         expect(root.dataset.theme).toBe("light");
     });
 

@@ -50,6 +50,40 @@ def _encode_compare_run_fragment(config: dict[str, object]) -> str:
 
 
 class SharedUiFlowMixin(SharedUiFlowHelpers):
+    def test_theme_reset_immediately_resumes_following_the_os_scheme(self) -> None:
+        case = self._case()
+        storage_key = str(
+            case.page.evaluate(
+                """() => window.APP_DEFAULTS?.theme?.storage_key ||
+                    'cellular-automaton-theme'"""
+            )
+        )
+        case.page.evaluate("(key) => window.localStorage.removeItem(key)", storage_key)
+
+        case.page.emulate_media(color_scheme="light")
+        self._expect("html").to_have_attribute("data-theme", "light")
+        case.page.emulate_media(color_scheme="dark")
+        self._expect("html").to_have_attribute("data-theme", "dark")
+
+        case.page.click("#theme-toggle-btn")
+        self._expect("html").to_have_attribute("data-theme", "light")
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),
+            "light",
+        )
+
+        self._ensure_drawer_open()
+        case.page.click('.drawer-nav-pill[href="#advanced-section"]')
+        case.page.click("#reset-all-settings-btn")
+        self._expect("html").to_have_attribute("data-theme", "dark")
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),
+            None,
+        )
+
+        case.page.emulate_media(color_scheme="light")
+        self._expect("html").to_have_attribute("data-theme", "light")
+
     def test_rule_picker_updates_rule_ui(self) -> None:
         case = self._case()
         self._expect("#tiling-family-select").to_have_value("square")
