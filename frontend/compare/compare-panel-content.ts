@@ -65,16 +65,7 @@ import {
 import { createFilmstripTransport } from "./compare-transport.js";
 import { paneSessionId, type FocusPaneServices } from "../pane/pane-core.js";
 import type { FocusPaneHandle } from "./compare-focus-pane.js";
-import {
-    deleteSavedCompareRun,
-    deleteSavedTilingSet,
-    listSavedCompareRuns,
-    listSavedTilingSets,
-    saveCompareRun,
-    saveTilingSet,
-    type SavedCompareRun,
-    type SavedTilingSet,
-} from "./compare-storage.js";
+import { createCompareSavedControls } from "./compare-saved-controls.js";
 // `?inline` keeps the stylesheet inside this chunk (not an emitted .css asset)
 // while letting Vite's CSS minifier strip the comments and whitespace.
 import COMPARE_PANEL_STYLES from "./compare-panel.css?inline";
@@ -241,8 +232,6 @@ export function createComparePanelContent(
     const previewCache = new Map<string, Promise<TopologyPreview>>();
     const analysisCache = new Map<string, SeedComparisonResult>();
     const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
-    let editingSavedRunId = "";
-    let editingSavedTilingSetId = "";
     // True while the stage-wide analysis overlay is open; gates the analysis
     // scheduling that used to be tied to the (now removed) analysis config tab.
     let analysisOverlayOpen = false;
@@ -492,64 +481,6 @@ export function createComparePanelContent(
         },
         [dockGlyph("✎"), dockLabel("Edit seed")],
     );
-    const savedRunNameInput = el("input", {
-        class: "compare-field compare-saved-name",
-        type: "text",
-        placeholder: "Run name",
-        "aria-label": "Saved run name",
-    });
-    const savedRunSelect = el("select", {
-        class: "compare-field compare-saved-select",
-        "aria-label": "Saved compare runs",
-    });
-    const saveRunButton = el("button", {
-        class: "compare-mini",
-        type: "button",
-        textContent: "Save run",
-    });
-    const loadRunButton = el("button", {
-        class: "compare-mini",
-        type: "button",
-        textContent: "Load run",
-    });
-    const deleteRunButton = el("button", {
-        class: "compare-mini",
-        type: "button",
-        textContent: "Delete run",
-    });
-    const savedRunHint = el("div", {
-        class: "compare-saved-empty",
-        id: "compare-saved-runs-hint",
-    });
-    const savedTilingSetNameInput = el("input", {
-        class: "compare-field compare-saved-name",
-        type: "text",
-        placeholder: "Tiling set name",
-        "aria-label": "Saved tiling set name",
-    });
-    const savedTilingSetSelect = el("select", {
-        class: "compare-field compare-saved-select",
-        "aria-label": "Saved tiling sets",
-    });
-    const saveTilingSetButton = el("button", {
-        class: "compare-mini",
-        type: "button",
-        textContent: "Save set",
-    });
-    const loadTilingSetButton = el("button", {
-        class: "compare-mini",
-        type: "button",
-        textContent: "Load set",
-    });
-    const deleteTilingSetButton = el("button", {
-        class: "compare-mini",
-        type: "button",
-        textContent: "Delete set",
-    });
-    const savedTilingSetHint = el("div", {
-        class: "compare-saved-empty",
-        id: "compare-saved-tilings-hint",
-    });
     const statusLine = el("div", {
         class: "compare-status",
         role: "status",
@@ -668,6 +599,26 @@ export function createComparePanelContent(
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
     const workspaceStore = createCompareWorkspaceStore(currentRunConfig());
+    const savedControls = createCompareSavedControls({
+        workspaceStore,
+        currentRunConfig,
+        selectedGeometries: () => [...selected],
+        applyRunConfig,
+        applyTilingSet(saved): string {
+            const knownGeometries = new Set(allTilings.map((tiling) => tiling.geometry));
+            const omitted = replaceSelection(
+                new Set(saved.geometries.filter((geometry) => knownGeometries.has(geometry))),
+            );
+            pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
+            renderTilingChecklist();
+            refreshPreview();
+            scheduleWallRerun();
+            return omitted > 0
+                ? `Loaded tiling set "${saved.name}" with ${selected.size} tilings. ${wallCapacityMessage(currentWallCapacity())}`
+                : `Loaded tiling set "${saved.name}".`;
+        },
+        statusElement: statusLine,
+    });
     // Store-derived renders driven by selector subscriptions. Handles are torn
     // down in dispose(). Views that also depend on local UI state (the tiling
     // selection Set, config fields) stay imperatively invoked; only the
@@ -1596,7 +1547,7 @@ export function createComparePanelContent(
     const helpConfigPanel = configPanel("help", [
         el("div", { class: "compare-help" }, comparisonHelpContent()),
     ]);
-    const savedConfigPanel = configPanel("saved", [savedCompareControls()]);
+    const savedConfigPanel = configPanel("saved", [savedControls.element]);
     const configSheet = el(
         "aside",
         {
@@ -1660,7 +1611,7 @@ export function createComparePanelContent(
     ]);
 
     renderTilingChecklist();
-    refreshSavedControls();
+    savedControls.refresh();
 
     // The explainer is purely store-derived: inspected board, the wall result,
     // and the current frame index. Subscribing to exactly that slice means a
@@ -1875,59 +1826,6 @@ export function createComparePanelContent(
                     presetButton("None", "none"),
                 ]),
             ]),
-        ]);
-    }
-
-    function savedCompareControls(): HTMLElement {
-        saveRunButton.addEventListener("click", saveCurrentRun);
-        loadRunButton.addEventListener("click", () => void loadSelectedRun());
-        deleteRunButton.addEventListener("click", deleteSelectedRun);
-        saveTilingSetButton.addEventListener("click", saveCurrentTilingSet);
-        loadTilingSetButton.addEventListener("click", loadSelectedTilingSet);
-        deleteTilingSetButton.addEventListener("click", deleteSelectedTilingSet);
-
-        return el("div", { class: "compare-saved" }, [
-            el(
-                "section",
-                { class: "compare-saved-section", "aria-labelledby": "compare-saved-runs-title" },
-                [
-                    el("h3", {
-                        class: "compare-saved-title",
-                        id: "compare-saved-runs-title",
-                        textContent: "Saved runs",
-                    }),
-                    el("div", { class: "compare-saved-row" }, [
-                        savedRunNameInput,
-                        saveRunButton,
-                        savedRunSelect,
-                        loadRunButton,
-                        deleteRunButton,
-                    ]),
-                    savedRunHint,
-                ],
-            ),
-            el(
-                "section",
-                {
-                    class: "compare-saved-section",
-                    "aria-labelledby": "compare-saved-tilings-title",
-                },
-                [
-                    el("h3", {
-                        class: "compare-saved-title",
-                        id: "compare-saved-tilings-title",
-                        textContent: "Saved tiling sets",
-                    }),
-                    el("div", { class: "compare-saved-row" }, [
-                        savedTilingSetNameInput,
-                        saveTilingSetButton,
-                        savedTilingSetSelect,
-                        loadTilingSetButton,
-                        deleteTilingSetButton,
-                    ]),
-                    savedTilingSetHint,
-                ],
-            ),
         ]);
     }
 
@@ -2566,154 +2464,6 @@ export function createComparePanelContent(
         return buildCompareRunUrl(currentRunConfig(), window.location.href);
     }
 
-    function refreshSavedControls(preferredRunId = "", preferredTilingSetId = ""): void {
-        const runs = listSavedCompareRuns();
-        const tilingSets = listSavedTilingSets();
-        workspaceStore.update((state) => ({
-            ...state,
-            saved: { runs, tilingSets },
-        }));
-        populateSavedSelect(savedRunSelect, runs, "No saved runs", preferredRunId);
-        populateSavedSelect(
-            savedTilingSetSelect,
-            tilingSets,
-            "No saved tiling sets",
-            preferredTilingSetId,
-        );
-        const hasRuns = runs.length > 0;
-        const hasTilingSets = tilingSets.length > 0;
-        loadRunButton.disabled = !hasRuns;
-        deleteRunButton.disabled = !hasRuns;
-        loadTilingSetButton.disabled = !hasTilingSets;
-        deleteTilingSetButton.disabled = !hasTilingSets;
-        savedRunHint.textContent = hasRuns
-            ? `${runs.length} saved run${runs.length === 1 ? "" : "s"} available.`
-            : "No saved runs yet. Name the current setup and choose Save run.";
-        savedTilingSetHint.textContent = hasTilingSets
-            ? `${tilingSets.length} saved tiling set${tilingSets.length === 1 ? "" : "s"} available.`
-            : "No saved tiling sets yet. Select tilings, name the set, and choose Save set.";
-    }
-
-    function populateSavedSelect(
-        select: HTMLSelectElement,
-        items: readonly { id: string; name: string }[],
-        emptyLabel: string,
-        preferredId: string,
-    ): void {
-        select.replaceChildren();
-        if (items.length === 0) {
-            select.append(el("option", { value: "", textContent: emptyLabel }));
-            select.disabled = true;
-            return;
-        }
-        select.disabled = false;
-        for (const item of items) {
-            select.append(el("option", { value: item.id, textContent: item.name }));
-        }
-        if (preferredId && [...select.options].some((option) => option.value === preferredId)) {
-            select.value = preferredId;
-        }
-    }
-
-    function saveCurrentRun(): void {
-        try {
-            const replaceId = editingSavedRunId;
-            const saved = saveCompareRun(savedRunNameInput.value, currentRunConfig());
-            if (replaceId && replaceId !== saved.id) {
-                deleteSavedCompareRun(replaceId);
-            }
-            editingSavedRunId = saved.id;
-            savedRunNameInput.value = saved.name;
-            refreshSavedControls(saved.id, savedTilingSetSelect.value);
-            statusLine.textContent = `Saved run "${saved.name}".`;
-        } catch (error) {
-            statusLine.textContent = `Could not save run: ${error instanceof Error ? error.message : String(error)}`;
-        }
-    }
-
-    async function loadSelectedRun(): Promise<void> {
-        const saved = workspaceStore
-            .getState()
-            .saved.runs.find((run) => run.id === savedRunSelect.value);
-        if (!saved) {
-            return;
-        }
-        await applyRunConfig(saved.config);
-        editingSavedRunId = saved.id;
-        savedRunNameInput.value = saved.name;
-        refreshSavedControls(saved.id, savedTilingSetSelect.value);
-    }
-
-    function deleteSelectedRun(): void {
-        const saved = workspaceStore
-            .getState()
-            .saved.runs.find((run) => run.id === savedRunSelect.value);
-        if (!saved) {
-            return;
-        }
-        deleteSavedCompareRun(saved.id);
-        if (editingSavedRunId === saved.id) {
-            editingSavedRunId = "";
-        }
-        refreshSavedControls("", savedTilingSetSelect.value);
-        statusLine.textContent = `Deleted run "${saved.name}".`;
-    }
-
-    function saveCurrentTilingSet(): void {
-        try {
-            const replaceId = editingSavedTilingSetId;
-            const saved = saveTilingSet(savedTilingSetNameInput.value, [...selected]);
-            if (replaceId && replaceId !== saved.id) {
-                deleteSavedTilingSet(replaceId);
-            }
-            editingSavedTilingSetId = saved.id;
-            savedTilingSetNameInput.value = saved.name;
-            refreshSavedControls(savedRunSelect.value, saved.id);
-            statusLine.textContent = `Saved tiling set "${saved.name}".`;
-        } catch (error) {
-            statusLine.textContent = `Could not save tiling set: ${error instanceof Error ? error.message : String(error)}`;
-        }
-    }
-
-    function loadSelectedTilingSet(): void {
-        const saved = workspaceStore
-            .getState()
-            .saved.tilingSets.find((set) => set.id === savedTilingSetSelect.value);
-        if (!saved) {
-            return;
-        }
-        const knownGeometries = new Set(allTilings.map((tiling) => tiling.geometry));
-        const omitted = replaceSelection(
-            new Set(saved.geometries.filter((geometry) => knownGeometries.has(geometry))),
-        );
-        pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
-        renderTilingChecklist();
-        refreshPreview();
-        editingSavedTilingSetId = saved.id;
-        savedTilingSetNameInput.value = saved.name;
-        refreshSavedControls(savedRunSelect.value, saved.id);
-        statusLine.textContent =
-            omitted > 0
-                ? `Loaded tiling set "${saved.name}" with ${selected.size} tilings. ${wallCapacityMessage(currentWallCapacity())}`
-                : `Loaded tiling set "${saved.name}".`;
-        scheduleWallRerun();
-    }
-
-    function deleteSelectedTilingSet(): void {
-        const saved = workspaceStore
-            .getState()
-            .saved.tilingSets.find((set) => set.id === savedTilingSetSelect.value);
-        if (!saved) {
-            return;
-        }
-        deleteSavedTilingSet(saved.id);
-        if (editingSavedTilingSetId === saved.id) {
-            editingSavedTilingSetId = "";
-        }
-        refreshSavedControls(savedRunSelect.value);
-        statusLine.textContent = `Deleted tiling set "${saved.name}".`;
-    }
-
     async function ensureRules(): Promise<void> {
         if (rulesLoaded) {
             return;
@@ -2771,7 +2521,7 @@ export function createComparePanelContent(
         // subscription; the browser paints only the settled DOM either way.
         if (!next) {
             renderTilingChecklist();
-            refreshSavedControls(savedRunSelect.value, savedTilingSetSelect.value);
+            savedControls.refresh();
             syncShapeMode();
             window.requestAnimationFrame(() => focusTilingSearchIfOpen());
         }
