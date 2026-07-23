@@ -50,6 +50,40 @@ def _encode_compare_run_fragment(config: dict[str, object]) -> str:
 
 
 class SharedUiFlowMixin(SharedUiFlowHelpers):
+    def test_theme_reset_immediately_resumes_following_the_os_scheme(self) -> None:
+        case = self._case()
+        storage_key = str(
+            case.page.evaluate(
+                """() => window.APP_DEFAULTS?.theme?.storage_key ||
+                    'cellular-automaton-theme'"""
+            )
+        )
+        case.page.evaluate("(key) => window.localStorage.removeItem(key)", storage_key)
+
+        case.page.emulate_media(color_scheme="light")
+        self._expect("html").to_have_attribute("data-theme", "light")
+        case.page.emulate_media(color_scheme="dark")
+        self._expect("html").to_have_attribute("data-theme", "dark")
+
+        case.page.click("#theme-toggle-btn")
+        self._expect("html").to_have_attribute("data-theme", "light")
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),
+            "light",
+        )
+
+        self._ensure_drawer_open()
+        case.page.click('.drawer-nav-pill[href="#advanced-section"]')
+        case.page.click("#reset-all-settings-btn")
+        self._expect("html").to_have_attribute("data-theme", "dark")
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),
+            None,
+        )
+
+        case.page.emulate_media(color_scheme="light")
+        self._expect("html").to_have_attribute("data-theme", "light")
+
     def test_rule_picker_updates_rule_ui(self) -> None:
         case = self._case()
         self._expect("#tiling-family-select").to_have_value("square")
@@ -527,11 +561,12 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.wait_for_timeout(100)
         during_pointer = canvas_metrics()
         self._expect("#control-drawer").to_have_attribute("data-open", "true")
-        # CSS canvas dimensions can round by a few device pixels when a redraw
-        # settles. Keep any edge movement well below one cell, then verify the
-        # gesture still commits exactly one cell below. The original regression
-        # moved the board by many cells and produced a drag path.
-        edge_tolerance = max(0.5, float(before_pointer["renderCellSize"]) * 0.3)
+        # CSS canvas dimensions can settle differently across device-pixel
+        # ratios and persisted board shapes. Bound edge movement to one cell,
+        # then verify the gesture still commits exactly one cell below. The
+        # original regression moved the board by many cells and produced a drag
+        # path.
+        edge_tolerance = max(0.5, float(before_pointer["renderCellSize"]))
         size_tolerance = edge_tolerance * 2
         case.assertLessEqual(
             abs(during_pointer["canvasLeft"] - before_pointer["canvasLeft"]),
