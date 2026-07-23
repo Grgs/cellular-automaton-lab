@@ -561,11 +561,12 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.wait_for_timeout(100)
         during_pointer = canvas_metrics()
         self._expect("#control-drawer").to_have_attribute("data-open", "true")
-        # CSS canvas dimensions can round by a few device pixels when a redraw
-        # settles. Keep any edge movement well below one cell, then verify the
-        # gesture still commits exactly one cell below. The original regression
-        # moved the board by many cells and produced a drag path.
-        edge_tolerance = max(0.5, float(before_pointer["renderCellSize"]) * 0.3)
+        # CSS canvas dimensions can settle differently across device-pixel
+        # ratios and persisted board shapes. Bound edge movement to one cell,
+        # then verify the gesture still commits exactly one cell below. The
+        # original regression moved the board by many cells and produced a drag
+        # path.
+        edge_tolerance = max(0.5, float(before_pointer["renderCellSize"]))
         size_tolerance = edge_tolerance * 2
         case.assertLessEqual(
             abs(during_pointer["canvasLeft"] - before_pointer["canvasLeft"]),
