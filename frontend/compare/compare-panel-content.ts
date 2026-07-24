@@ -20,19 +20,12 @@ import type {
     RuleDefinition,
     SeedComparisonResult,
     SeedFilmstripResult,
-    TopologyComparisonResultPayload,
     TopologyFilmstrip,
-    TopologyPreview,
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
 import { buildShareUrl } from "../share-link.js";
 import { element as el } from "./compare-dom.js";
-import {
-    buildComparisonStatePattern,
-    buildFilmstripFramePattern,
-    PATTERN_FORMAT,
-    PATTERN_VERSION,
-} from "./compare-patterns.js";
+import { buildFilmstripFramePattern, PATTERN_FORMAT, PATTERN_VERSION } from "./compare-patterns.js";
 import { buildCompareRunUrl, type CompareRunConfig } from "./compare-run-link.js";
 import {
     comparisonTilingOptions,
@@ -48,13 +41,7 @@ import {
     SEED_SHAPE_OPTIONS,
     TRAVERSAL_OPTIONS,
 } from "./compare-options.js";
-import {
-    buildClassificationGrid,
-    buildPhasePortraitSvg,
-    buildPortraitLegend,
-    familyColor,
-} from "./compare-charts.js";
-import { buildBoardThumbnailSvg } from "./compare-thumbnail.js";
+import { familyColor } from "./compare-charts.js";
 import { createSeedPad } from "./compare-seed-pad.js";
 import { createSeedPreview } from "./compare-seed-preview.js";
 import {
@@ -93,10 +80,7 @@ import { subscribeSelector } from "./compare-workspace-subscriptions.js";
 import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
 import { createCompareWorkspaceLayout } from "./compare-workspace-layout.js";
 import { createCompareOperationCoordinator } from "./compare-operation-coordinator.js";
-
-// Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
-// patches are not offered a thumbnail (the backend would reject them anyway).
-const MAX_PREVIEW_CELLS = 10000;
+import { createCompareResultView } from "./compare-result-view.js";
 
 const DEFAULT_SEED = "01100 11000 01000";
 const STYLE_ELEMENT_ID = "compare-panel-styles";
@@ -122,10 +106,6 @@ interface ScheduledAnalysisRun {
 }
 
 type ScheduledCompareRun = ScheduledFilmstripRun | ScheduledAnalysisRun;
-
-function openPatternInTab(pattern: PatternPayload): void {
-    window.open(buildShareUrl(pattern, window.location.href), "_blank", "noopener");
-}
 
 function prefersReducedMotion(): boolean {
     return (
@@ -192,12 +172,6 @@ export interface ComparePanelContentHandle {
 type TilingPreset = "representative" | "regular" | "mixed" | "aperiodic" | "all" | "none";
 type ConfigTab = "setup" | "tilings" | "help" | "saved";
 
-interface ActionMenuItem {
-    label: string;
-    title: string;
-    onClick(): void;
-}
-
 export function ensureComparePanelStyles(): void {
     if (document.getElementById(STYLE_ELEMENT_ID)) {
         return;
@@ -221,7 +195,6 @@ export function createComparePanelContent(
     let disposed = false;
     let tilingSearchQuery = "";
     let activeConfigTab: ConfigTab = "setup";
-    const previewCache = new Map<string, Promise<TopologyPreview>>();
     const analysisCache = new Map<string, SeedComparisonResult>();
     const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
     // True while the stage-wide analysis overlay is open; gates the analysis
@@ -307,13 +280,16 @@ export function createComparePanelContent(
             clampNumber(gridInput.value, MIN_COMPARE_GRID_SIZE, MAX_COMPARE_GRID_SIZE, 16),
         getPattern: () => shapeSelect.value,
         getPreviewHref: ({ cellsById, preview }) =>
-            patternShareUrl({
-                format: PATTERN_FORMAT,
-                version: PATTERN_VERSION,
-                topology_spec: preview.topology_spec,
-                rule: selectedRuleName(),
-                cells_by_id: cellsById,
-            }),
+            buildShareUrl(
+                {
+                    format: PATTERN_FORMAT,
+                    version: PATTERN_VERSION,
+                    topology_spec: preview.topology_spec,
+                    rule: selectedRuleName(),
+                    cells_by_id: cellsById,
+                },
+                location.href,
+            ),
         getTilings: () =>
             allTilings
                 .filter((tiling) => selected.has(tiling.geometry))
@@ -588,7 +564,17 @@ export function createComparePanelContent(
             }));
         },
     });
-    const resultsArea = el("div", { class: "compare-results" });
+    const tilingLabels = new Map(allTilings.map((tiling) => [tiling.geometry, tiling.label]));
+    const [resultsArea, renderResults, openResultPattern, closeResultMenu, disposeResultView] =
+        createCompareResultView(
+            options.backend,
+            tilingLabels,
+            liveColorForRule,
+            highlightGeometry,
+            statusLine,
+            options.onOpenPattern,
+            options.onRequestClose,
+        );
     let filmstripView: FilmstripViewController | null = null;
     const workspaceStore = createCompareWorkspaceStore(currentRunConfig());
     const operationCoordinator = createCompareOperationCoordinator({
@@ -1159,7 +1145,7 @@ export function createComparePanelContent(
         // Standalone (no server session): fork into the Lab instead of in
         // place, folding the paint into the pattern so it isn't dropped.
         if (!services?.baseSessionId) {
-            openPattern(
+            void openResultPattern(
                 initialPaint
                     ? {
                           ...pattern,
@@ -1263,7 +1249,7 @@ export function createComparePanelContent(
             statusLine.textContent = "This generation cannot be opened in the Lab.";
             return;
         }
-        openPattern(pattern);
+        void openResultPattern(pattern);
     }
 
     function showStageHero(): void {
@@ -2302,6 +2288,14 @@ export function createComparePanelContent(
         return rules.find((rule) => rule.name === ruleName) ?? null;
     }
 
+    function liveColorForRule(ruleName: string): (state: number) => string {
+        const colorByValue = new Map<number, string>();
+        for (const definition of ruleByName(ruleName)?.states ?? []) {
+            colorByValue.set(definition.value, definition.color);
+        }
+        return (state) => colorByValue.get(state) ?? "var(--compare-live, var(--live, #2dd4bf))";
+    }
+
     function tilingCompatibleWithRule(
         rule: RuleDefinition | null | undefined,
         option: TilingOption,
@@ -2364,10 +2358,6 @@ export function createComparePanelContent(
         if (changed) {
             refreshPreview();
         }
-    }
-
-    function patternShareUrl(pattern: PatternPayload): string {
-        return buildShareUrl(pattern, window.location.href);
     }
 
     function integerRangeProblem(
@@ -2880,292 +2870,6 @@ export function createComparePanelContent(
         return workspaceScheduler.runNow(scheduledFilmstripRun(playback, runOptions));
     }
 
-    function renderResults(comparison: Parameters<typeof buildPhasePortraitSvg>[0]): void {
-        resultsArea.replaceChildren();
-        if (comparison.degenerate) {
-            resultsArea.append(
-                el("div", {
-                    class: "compare-warning",
-                    textContent:
-                        "This seed extincts quickly on most selected tilings — not a meaningful comparison. Try a larger seed, different rule, or more steps.",
-                }),
-            );
-        }
-        const tilingLabels = new Map(allTilings.map((tiling) => [tiling.geometry, tiling.label]));
-        const legend = buildPortraitLegend(comparison);
-        resultsArea.append(
-            el("div", {
-                class: "compare-section-title",
-                textContent: "Phase portrait — live(t) / live(0)",
-            }),
-            buildPhasePortraitSvg(comparison),
-            ...(legend ? [legend] : []),
-            el("div", { class: "compare-section-title", textContent: "End-state classification" }),
-            el("div", { class: "compare-grid-scroll" }, [
-                buildClassificationGrid(comparison, {
-                    onRowHover: highlightGeometry,
-                    renderRowActions: (result) => renderRowActions(comparison, result),
-                    labelForGeometry: (geometry) => tilingLabels.get(geometry),
-                }),
-            ]),
-        );
-    }
-
-    async function openPattern(pattern: PatternPayload): Promise<void> {
-        if (options.onOpenPattern) {
-            await options.onOpenPattern(pattern);
-            options.onRequestClose?.();
-            return;
-        }
-        openPatternInTab(pattern);
-    }
-
-    function renderRowActions(
-        comparison: SeedComparisonResult,
-        result: TopologyComparisonResultPayload,
-    ): Node | null {
-        const begin = buildComparisonStatePattern(comparison, result, "begin");
-        if (!begin) {
-            return null;
-        }
-        const end = buildComparisonStatePattern(comparison, result, "end");
-        const wrap = el("div", { class: "compare-row-actions" });
-        const inPlace = options.onOpenPattern;
-        const beginTitle = inPlace
-            ? "Load the seed on this tiling into the board"
-            : "Open the seed on this tiling in a new tab";
-        const openItems: ActionMenuItem[] = [
-            {
-                label: "Begin",
-                title: beginTitle,
-                onClick: () => void openPattern(begin),
-            },
-        ];
-        if (end) {
-            const endTitle = inPlace
-                ? "Load the final state on this tiling into the board"
-                : "Open the final state on this tiling in a new tab";
-            openItems.push({
-                label: "End",
-                title: endTitle,
-                onClick: () => void openPattern(end),
-            });
-        }
-        wrap.append(actionMenu("Open", "Open state", openItems));
-        if (end) {
-            // Symmetric with the open buttons: a shareable link for either state.
-            wrap.append(
-                actionMenu("Copy", "Copy share link", [
-                    copyLinkMenuItem(begin, "Begin", "Copy a shareable link to the seed state"),
-                    copyLinkMenuItem(end, "End", "Copy a shareable link to the final state"),
-                ]),
-            );
-        } else {
-            wrap.append(
-                actionMenu("Copy", "Copy share link", [
-                    copyLinkMenuItem(begin, "Link", "Copy a shareable link to this state"),
-                ]),
-            );
-        }
-        if (result.topology_spec && result.cell_count > 0) {
-            if (result.cell_count <= MAX_PREVIEW_CELLS) {
-                const previewButton = linkButton("▸ preview", "Show begin/end thumbnails", () =>
-                    togglePreview(comparison, result, previewButton),
-                );
-                wrap.append(previewButton);
-            } else {
-                // Too dense for a useful 132 px thumbnail; say so rather than
-                // silently dropping the preview affordance.
-                wrap.append(
-                    el("span", {
-                        class: "compare-row-note",
-                        textContent: "preview too large",
-                        title: `${result.cell_count.toLocaleString()} cells exceeds the ${MAX_PREVIEW_CELLS.toLocaleString()}-cell preview limit`,
-                    }),
-                );
-            }
-        }
-        return wrap;
-    }
-
-    function previewKey(result: TopologyComparisonResultPayload): string {
-        const spec = result.topology_spec;
-        return `${result.geometry}:${spec?.width}x${spec?.height}:${spec?.patch_depth}`;
-    }
-
-    function fetchPreview(result: TopologyComparisonResultPayload): Promise<TopologyPreview> {
-        const key = previewKey(result);
-        let pending = previewCache.get(key);
-        if (!pending) {
-            const spec = result.topology_spec;
-            pending = options.backend.previewTopology({
-                geometry: result.geometry,
-                width: spec?.width ?? 16,
-                height: spec?.height ?? 16,
-                ...(spec?.patch_depth === undefined ? {} : { patch_depth: spec.patch_depth }),
-            });
-            previewCache.set(key, pending);
-        }
-        return pending;
-    }
-
-    function liveColorForRule(ruleName: string): (state: number) => string {
-        const rule = rules.find((candidate) => candidate.name === ruleName);
-        const colorByValue = new Map<number, string>();
-        for (const definition of rule?.states ?? []) {
-            colorByValue.set(definition.value, definition.color);
-        }
-        return (state) => colorByValue.get(state) ?? "var(--compare-live, var(--live, #2dd4bf))";
-    }
-
-    function thumbnailBlock(
-        label: string,
-        preview: TopologyPreview,
-        cellsById: Record<string, number>,
-        liveColor: (state: number) => string,
-        pattern: PatternPayload | null = null,
-    ): HTMLElement {
-        const thumbnail = buildBoardThumbnailSvg(preview, cellsById, {
-            liveColor,
-            label: `${label} state`,
-        });
-        const media = pattern
-            ? el(
-                  "a",
-                  {
-                      class: "compare-thumb-link",
-                      href: patternShareUrl(pattern),
-                      target: "_blank",
-                      rel: "noopener",
-                      title: `Open ${label.toLowerCase()} state in a new tab`,
-                      "aria-label": `Open ${label.toLowerCase()} state in a new tab`,
-                  },
-                  [thumbnail],
-              )
-            : thumbnail;
-        return el("div", { class: "compare-thumb-block" }, [
-            el("div", { class: "compare-thumb-label", textContent: label }),
-            media,
-        ]);
-    }
-
-    function togglePreview(
-        comparison: SeedComparisonResult,
-        result: TopologyComparisonResultPayload,
-        button: HTMLButtonElement,
-    ): void {
-        const row = button.closest("tr");
-        if (!row) {
-            return;
-        }
-        const sibling = row.nextElementSibling;
-        if (sibling instanceof HTMLElement && sibling.classList.contains("compare-detail")) {
-            sibling.remove();
-            button.textContent = "▸ preview";
-            return;
-        }
-        button.textContent = "▾ preview";
-        const cell = el("td", { class: "compare-detail-cell" });
-        cell.colSpan = row.children.length;
-        cell.append(el("div", { class: "compare-detail-status", textContent: "Loading preview…" }));
-        const detail = el("tr", { class: "compare-detail" }, [cell]);
-        row.after(detail);
-        void renderPreviewInto(comparison, result, cell);
-    }
-
-    async function renderPreviewInto(
-        comparison: SeedComparisonResult,
-        result: TopologyComparisonResultPayload,
-        cell: HTMLTableCellElement,
-    ): Promise<void> {
-        try {
-            const preview = await fetchPreview(result);
-            const liveColor = liveColorForRule(comparison.rule_name);
-            cell.replaceChildren(
-                el("div", { class: "compare-detail-grid" }, [
-                    thumbnailBlock(
-                        "Begin",
-                        preview,
-                        result.initial_cells_by_id ?? {},
-                        liveColor,
-                        buildComparisonStatePattern(comparison, result, "begin"),
-                    ),
-                    thumbnailBlock(
-                        "End",
-                        preview,
-                        result.final_cells_by_id ?? {},
-                        liveColor,
-                        buildComparisonStatePattern(comparison, result, "end"),
-                    ),
-                ]),
-            );
-        } catch (error) {
-            cell.replaceChildren(
-                el("div", {
-                    class: "compare-detail-status",
-                    textContent: `Preview failed: ${error instanceof Error ? error.message : String(error)}`,
-                }),
-            );
-        }
-    }
-
-    function linkButton(label: string, title: string, onClick: () => void): HTMLButtonElement {
-        const button = el("button", { class: "compare-link", type: "button", title }, [label]);
-        button.addEventListener("click", onClick);
-        return button;
-    }
-
-    function actionMenu(label: string, title: string, items: ActionMenuItem[]): HTMLElement {
-        const details = el("details", { class: "compare-action-menu" });
-        const summary = el("summary", { class: "compare-link", title, textContent: label });
-        const panel = el(
-            "div",
-            { class: "compare-action-menu-panel" },
-            items.map((item) => {
-                const button = el("button", {
-                    class: "compare-action-menu-item",
-                    type: "button",
-                    title: item.title,
-                    textContent: item.label,
-                });
-                button.addEventListener("click", () => {
-                    details.removeAttribute("open");
-                    item.onClick();
-                });
-                return button;
-            }),
-        );
-        details.append(summary, panel);
-        return details;
-    }
-
-    function copyLinkMenuItem(
-        pattern: PatternPayload,
-        label: string,
-        title: string,
-    ): ActionMenuItem {
-        return {
-            label,
-            title,
-            onClick: () => copyPatternLink(pattern, label),
-        };
-    }
-
-    function copyPatternLink(pattern: PatternPayload, copiedLabel: string): void {
-        const url = patternShareUrl(pattern);
-        const clipboard = navigator.clipboard;
-        if (!clipboard) {
-            window.prompt("Copy this share link:", url);
-            return;
-        }
-        void clipboard.writeText(url).then(
-            () => {
-                statusLine.textContent = `Copied ${copiedLabel.toLowerCase()} share link.`;
-            },
-            () => window.prompt("Copy this share link:", url),
-        );
-    }
-
     function copyRunLink(): void {
         const url = compareRunUrl();
         const clipboard = navigator.clipboard;
@@ -3179,17 +2883,6 @@ export function createComparePanelContent(
             },
             () => window.prompt("Copy this run link:", url),
         );
-    }
-
-    // Native <details> menus stay open until re-clicked; close any open one when
-    // the click lands outside it so only one menu is ever open at a time.
-    function onDocumentPointerDown(event: Event): void {
-        const target = event.target;
-        for (const menu of root.querySelectorAll(".compare-action-menu[open]")) {
-            if (!(target instanceof Node) || !menu.contains(target)) {
-                menu.removeAttribute("open");
-            }
-        }
     }
 
     // Back/forward (or an external hash edit) re-applies the focused board.
@@ -3352,7 +3045,6 @@ export function createComparePanelContent(
     tilingsButton.addEventListener("click", openTilingsSheet);
     configSheetCloseButton.addEventListener("click", workspaceLayout.closeSetup);
     inspectorCloseButton.addEventListener("click", workspaceLayout.closeInspector);
-    document.addEventListener("pointerdown", onDocumentPointerDown);
     window.addEventListener("hashchange", onHashChangeFocus);
     const onWallCapacityChange = (): void => {
         renderTilingChecklist();
@@ -3371,7 +3063,7 @@ export function createComparePanelContent(
             filmstripTransport.pause();
             disposeAllForkedBoards();
             closeAnalysisOverlayIfOpen({ restoreFocus: false });
-            root.querySelector(".compare-action-menu[open]")?.removeAttribute("open");
+            closeResultMenu();
         },
         applyRunConfig,
         runFeaturedDemo,
@@ -3383,9 +3075,7 @@ export function createComparePanelContent(
             if (filmstripView?.closeTilingPicker()) {
                 return true;
             }
-            const openMenu = root.querySelector(".compare-action-menu[open]");
-            if (openMenu) {
-                openMenu.removeAttribute("open");
+            if (closeResultMenu()) {
                 return true;
             }
             // Peel the analysis overlay before the config sheet / speaker view.
@@ -3434,12 +3124,12 @@ export function createComparePanelContent(
             operationCoordinator.dispose();
             workspaceScheduler.dispose();
             workspaceLayout.dispose();
-            document.removeEventListener("pointerdown", onDocumentPointerDown);
             window.removeEventListener("hashchange", onHashChangeFocus);
             window.removeEventListener("resize", onWallCapacityChange);
             disposeAllForkedBoards();
             seedPad.dispose();
             seedPreview.dispose();
+            disposeResultView();
             filmstripView?.dispose();
         },
     };
