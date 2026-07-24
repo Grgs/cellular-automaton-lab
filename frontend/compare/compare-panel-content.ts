@@ -81,6 +81,7 @@ import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
 import { createCompareWorkspaceLayout } from "./compare-workspace-layout.js";
 import { createCompareOperationCoordinator } from "./compare-operation-coordinator.js";
 import { createCompareResultView } from "./compare-result-view.js";
+import { createCompareFilmstripPresentation } from "./compare-filmstrip-presentation.js";
 
 const DEFAULT_SEED = "01100 11000 01000";
 const STYLE_ELEMENT_ID = "compare-panel-styles";
@@ -494,38 +495,6 @@ export function createComparePanelContent(
             setupRunButton,
         ],
     );
-    const stageHero = el("div", { class: "compare-stage-hero" }, [
-        el("div", { class: "compare-stage-hero-glyph", "aria-hidden": "true", textContent: "▦" }),
-        el("div", {
-            class: "compare-stage-hero-title",
-            textContent: "Watch one seed evolve across every tiling",
-        }),
-        el("p", {
-            class: "compare-stage-hero-blurb",
-            textContent: "Pick a rule and tilings, then run every board on one shared clock.",
-        }),
-    ]);
-    const wallLoadingOverlay = el(
-        "div",
-        {
-            class: "compare-wall-loading",
-            role: "status",
-            "aria-live": "polite",
-            hidden: true,
-        },
-        [
-            el("span", {
-                class: "compare-wall-loading-text",
-                textContent: "Building comparison...",
-            }),
-            el("div", { class: "compare-wall-loading-grid", "aria-hidden": "true" }, [
-                el("span", { class: "compare-wall-loading-card" }),
-                el("span", { class: "compare-wall-loading-card" }),
-                el("span", { class: "compare-wall-loading-card" }),
-                el("span", { class: "compare-wall-loading-card" }),
-            ]),
-        ],
-    );
     const retryWallUpdateButton = el("button", {
         class: "compare-mini compare-stale-retry",
         type: "button",
@@ -541,17 +510,6 @@ export function createComparePanelContent(
         },
         [staleResultNoticeMessage, retryWallUpdateButton],
     );
-    // Names the run that is playing (seed · rule · N tilings) so the wall isn't
-    // an unlabelled animation; hidden on the empty-state hero.
-    const stageCaption = el("div", {
-        class: "compare-stage-caption",
-        hidden: true,
-    });
-    const filmstripArea = el("div", { class: "compare-filmstrip-area" }, [
-        stageCaption,
-        stageHero,
-        wallLoadingOverlay,
-    ]);
     // The dock's play button doubles as "Run comparison" before any run is
     // attached, so the transport owns the primary action rather than a separate
     // button sitting beside it.
@@ -585,6 +543,8 @@ export function createComparePanelContent(
             setRunning(busy);
         },
     });
+    const [filmstripArea, loadFilmstrip, showStageHero, updateStageCaption, setWallLoading] =
+        createCompareFilmstripPresentation(createWallView, shapeSelect, ruleSelect);
     const savedControls = createCompareSavedControls({
         workspaceStore,
         currentRunConfig,
@@ -1252,68 +1212,12 @@ export function createComparePanelContent(
         void openResultPattern(pattern);
     }
 
-    function showStageHero(): void {
-        stageHero.hidden = false;
-        stageCaption.hidden = true;
-        if (filmstripView) {
-            filmstripView.element.hidden = true;
-        }
-    }
-
-    function showStageBoards(): void {
-        stageHero.hidden = true;
-        stageCaption.hidden = stageCaption.textContent === "";
-        if (filmstripView) {
-            filmstripView.element.hidden = false;
-        }
-    }
-
-    function optionLabel(select: HTMLSelectElement, value: string): string {
-        return [...select.options].find((option) => option.value === value)?.textContent ?? "";
-    }
-
-    /** Drop a "Category: " prefix so the caption reads "R-pentomino", not "Shape: R-pentomino". */
-    function conciseLabel(label: string): string {
-        const separator = label.indexOf(": ");
-        return separator >= 0 ? label.slice(separator + 2) : label;
-    }
-
-    function updateStageCaption(runConfig: CompareRunConfig): void {
-        const seedLabel = runConfig.pattern
-            ? conciseLabel(optionLabel(shapeSelect, runConfig.pattern)) || runConfig.pattern
-            : "Custom seed";
-        const ruleLabel = conciseLabel(optionLabel(ruleSelect, runConfig.rule)) || runConfig.rule;
-        const count = runConfig.geometries.length;
-        stageCaption.textContent = `${seedLabel} · ${ruleLabel} · ${count} tiling${
-            count === 1 ? "" : "s"
-        }`;
-        stageCaption.hidden = stageHero.hidden === false;
-    }
-
-    /**
-     * The bottom status reflects whether the shared clock is running, so it does
-     * not sit on "Press play" while the demo autoplays. It anchors on "Filmstrip
-     * ready" while paused and names the board count, but the transport owns the
-     * generation counter, so the status no longer restates a (differently
-     * framed) generation count.
-     */
     function filmstripReadyStatus(playing: boolean): string {
         const count = workspaceStore.getState().results.filmstrip?.tilings.length ?? 0;
         const boards = `${count} tiling${count === 1 ? "" : "s"}`;
         return playing
             ? `Playing ${boards} in lockstep.`
             : `Filmstrip ready — ${boards}. Press play.`;
-    }
-
-    function setWallLoading(message: string | null): void {
-        if (message) {
-            wallLoadingOverlay.querySelector(".compare-wall-loading-text")!.textContent = message;
-            wallLoadingOverlay.hidden = false;
-            filmstripArea.classList.add("is-loading");
-            return;
-        }
-        wallLoadingOverlay.hidden = true;
-        filmstripArea.classList.remove("is-loading");
     }
 
     const seedPadBlock = el("div", { class: "compare-seedpad-block" }, [
@@ -2582,7 +2486,7 @@ export function createComparePanelContent(
         renderTilingChecklist();
         refreshPreview();
         resultsArea.replaceChildren();
-        showStageHero();
+        showStageHero(true);
         stageMain.classList.remove("is-speaker");
         workspaceStore.update((state) => ({
             ...state,
@@ -2720,6 +2624,51 @@ export function createComparePanelContent(
         }
     }
 
+    function createWallView(): FilmstripViewController {
+        const view = createFilmstripView({
+            backend: options.backend,
+            transport: filmstripTransport,
+            getLiveColor: () => liveColorForRule(selectedRuleName()),
+            loop: true,
+            onFocusChange: handleFocusChanged,
+            onFrameChange: () => {
+                // Publishing the frame index re-renders the explainer through
+                // its subscription; the summary stays put as the clock ticks.
+                workspaceStore.update((state) => ({
+                    ...state,
+                    playback: {
+                        ...state.playback,
+                        frameIndex: filmstripView?.currentFrameIndex() ?? 0,
+                    },
+                }));
+                noteDetachedForksOnClockMove();
+            },
+            onPaintCell: handlePaintCell,
+            onRemoveBoard: removeBoardFromWall,
+            tilingOptions: wallTilingPickerOptions(allTilings),
+            onReplaceBoard: replaceBoardOnWall,
+            onAddBoard: addBoardToWall,
+            canAddBoard: () => selected.size < currentWallCapacity(),
+            addBoardDisabledReason: () => wallCapacityMessage(currentWallCapacity()),
+            isTilingAvailable: (geometry) =>
+                Boolean(
+                    allTilings.find(
+                        (tiling) =>
+                            tiling.geometry === geometry &&
+                            tilingCompatibleWithSelectedRule(tiling),
+                    ),
+                ),
+        });
+        filmstripView = view;
+        const operation = workspaceStore.getState().operation;
+        view.setManagementBusy(operation.executing);
+        view.setManagementBlocked(
+            operation.wallUpdateFailed ? FAILED_UPDATE_MANAGEMENT_REASON : null,
+        );
+        view.setEditMode(editMode);
+        return view;
+    }
+
     async function performFilmstrip(
         scheduled: ScheduledFilmstripRun,
         signal: AbortSignal,
@@ -2732,7 +2681,7 @@ export function createComparePanelContent(
         disposeAllForkedBoards();
         if (runConfig.geometries.length < MIN_WALL_TILINGS) {
             statusLine.textContent = "Select at least two tilings to run a comparison.";
-            showStageHero();
+            showStageHero(true);
             setWallLoading(null);
             return;
         }
@@ -2782,52 +2731,7 @@ export function createComparePanelContent(
                 results: { ...state.results, filmstrip, filmstripKey: requestKey },
                 playback: { frameIndex: 0, playing: false },
             }));
-            if (!filmstripView) {
-                filmstripView = createFilmstripView({
-                    backend: options.backend,
-                    transport: filmstripTransport,
-                    getLiveColor: () => liveColorForRule(selectedRuleName()),
-                    loop: true,
-                    onFocusChange: handleFocusChanged,
-                    onFrameChange: () => {
-                        // Publishing the frame index re-renders the explainer
-                        // through its subscription; the summary selector omits
-                        // the frame index, so it stays put as the clock ticks.
-                        workspaceStore.update((state) => ({
-                            ...state,
-                            playback: {
-                                ...state.playback,
-                                frameIndex: filmstripView?.currentFrameIndex() ?? 0,
-                            },
-                        }));
-                        noteDetachedForksOnClockMove();
-                    },
-                    onPaintCell: handlePaintCell,
-                    onRemoveBoard: removeBoardFromWall,
-                    tilingOptions: wallTilingPickerOptions(allTilings),
-                    onReplaceBoard: replaceBoardOnWall,
-                    onAddBoard: addBoardToWall,
-                    canAddBoard: () => selected.size < currentWallCapacity(),
-                    addBoardDisabledReason: () => wallCapacityMessage(currentWallCapacity()),
-                    isTilingAvailable: (geometry) =>
-                        Boolean(
-                            allTilings.find(
-                                (tiling) =>
-                                    tiling.geometry === geometry &&
-                                    tilingCompatibleWithSelectedRule(tiling),
-                            ),
-                        ),
-                });
-                const operation = workspaceStore.getState().operation;
-                filmstripView.setManagementBusy(operation.executing);
-                filmstripView.setManagementBlocked(
-                    operation.wallUpdateFailed ? FAILED_UPDATE_MANAGEMENT_REASON : null,
-                );
-                filmstripView.setEditMode(editMode);
-                filmstripArea.append(filmstripView.element);
-            }
-            showStageBoards();
-            await filmstripView.load(filmstrip, {
+            await loadFilmstrip(filmstrip, {
                 ...(playback ?? {}),
                 ...(hadFilmstrip ? { preserveBoards: true } : {}),
             });
@@ -2851,11 +2755,11 @@ export function createComparePanelContent(
             const message = error instanceof Error ? error.message : String(error);
             statusLine.textContent = `Error: ${message}`;
             if (hadFilmstrip) {
-                showStageBoards();
+                showStageHero(false);
                 reportFailedWallUpdate(message);
             } else {
                 clearFailedWallUpdate();
-                showStageHero();
+                showStageHero(true);
             }
             throw error;
         } finally {
