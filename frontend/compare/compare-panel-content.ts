@@ -92,6 +92,7 @@ import {
 import { subscribeSelector } from "./compare-workspace-subscriptions.js";
 import { createLatestConfigScheduler } from "./latest-config-scheduler.js";
 import { createCompareWorkspaceLayout } from "./compare-workspace-layout.js";
+import { createCompareOperationCoordinator } from "./compare-operation-coordinator.js";
 
 // Matches _MAX_PREVIEW_CELLS in backend/simulation/topology_preview.py; larger
 // patches are not offered a thumbnail (the backend would reject them anyway).
@@ -121,12 +122,6 @@ interface ScheduledAnalysisRun {
 }
 
 type ScheduledCompareRun = ScheduledFilmstripRun | ScheduledAnalysisRun;
-
-interface OperationTicket {
-    id: number;
-    revision: number;
-    kind: "analysis" | "filmstrip";
-}
 
 function openPatternInTab(pattern: PatternPayload): void {
     window.open(buildShareUrl(pattern, window.location.href), "_blank", "noopener");
@@ -224,9 +219,6 @@ export function createComparePanelContent(
     let rules: RuleDefinition[] = [];
     let rulesLoaded = false;
     let disposed = false;
-    let operationSequence = 0;
-    let lifecycleRevision = 0;
-    let activeOperation: OperationTicket | null = null;
     let tilingSearchQuery = "";
     let activeConfigTab: ConfigTab = "setup";
     const previewCache = new Map<string, Promise<TopologyPreview>>();
@@ -599,6 +591,14 @@ export function createComparePanelContent(
     const resultsArea = el("div", { class: "compare-results" });
     let filmstripView: FilmstripViewController | null = null;
     const workspaceStore = createCompareWorkspaceStore(currentRunConfig());
+    const operationCoordinator = createCompareOperationCoordinator({
+        onBusyChange(busy): void {
+            if (!busy) {
+                setWallLoading(null);
+            }
+            setRunning(busy);
+        },
+    });
     const savedControls = createCompareSavedControls({
         workspaceStore,
         currentRunConfig,
@@ -2527,37 +2527,6 @@ export function createComparePanelContent(
         }
     }
 
-    function ownsOperation(ticket: OperationTicket): boolean {
-        return (
-            !disposed && ticket.revision === lifecycleRevision && activeOperation?.id === ticket.id
-        );
-    }
-
-    function beginOperation(kind: OperationTicket["kind"]): OperationTicket {
-        const ticket = { id: ++operationSequence, revision: lifecycleRevision, kind };
-        activeOperation = ticket;
-        setRunning(true);
-        return ticket;
-    }
-
-    function finishOperation(ticket: OperationTicket): void {
-        if (!ownsOperation(ticket)) {
-            return;
-        }
-        activeOperation = null;
-        setWallLoading(null);
-        setRunning(false);
-    }
-
-    function invalidateOperations(): void {
-        lifecycleRevision += 1;
-        activeOperation = null;
-        if (workspaceStore.getState().operation.executing) {
-            setWallLoading(null);
-            setRunning(false);
-        }
-    }
-
     function clearFailedWallUpdate(): void {
         workspaceStore.update((state) => ({
             ...state,
@@ -2593,7 +2562,7 @@ export function createComparePanelContent(
     async function applyRunConfig(config: CompareRunConfig): Promise<void> {
         // A loaded run replaces the entire wall. Older backend work may still
         // settle, but it no longer owns any visible or busy state.
-        invalidateOperations();
+        operationCoordinator.invalidate();
         clearFailedWallUpdate();
         await ensureRules();
         if (disposed) {
@@ -2732,12 +2701,12 @@ export function createComparePanelContent(
             return;
         }
         const { request } = scheduled;
-        const ticket = beginOperation("analysis");
+        const ticket = operationCoordinator.begin("analysis");
         statusLine.textContent = `Updating analysis for ${request.geometries?.length ?? selected.size} tilings…`;
 
         try {
             const comparison = await options.backend.compareSeed(request, { signal });
-            if (signal.aborted || !ownsOperation(ticket)) {
+            if (signal.aborted || !operationCoordinator.owns(ticket)) {
                 return;
             }
             analysisCache.set(scheduled.key, comparison);
@@ -2751,13 +2720,13 @@ export function createComparePanelContent(
                 : `${comparison.seed_bits} bits`;
             statusLine.textContent = `Done — ${comparison.results.length} tilings, ${sourceDesc}.`;
         } catch (error) {
-            if (signal.aborted || !ownsOperation(ticket)) {
+            if (signal.aborted || !operationCoordinator.owns(ticket)) {
                 return;
             }
             statusLine.textContent = `Error: ${error instanceof Error ? error.message : String(error)}`;
             throw error;
         } finally {
-            finishOperation(ticket);
+            operationCoordinator.finish(ticket);
         }
     }
 
@@ -2784,7 +2753,7 @@ export function createComparePanelContent(
         const hadFilmstrip = workspaceStore.getState().results.filmstrip !== null;
         const loadingMessage = hadFilmstrip ? "Updating comparison..." : "Building comparison...";
         const showLoadingOverlay = !runOptions.quietUpdate || !hadFilmstrip;
-        const ticket = beginOperation("filmstrip");
+        const ticket = operationCoordinator.begin("filmstrip");
         statusLine.textContent = `${loadingMessage} ${runConfig.geometries.length} tilings…`;
         if (showLoadingOverlay) {
             setWallLoading(loadingMessage);
@@ -2804,7 +2773,7 @@ export function createComparePanelContent(
 
         try {
             const filmstrip = await options.backend.requestFilmstrip(request, { signal });
-            if (signal.aborted || !ownsOperation(ticket)) {
+            if (signal.aborted || !operationCoordinator.owns(ticket)) {
                 return;
             }
             workspaceStore.update((state) => ({
@@ -2872,7 +2841,7 @@ export function createComparePanelContent(
                 ...(playback ?? {}),
                 ...(hadFilmstrip ? { preserveBoards: true } : {}),
             });
-            if (signal.aborted || !ownsOperation(ticket)) {
+            if (signal.aborted || !operationCoordinator.owns(ticket)) {
                 return;
             }
             // Honour a deep-linked focus (e.g. #/compare&focus=square) now that boards exist.
@@ -2886,7 +2855,7 @@ export function createComparePanelContent(
                 scheduleAnalysis();
             }
         } catch (error) {
-            if (signal.aborted || !ownsOperation(ticket)) {
+            if (signal.aborted || !operationCoordinator.owns(ticket)) {
                 return;
             }
             const message = error instanceof Error ? error.message : String(error);
@@ -2900,7 +2869,7 @@ export function createComparePanelContent(
             }
             throw error;
         } finally {
-            finishOperation(ticket);
+            operationCoordinator.finish(ticket);
         }
     }
 
@@ -3264,9 +3233,7 @@ export function createComparePanelContent(
         }
         const restoreFocus = options.restoreFocus ?? true;
         workspaceScheduler.cancel((scheduled) => scheduled.kind === "analysis");
-        if (activeOperation?.kind === "analysis") {
-            activeOperation = null;
-            setRunning(false);
+        if (operationCoordinator.cancel("analysis")) {
             statusLine.textContent = workspaceStore.getState().results.filmstrip
                 ? filmstripReadyStatus(workspaceStore.getState().playback.playing)
                 : "Analysis cancelled.";
@@ -3464,7 +3431,7 @@ export function createComparePanelContent(
         dispose(): void {
             disposed = true;
             storeRenderSubscriptions.forEach((unsubscribe) => unsubscribe());
-            invalidateOperations();
+            operationCoordinator.dispose();
             workspaceScheduler.dispose();
             workspaceLayout.dispose();
             document.removeEventListener("pointerdown", onDocumentPointerDown);
