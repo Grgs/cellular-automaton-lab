@@ -79,3 +79,32 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     status_parser.set_defaults(
         _run=lambda args: _standalone_build_status(["--format", args.format])
     )
+    _register_plan(subparsers)
+
+
+def _register_plan(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    plan_parser = subparsers.add_parser(
+        "plan",
+        help="Plan focused checks, the local PR gate, and CI-owned checks.",
+        description="Plan read-only validation from changed paths without running checks.",
+    )
+    plan_parser.add_argument("--base", default="origin/main")
+    plan_parser.add_argument("--changed", nargs="+", metavar="PATH")
+    plan_parser.add_argument("--format", choices=("text", "json"), default="text")
+    plan_parser.set_defaults(_run=lambda args: _run_plan(args))
+
+
+def _run_plan(args: argparse.Namespace) -> int:
+    from tools.test_planner import (
+        build_validation_plan,
+        changed_paths_from_base,
+        render_validation_plan,
+    )
+
+    paths = args.changed if args.changed is not None else changed_paths_from_base(args.base)
+    plan = build_validation_plan(paths)
+    if args.format == "json":
+        print(json.dumps(plan.payload(), indent=2))
+    else:
+        print(render_validation_plan(plan))
+    return 0
