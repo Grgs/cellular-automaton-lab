@@ -117,7 +117,8 @@ class ApiCompareTests(ApiTestCase):
         )
         for tiling in tilings:
             self.assertEqual(len(tiling["frames"]), 10)  # synchronized frame counts
-            self.assertTrue(tiling["topology"]["cells"])  # renderable geometry
+            self.assertTrue(tiling["topology_spec"])  # descriptor for the shared preview API
+            self.assertNotIn("topology", tiling)  # do not resend the preview geometry
             self.assertEqual(tiling["topology_spec"]["tiling_family"], tiling["tiling_family"])
 
     def test_filmstrip_does_not_disturb_running_simulation_state(self) -> None:

@@ -53,7 +53,6 @@ function tiling(geometry: string, frames: Record<string, number>[]): TopologyFil
         tiling_family: "square",
         family: "regular",
         cell_count: 4,
-        topology: {} as TopologyFilmstrip["topology"],
         topology_spec: topologySpec(),
         frames,
         extinction_step: null,
