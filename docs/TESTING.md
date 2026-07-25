@@ -32,6 +32,7 @@ The guard stack uses:
 - `detect-secrets` for secret scanning
 - a repo-local privacy scanner for local filesystem paths, consumer email addresses, and consumer cloud-share links
 - a path-gated full-project mypy check for Python and mypy-configuration changes
+- path-gated documentation-link and fresh standalone-bundle checks for the files those checks can validate
 
 Enable the repository-managed hooks with:
 
@@ -51,12 +52,18 @@ python -m pre_commit run --all-files
 python -m pre_commit run --hook-stage pre-push --all-files
 ```
 
-The pre-push stage rebuilds the standalone frontend and enforces its bundle-size
-budget, so a stale `output/standalone/` directory cannot hide a regression. Run
-the same guard directly with `npm run check:bundle-size:fresh`. Raw budgets for
-actively changing frontend categories retain approximately `max(1%, 1 KiB)` of
-headroom; gzip ceilings remain tighter and should only move with an intentional,
-measured bundle change.
+When changed files can affect the standalone artifact, the pre-push stage
+rebuilds the standalone frontend and enforces its bundle-size budget, so a stale
+`output/standalone/` directory cannot hide a regression. Its inputs are the
+packaged backend/configuration Python and JSON, frontend source, staged shell
+assets, and the package, Vite, and standalone-builder configuration that creates
+the artifact. Documentation-link checking likewise runs only for the root,
+`.github/`, and `docs/` Markdown globs used by Linkinator. The full-repository
+privacy and secret scans remain unconditional. Run the standalone guard directly
+with `npm run check:bundle-size:fresh`. Raw budgets for actively changing
+frontend categories retain approximately `max(1%, 1 KiB)` of headroom; gzip
+ceilings remain tighter and should only move with an intentional, measured bundle
+change.
 
 Python type checking runs at both pre-commit and pre-push when the affected paths
 include `app.py`, `pyproject.toml`, or Python files under `backend/`, `tests/`, or

@@ -1,10 +1,23 @@
 from __future__ import annotations
 
 import json
+import re
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def _hook_config(config: str, hook_id: str) -> str:
+    _, hook = config.split(f"      - id: {hook_id}", maxsplit=1)
+    return hook.split("\n      - id:", maxsplit=1)[0]
+
+
+def _hook_files_pattern(hook: str) -> str:
+    match = re.search(r"^        files: (.+)$", hook, flags=re.MULTILINE)
+    if match is None:
+        raise AssertionError("hook is missing a files filter")
+    return match.group(1)
 
 
 class RepoGuardConfigTests(unittest.TestCase):
@@ -20,17 +33,80 @@ class RepoGuardConfigTests(unittest.TestCase):
 
     def test_pre_push_runs_the_fresh_bundle_guard(self) -> None:
         config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
-        _, hook = config.split("      - id: standalone-bundle-budget", maxsplit=1)
-        hook = hook.split("\n      - id:", maxsplit=1)[0]
+        hook = _hook_config(config, "standalone-bundle-budget")
 
         self.assertIn("entry: npm run check:bundle-size:fresh", hook)
         self.assertIn("pass_filenames: false", hook)
         self.assertIn("stages: [pre-push, manual]", hook)
 
+    def test_doc_links_only_run_for_documented_linkinator_globs(self) -> None:
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        self.assertEqual(
+            package["scripts"]["check:doc-links"],
+            'linkinator "*.md" ".github/**/*.md" "docs/**/*.md"',
+        )
+
+        config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
+        pattern = _hook_files_pattern(_hook_config(config, "doc-links"))
+        self.assertEqual(pattern, r"^(?:[^/]+\.md|\.github/.*\.md|docs/.*\.md)$")
+
+        for path in ("README.md", ".github/PULL_REQUEST_TEMPLATE.md", "docs/TESTING.md"):
+            with self.subTest(path=path):
+                self.assertIsNotNone(re.fullmatch(pattern, path))
+        for path in ("examples/README.md", "docs/diagram.svg", "frontend/standalone.ts"):
+            with self.subTest(path=path):
+                self.assertIsNone(re.fullmatch(pattern, path))
+
+    def test_fresh_bundle_guard_only_runs_for_standalone_build_inputs(self) -> None:
+        config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
+        pattern = _hook_files_pattern(_hook_config(config, "standalone-bundle-budget"))
+        self.assertEqual(
+            pattern,
+            r"^(?:(?:backend|config)/.*\.(?:py|json)|frontend/.*|static/(?:css/styles\.css|favicon\.svg)|(?:package(?:-lock)?\.json|vite\.config\.ts|tools/(?:_common|provenance|standalone_build)\.py))$",
+        )
+
+        # Derived from standalone_build.py: its Python bundle, Vite source tree,
+        # staged shell assets, and the builder/configuration helpers it invokes.
+        for path in (
+            "backend/app_shell.py",
+            "config/defaults.json",
+            "frontend/standalone.ts",
+            "frontend/shell/app-shell-body.html",
+            "static/css/styles.css",
+            "static/favicon.svg",
+            "package.json",
+            "package-lock.json",
+            "vite.config.ts",
+            "tools/standalone_build.py",
+            "tools/provenance.py",
+            "tools/_common.py",
+        ):
+            with self.subTest(path=path):
+                self.assertIsNotNone(re.fullmatch(pattern, path))
+        for path in (
+            "README.md",
+            "docs/TESTING.md",
+            "examples/README.md",
+            "static/images/diagram.svg",
+            "tools/check_bundle_size.py",
+            "tools/standalone_bundle_budget.json",
+            "tests/unit/test_repo_guard_config.py",
+        ):
+            with self.subTest(path=path):
+                self.assertIsNone(re.fullmatch(pattern, path))
+
+    def test_full_repository_security_scans_remain_unconditional_at_pre_push(self) -> None:
+        config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
+        for hook_id in ("privacy-guard-push", "detect-secrets-push"):
+            with self.subTest(hook_id=hook_id):
+                hook = _hook_config(config, hook_id)
+                self.assertNotIn("files:", hook)
+                self.assertIn("pass_filenames: false", hook)
+                self.assertIn("stages: [pre-push, manual]", hook)
+
     def test_python_typecheck_runs_for_python_changes_before_commit_and_push(self) -> None:
         config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
-        _, hook = config.split("      - id: python-typecheck", maxsplit=1)
-        hook = hook.split("\n      - id:", maxsplit=1)[0]
+        hook = _hook_config(config, "python-typecheck")
 
         self.assertIn("entry: npm run typecheck:python", hook)
         self.assertIn(
