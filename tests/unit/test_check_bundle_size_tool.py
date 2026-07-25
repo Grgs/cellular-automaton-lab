@@ -11,11 +11,14 @@ try:
     from tools.check_bundle_size import (
         Budget,
         CategoryBudget,
+        CategorySizes,
         TotalBudget,
         Violation,
         _classify,
         _format_bytes,
+        _format_summary,
         _gzip_size,
+        _load_baseline,
         evaluate,
         load_budget,
         main,
@@ -26,11 +29,14 @@ except ModuleNotFoundError:
     from tools.check_bundle_size import (
         Budget,
         CategoryBudget,
+        CategorySizes,
         TotalBudget,
         Violation,
         _classify,
         _format_bytes,
+        _format_summary,
         _gzip_size,
+        _load_baseline,
         evaluate,
         load_budget,
         main,
@@ -92,6 +98,28 @@ class FormatBytesTests(unittest.TestCase):
 
     def test_mebibytes(self) -> None:
         self.assertEqual(_format_bytes(2 * 1024 * 1024), "2.00 MiB")
+
+    def test_summary_reports_raw_and_gzip_deltas_for_categories_and_total(self) -> None:
+        budget = _budget(CategoryBudget("html", ("*.html",), raw=200, gzip=100))
+        sizes = {"html": CategorySizes(name="html", raw_bytes=120, gzip_bytes=60)}
+        total = CategorySizes(name="TOTAL", raw_bytes=120, gzip_bytes=60)
+
+        rendered = _format_summary(
+            sizes,
+            total,
+            budget,
+            uncategorised=[],
+            violations=[],
+            baseline={
+                "html": {"raw_bytes": 100, "gzip_bytes": 50},
+                "TOTAL": {"raw_bytes": 100, "gzip_bytes": 50},
+            },
+        )
+
+        self.assertIn("delta raw", rendered)
+        self.assertIn("delta gzip", rendered)
+        self.assertEqual(rendered.count("+20"), 2)
+        self.assertEqual(rendered.count("+10"), 2)
 
 
 class MeasureAndEvaluateTests(unittest.TestCase):
@@ -191,6 +219,33 @@ class LoadBudgetTests(unittest.TestCase):
             path.write_bytes(b"\xef\xbb\xbf" + payload.encode("utf-8"))
             budget = load_budget(path)
         self.assertEqual(budget.categories[0].name, "h")
+
+
+class BaselineManifestTests(unittest.TestCase):
+    def test_load_baseline_keeps_only_integer_measurements(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "baseline.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "categories": {
+                            "html": {"raw_bytes": 100, "gzip_bytes": 50, "files": []},
+                            "invalid": "not a category",
+                        },
+                        "TOTAL": {"raw_bytes": 100, "gzip_bytes": 50, "file_count": 1},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            baseline = _load_baseline(path)
+
+        self.assertEqual(
+            baseline,
+            {
+                "html": {"raw_bytes": 100, "gzip_bytes": 50},
+                "TOTAL": {"raw_bytes": 100, "gzip_bytes": 50, "file_count": 1},
+            },
+        )
 
 
 class MainEntrypointTests(unittest.TestCase):
@@ -319,6 +374,50 @@ class MainEntrypointTests(unittest.TestCase):
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             self.assertIn("categories", manifest)
             self.assertIn("html", manifest["categories"])
+
+    def test_main_reports_raw_and_gzip_deltas_from_baseline_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "build").mkdir()
+            contents = b"<html/>"
+            (root / "build" / "standalone.html").write_bytes(contents)
+            budget_path = root / "budget.json"
+            budget_path.write_text(
+                json.dumps(
+                    {
+                        "categories": [{"name": "html", "patterns": ["*.html"]}],
+                        "total": {},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            gzip_bytes = _gzip_size(contents)
+            baseline_path = root / "baseline.json"
+            baseline_path.write_text(
+                json.dumps(
+                    {
+                        "categories": {"html": {"raw_bytes": 0, "gzip_bytes": 0}},
+                        "TOTAL": {"raw_bytes": 0, "gzip_bytes": 0},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            buffer = self._silence_stdout()
+            with redirect_stdout(buffer):
+                rc = main(
+                    [
+                        "--build-dir",
+                        str(root / "build"),
+                        "--budget",
+                        str(budget_path),
+                        "--baseline",
+                        str(baseline_path),
+                    ]
+                )
+
+        self.assertEqual(rc, 0)
+        self.assertIn(f"+{len(contents)}", buffer.getvalue())
+        self.assertIn(f"+{gzip_bytes}", buffer.getvalue())
 
     def test_main_returns_two_when_build_dir_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
