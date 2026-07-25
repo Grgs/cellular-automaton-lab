@@ -365,7 +365,6 @@ function optionalFilmstrip(value: unknown, context: string): SeedFilmstripResult
             family: string(tiling.family, context, "filmstrip tiling.family"),
             ...(label === undefined ? {} : { label }),
             cell_count: number(tiling.cell_count, context, "filmstrip tiling.cell_count"),
-            topology: topology(tiling.topology, context),
             topology_spec: topologySpec(tiling.topology_spec, context),
             frames: array(tiling.frames, context, "filmstrip tiling.frames").map((frame) =>
                 numberRecord(frame, context, "filmstrip frame"),

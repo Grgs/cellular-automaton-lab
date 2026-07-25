@@ -1,3 +1,4 @@
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -45,7 +46,7 @@ class SeedFilmstripEngineTests(unittest.TestCase):
             with self.subTest(tiling=tiling.tiling_family):
                 self.assertEqual(len(tiling.frames), 8)
 
-    def test_frame_zero_is_the_seed_and_carries_topology(self) -> None:
+    def test_frame_zero_is_the_seed_and_carries_topology_spec(self) -> None:
         filmstrip = run_seed_filmstrip(
             seed="111",
             rule_name="conway",
@@ -57,8 +58,8 @@ class SeedFilmstripEngineTests(unittest.TestCase):
         # Sparse frames: a cell-id -> state map, zero states omitted.
         self.assertEqual(len(tiling.frames[0]), 3)
         self.assertTrue(all(state != 0 for state in tiling.frames[0].values()))
-        self.assertTrue(tiling.topology["cells"])
         self.assertEqual(tiling.topology_spec["tiling_family"], "square")
+        self.assertNotIn("topology", tiling.to_dict())
         # The friendly catalog label rides along so the client can name the
         # board without re-deriving it from the geometry key.
         self.assertEqual(tiling.label, "Square")
@@ -93,6 +94,17 @@ class SeedFilmstripEngineTests(unittest.TestCase):
             grid_size=8,
         )
         self.assertEqual(first.to_dict(), second.to_dict())
+
+    def test_repository_baseline_payload_stays_below_the_issue_210_target(self) -> None:
+        filmstrip = run_seed_filmstrip(
+            seed="011001100001000",
+            geometries=("square", "hex", "trihexagonal-3-6-3-6"),
+            frame_count=30,
+            grid_size=12,
+        )
+        payload_bytes = len(json.dumps(filmstrip.to_dict(), separators=(",", ":")).encode("utf-8"))
+        legacy_payload_bytes = 165_687
+        self.assertLessEqual(payload_bytes, int(legacy_payload_bytes * 0.7))
 
     def test_frame_count_is_clamped_to_the_maximum(self) -> None:
         filmstrip = run_seed_filmstrip(

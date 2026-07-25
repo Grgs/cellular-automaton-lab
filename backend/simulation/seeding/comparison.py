@@ -403,20 +403,20 @@ def compare_seed(
 class TopologyFilmstrip:
     """Per-generation board states for one tiling, for live side-by-side play.
 
-    ``topology`` is the full geometry payload (cells/vertices) sent once so the
-    client can render the board; ``frames`` is one sparse live-cell map per
-    generation (``frames[0]`` is the seed), all tilings sharing the same frame
-    count so a single client clock keeps them synchronised. ``seed_order`` is
-    the traversal's cell ordering for this board: bit ``i`` of a bit-string
-    seed lands on ``seed_order[i]``, so a client can pull a frame-0 cell edit
-    back to the shared seed without re-deriving the traversal.
+    ``topology_spec`` lets the client request the same cached preview used by
+    the Lab instead of embedding a duplicate full geometry payload. ``frames``
+    is one sparse live-cell map per generation (``frames[0]`` is the seed), all
+    tilings sharing the same frame count so a single client clock keeps them
+    synchronised. ``seed_order`` is the traversal's cell ordering for this
+    board: bit ``i`` of a bit-string seed lands on ``seed_order[i]``, so a
+    client can pull a frame-0 cell edit back to the shared seed without
+    re-deriving the traversal.
     """
 
     geometry: str
     tiling_family: str
     family: str
     cell_count: int
-    topology: dict[str, Any]
     topology_spec: dict[str, Any]
     frames: list[dict[str, int]]
     extinction_step: int | None
@@ -433,7 +433,6 @@ class TopologyFilmstrip:
             "family": self.family,
             "label": self.label,
             "cell_count": self.cell_count,
-            "topology": self.topology,
             "topology_spec": self.topology_spec,
             "frames": self.frames,
             "extinction_step": self.extinction_step,
@@ -517,7 +516,6 @@ def _run_single_filmstrip(
         family=variant.family,
         label=variant.label,
         cell_count=seeded.frame.cell_count,
-        topology=dict(board.topology.to_dict()),
         topology_spec=dict(
             topology_spec_payload(
                 geometry,
@@ -599,7 +597,6 @@ def run_seed_filmstrip(
                 family=variant.family,
                 label=variant.label,
                 cell_count=0,
-                topology={},
                 topology_spec={},
                 frames=[],
                 extinction_step=None,

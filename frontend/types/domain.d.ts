@@ -252,8 +252,7 @@ export interface TopologyFilmstrip {
      */
     label?: string;
     cell_count: number;
-    /** Full geometry, sent once so the client can render the board. */
-    topology: TopologyPayload;
+    /** Geometry descriptor used to fetch the shared topology preview on demand. */
     topology_spec: TopologySpec;
     /** One sparse live-cell map per generation; frames[0] is the seed. */
     frames: Record<string, number>[];
