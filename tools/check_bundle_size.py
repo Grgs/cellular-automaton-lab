@@ -199,42 +199,54 @@ def _format_summary(
 ) -> str:
     lines: list[str] = []
     lines.append(
-        f"{'category':<22}{'raw':>14}{'gzip':>14}{'budget raw':>14}{'budget gz':>14}{'delta raw':>12}"
+        f"{'category':<22}{'raw':>14}{'gzip':>14}{'budget raw':>14}{'budget gz':>14}"
+        f"{'delta raw':>12}{'delta gzip':>12}"
     )
-    lines.append("-" * 90)
+    lines.append("-" * 102)
     by_name = {c.name: c for c in budget.categories}
     for category in budget.categories:
         info = sizes.get(category.name)
         if info is None:
             continue
         cat_budget = by_name[category.name]
-        delta = ""
+        raw_delta = ""
+        gzip_delta = ""
         if baseline is not None:
-            prior = baseline.get(category.name, {}).get("raw_bytes")
-            if isinstance(prior, int):
-                diff = info.raw_bytes - prior
-                delta = f"{diff:+d}"
+            prior = baseline.get(category.name, {})
+            prior_raw = prior.get("raw_bytes")
+            prior_gzip = prior.get("gzip_bytes")
+            if isinstance(prior_raw, int):
+                raw_delta = f"{info.raw_bytes - prior_raw:+d}"
+            if isinstance(prior_gzip, int):
+                gzip_delta = f"{info.gzip_bytes - prior_gzip:+d}"
         lines.append(
             f"{category.name:<22}"
             f"{_format_bytes(info.raw_bytes):>14}"
             f"{_format_bytes(info.gzip_bytes):>14}"
             f"{(_format_bytes(cat_budget.raw) if cat_budget.raw else '-'):>14}"
             f"{(_format_bytes(cat_budget.gzip) if cat_budget.gzip else '-'):>14}"
-            f"{delta:>12}"
+            f"{raw_delta:>12}"
+            f"{gzip_delta:>12}"
         )
-    lines.append("-" * 90)
-    delta_total = ""
+    lines.append("-" * 102)
+    total_raw_delta = ""
+    total_gzip_delta = ""
     if baseline is not None:
-        prior_total = baseline.get("TOTAL", {}).get("raw_bytes")
-        if isinstance(prior_total, int):
-            delta_total = f"{grand_total.raw_bytes - prior_total:+d}"
+        prior_total = baseline.get("TOTAL", {})
+        prior_total_raw = prior_total.get("raw_bytes")
+        prior_total_gzip = prior_total.get("gzip_bytes")
+        if isinstance(prior_total_raw, int):
+            total_raw_delta = f"{grand_total.raw_bytes - prior_total_raw:+d}"
+        if isinstance(prior_total_gzip, int):
+            total_gzip_delta = f"{grand_total.gzip_bytes - prior_total_gzip:+d}"
     lines.append(
         f"{'TOTAL':<22}"
         f"{_format_bytes(grand_total.raw_bytes):>14}"
         f"{_format_bytes(grand_total.gzip_bytes):>14}"
         f"{(_format_bytes(budget.total.raw) if budget.total.raw else '-'):>14}"
         f"{(_format_bytes(budget.total.gzip) if budget.total.gzip else '-'):>14}"
-        f"{delta_total:>12}"
+        f"{total_raw_delta:>12}"
+        f"{total_gzip_delta:>12}"
     )
 
     if uncategorised:

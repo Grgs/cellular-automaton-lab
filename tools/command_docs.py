@@ -66,10 +66,11 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ("build", "bundle-size"),
         "build",
         "Check standalone bundle budgets and emit optional JSON or text reports.",
-        "Runs the standalone bundle budget gate against `output/standalone/` and supports baseline comparisons for CI/history tracking.",
+        "Runs the standalone bundle budget gate against `output/standalone/` and reports raw and gzip deltas when given a prior JSON manifest.",
         (
             "python -m tools build bundle-size",
             "python -m tools build bundle-size --format json",
+            "python -m tools build bundle-size --baseline output/bundle-size/standalone-bundle-size.txt.json",
         ),
     ),
     CommandDoc(

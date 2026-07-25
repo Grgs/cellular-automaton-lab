@@ -13,6 +13,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
+  actions: read
   contents: read
 
 jobs:
@@ -51,13 +52,53 @@ jobs:
           npm run build:frontend
           npm run build:frontend:standalone
 
+      - name: Download main bundle-size baseline
+        id: bundle-baseline
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          baseline_dir="$RUNNER_TEMP/bundle-size-baseline"
+          baseline_zip="$baseline_dir/main-bundle-size.zip"
+          baseline_manifest="$baseline_dir/standalone-bundle-size.json"
+          mkdir -p "$baseline_dir"
+
+          if ! run_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?branch=main&event=push&status=success&per_page=1" --jq '.workflow_runs[0].id // empty')" || [ -z "$run_id" ]; then
+            echo "::notice::No successful main CI run is available for bundle-size comparison."
+            exit 0
+          fi
+          if ! artifact_id="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/artifacts?name=standalone-bundle-size" --jq '[.artifacts[] | select(.expired == false)] | first | .id // empty')" || [ -z "$artifact_id" ]; then
+            echo "::notice::The latest successful main CI run has no available bundle-size artifact."
+            exit 0
+          fi
+          if ! gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact_id/zip" > "$baseline_zip"; then
+            echo "::notice::Could not download the main bundle-size artifact; continuing without deltas."
+            exit 0
+          fi
+          if ! unzip -p "$baseline_zip" standalone-bundle-size.txt.json > "$baseline_manifest"; then
+            echo "::notice::The main bundle-size artifact did not contain its JSON manifest; continuing without deltas."
+            rm -f "$baseline_manifest"
+          fi
+
       - name: Check standalone bundle size budget
+        env:
+          BASELINE_MANIFEST: ${{ runner.temp }}/bundle-size-baseline/standalone-bundle-size.json
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           mkdir -p output/bundle-size
-          python -m tools build bundle-size \
-            --output output/bundle-size/standalone-bundle-size.txt
+          if [ -f "$BASELINE_MANIFEST" ]; then
+            python -m tools build bundle-size \
+              --baseline "$BASELINE_MANIFEST" \
+              --output output/bundle-size/standalone-bundle-size.txt
+          else
+            if [ "$EVENT_NAME" = "pull_request" ]; then
+              echo "::notice::Bundle-size baseline unavailable or skipped for this pull request; enforcing budgets without deltas."
+            fi
+            python -m tools build bundle-size \
+              --output output/bundle-size/standalone-bundle-size.txt
+          fi
 
-      - name: Upload bundle-size manifest
+      - name: Upload bundle-size reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
