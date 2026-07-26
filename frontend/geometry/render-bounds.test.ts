@@ -230,6 +230,7 @@ describe("geometry/render-bounds", () => {
 
     it("frames newer substitution representative fixtures tightly enough for geometry review", async () => {
         for (const [filename, widthThreshold, heightThreshold] of [
+            ["hat-monotile-depth-3.json", 0.95, 0.95],
             ["spectre-depth-3.json", 0.95, 0.95],
             ["taylor-socolar-depth-3.json", 0.9, 0.9],
             ["sphinx-depth-3.json", 0.9, 0.9],

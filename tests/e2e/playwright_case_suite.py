@@ -62,6 +62,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         case.page.emulate_media(color_scheme="light")
         self._expect("html").to_have_attribute("data-theme", "light")
+
         case.page.emulate_media(color_scheme="dark")
         self._expect("html").to_have_attribute("data-theme", "dark")
 
@@ -83,6 +84,74 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         case.page.emulate_media(color_scheme="light")
         self._expect("html").to_have_attribute("data-theme", "light")
+
+    def test_shell_menu_navigates_and_opens_theme_preferences(self) -> None:
+        case = self._case()
+        storage_key = str(
+            case.page.evaluate(
+                """() => window.APP_DEFAULTS?.theme?.storage_key ||
+                    'cellular-automaton-theme'"""
+            )
+        )
+        case.page.evaluate("(key) => window.localStorage.removeItem(key)", storage_key)
+        case.page.emulate_media(color_scheme="light")
+        self._expect("#shell-workspace-status").to_have_text("Lab editor")
+
+        menu = case.page.locator("#shell-menu")
+        menu_toggle = case.page.get_by_role("button", name="Open app menu")
+        expect(menu_toggle).to_be_visible()
+        menu_toggle.focus()
+        menu_toggle.press("Enter")
+        expect(menu).to_have_attribute("open", "")
+        expect(case.page.get_by_role("button", name="Preferences", exact=True)).to_be_visible()
+        case.page.locator("#shell-menu-compare").press("Enter")
+        case.page.wait_for_function("() => window.location.hash === ''")
+        self._expect(".wall-page").to_be_visible()
+        self._expect("#shell-workspace-status").to_have_text("Compare workspace")
+
+        menu_toggle.click()
+        case.page.click("#shell-menu-lab")
+        case.page.wait_for_function("() => window.location.hash === '#/lab'")
+        self._expect("#grid").to_be_visible()
+
+        case.page.set_viewport_size({"width": 390, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 800])
+        case.assertLessEqual(
+            int(case.page.evaluate("() => document.documentElement.scrollWidth")),
+            390,
+        )
+        menu_toggle.click()
+        case.page.click("#shell-preferences-btn")
+        preferences = case.page.get_by_role("dialog", name="Preferences")
+        expect(preferences).to_be_visible()
+        case.page.click("#shell-preferences-theme-btn")
+        self._expect("html").to_have_attribute("data-theme", "dark")
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),
+            "dark",
+        )
+        case.assertNotEqual(
+            case.page.locator("#shell-header").evaluate(
+                "(node) => getComputedStyle(node).backgroundColor"
+            ),
+            "rgba(0, 0, 0, 0)",
+        )
+        case.page.emulate_media(color_scheme="light")
+        case.page.click("#shell-preferences-system-btn")
+        self._expect("html").to_have_attribute("data-theme", "light")
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),
+            None,
+        )
+        case.page.click("#shell-preferences-close")
+        expect(preferences).not_to_be_visible()
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
 
     def test_rule_picker_updates_rule_ui(self) -> None:
         case = self._case()
@@ -119,6 +188,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect("#tiling-family-select").to_have_value("spectre")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
+        self._expect("#patch-depth-input").to_have_value("4")
         # The one-shell stage is taller than the old top-bar layout, so the
         # fitted patch's bounding box covers slightly less width (~0.949);
         # 0.9 matches the other aperiodic patch cases.
@@ -127,6 +197,15 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             minimum_coverage_width_ratio=0.9,
             minimum_coverage_height_ratio=0.9,
         )
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "false")
+        self._assert_browser_visible_aperiodic_patch(
+            minimum_fill_colors=1,
+            minimum_coverage_width_ratio=0.9,
+            minimum_coverage_height_ratio=0.9,
+        )
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "true")
 
     def test_taylor_socolar_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
@@ -188,7 +267,17 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect("#tiling-family-select").to_have_value("hat-monotile")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
+        self._expect("#patch-depth-input").to_have_value("3")
         self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "false")
+        self._assert_browser_visible_aperiodic_patch(
+            minimum_fill_colors=2,
+            minimum_coverage_width_ratio=0.9,
+            minimum_coverage_height_ratio=0.9,
+        )
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "true")
 
     def test_tuebingen_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()

@@ -5,11 +5,11 @@
         {"name": "bootstrap-data", "patterns": ["standalone-bootstrap.json"], "raw": 90000, "gzip": 13000},
         {"name": "python-bundle", "patterns": ["standalone-python-bundle.json"], "raw": 9500000, "gzip": 3000000},
         {"name": "build-manifest", "patterns": ["build-manifest.json"], "raw": 25000, "gzip": 6000},
-        {"name": "js-runtime", "patterns": ["assets/app-runtime-*.js"], "raw": 306000, "gzip": 83000},
+        {"name": "js-runtime", "patterns": ["assets/app-runtime-*.js"], "raw": 311100, "gzip": 83000},
         {"name": "js-standalone", "patterns": ["assets/standalone-*.js", "assets/standalone-worker-*.js"], "raw": 27800, "gzip": 8500},
         {"name": "tiling-preview", "patterns": ["assets/tiling-preview-data-*.js"], "raw": 90000, "gzip": 27000},
         {"name": "js-async", "patterns": ["assets/*.js"], "raw": 158600, "gzip": 45700},
-        {"name": "css", "patterns": ["assets/*.css"], "raw": 42700, "gzip": 8600},
+        {"name": "css", "patterns": ["assets/*.css"], "raw": 45300, "gzip": 9000},
         {"name": "favicon", "patterns": ["assets/favicon-*"], "raw": 5000},
         {"name": "other", "patterns": ["*"], "raw": 1000}
     ],

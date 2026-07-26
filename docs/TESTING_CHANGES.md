@@ -175,3 +175,15 @@ npm run test:e2e:playwright:standalone
 - Selectors describe stable user-visible controls when browser tests change.
 - Docs for known limitations, release notes, or developer workflows changed with the behavior they describe.
 - The commands run locally are recorded in the final change summary or PR description.
+
+## Validation Planner
+
+Use the read-only planner to map changed paths to focused checks, the one local PR gate, and CI-owned checks. It proposes commands without executing them.
+
+```powershell
+python -m tools test plan --base origin/main
+python -m tools test plan --changed frontend/controls/shell-clicks.ts
+python -m tools test plan --format json
+```
+
+Without `--changed`, the planner combines `BASE...HEAD` with staged, unstaged, and untracked paths.

@@ -13,6 +13,7 @@ import type {
 import { getGeometryAdapter } from "./geometry/registry.js";
 import { installReviewApi } from "./review-api.js";
 import { wireShellThemeToggle } from "./shell/shell-theme.js";
+import { wireShellMenu } from "./shell/shell-menu.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
 
 interface FitRenderCellSizeAdapter {
@@ -36,6 +37,7 @@ function handleAppError(error: unknown): void {
 let activeController: AppController | null = null;
 let disposeReviewApi: (() => void) | null = null;
 let disposeThemeToggle: (() => void) | null = null;
+let disposeShellMenu: (() => void) | null = null;
 let workspaceRouter: WorkspaceRouterHandle | null = null;
 
 export function disposeApp(): void {
@@ -45,6 +47,8 @@ export function disposeApp(): void {
     disposeReviewApi = null;
     disposeThemeToggle?.();
     disposeThemeToggle = null;
+    disposeShellMenu?.();
+    disposeShellMenu = null;
     activeController?.dispose();
     activeController = null;
     window.__appReady = false;
@@ -65,6 +69,10 @@ export async function initApp(options: InitAppOptions = {}): Promise<void> {
     }
     disposeApp();
     disposeThemeToggle = wireShellThemeToggle(elements);
+    disposeShellMenu = wireShellMenu({
+        wallTrigger: elements.wallViewBtn,
+        labTrigger: elements.openLabBtn,
+    });
     const backend = options.backend ?? createHttpSimulationBackend();
     const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
     const paneBaseSessionId = options.paneBaseSessionId ?? window.APP_SESSION_ID ?? null;
