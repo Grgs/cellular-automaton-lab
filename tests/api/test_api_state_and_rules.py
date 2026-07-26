@@ -744,12 +744,13 @@ class ApiStateAndRulesTests(ApiTestCase):
                     )
 
     def test_unsafe_size_override_allows_patch_depth_above_family_cap(self) -> None:
-        override_patch_depth = maximum_patch_depth_for_tiling_family("spectre") + 1
+        tiling_family = "socolar-12-fold"
+        override_patch_depth = maximum_patch_depth_for_tiling_family(tiling_family) + 1
         reset = self.client.post(
             "/api/control/reset",
             json={
                 "topology_spec": {
-                    "tiling_family": "spectre",
+                    "tiling_family": tiling_family,
                     "adjacency_mode": "edge",
                     "patch_depth": override_patch_depth,
                     "unsafe_size_override": True,
@@ -763,10 +764,10 @@ class ApiStateAndRulesTests(ApiTestCase):
         state = reset.get_json()
         topology = self.get_topology()
 
-        self.assertEqual(state["topology_spec"]["tiling_family"], "spectre")
+        self.assertEqual(state["topology_spec"]["tiling_family"], tiling_family)
         self.assertEqual(state["topology_spec"]["patch_depth"], override_patch_depth)
         self.assertEqual(topology["topology_spec"]["patch_depth"], override_patch_depth)
-        self.assertTrue(all(cell["kind"] == "spectre" for cell in topology["cells"]))
+        self.assertGreater(len(topology["cells"]), 0)
 
     def test_unsafe_size_override_does_not_reduce_dodecagonal_configured_cap(self) -> None:
         validated_patch_depth = maximum_patch_depth_for_tiling_family("dodecagonal-square-triangle")

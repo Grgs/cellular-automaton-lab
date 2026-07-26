@@ -30,7 +30,9 @@ export function wireShellMenu({
     labButton = document.getElementById("shell-menu-lab") as HTMLButtonElement | null,
     wallTrigger = document.getElementById("wall-view-btn") as HTMLButtonElement | null,
     labTrigger = document.getElementById("open-lab-btn") as HTMLButtonElement | null,
-    preferencesButton = document.getElementById("shell-preferences-btn") as HTMLButtonElement | null,
+    preferencesButton = document.getElementById(
+        "shell-preferences-btn",
+    ) as HTMLButtonElement | null,
     preferencesDialog = document.getElementById("shell-preferences") as HTMLDialogElement | null,
     preferencesThemeButton = document.getElementById(
         "shell-preferences-theme-btn",

@@ -61,11 +61,13 @@ repos:
         name: documentation links
         entry: npm run check:doc-links
         language: system
+        files: ^(?:[^/]+\.md|\.github/.*\.md|docs/.*\.md)$
         pass_filenames: false
         stages: [pre-push, manual]
       - id: standalone-bundle-budget
         name: standalone bundle budget (fresh build)
         entry: npm run check:bundle-size:fresh
         language: system
+        files: ^(?:(?:backend|config)/.*\.(?:py|json)|frontend/.*|static/(?:css/styles\.css|favicon\.svg)|(?:package(?:-lock)?\.json|vite\.config\.ts|tools/(?:_common|provenance|standalone_build)\.py))$
         pass_filenames: false
         stages: [pre-push, manual]
