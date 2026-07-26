@@ -13,25 +13,6 @@
                 hidden
             ></span>
         </h1>
-        <details id="shell-menu" class="shell-menu">
-            <summary
-                id="shell-menu-toggle"
-                class="shell-menu-toggle"
-                role="button"
-                aria-label="Open app menu"
-                title="Open app menu"
-            >
-                <span class="shell-menu-glyph" aria-hidden="true">☰</span>
-                <span>Menu</span>
-            </summary>
-            <div class="shell-menu-panel" role="group" aria-label="App menu">
-                <span class="shell-menu-heading">Navigate</span>
-                <button id="shell-menu-compare" type="button">Compare</button>
-                <button id="shell-menu-lab" type="button">Lab</button>
-                <span class="shell-menu-heading">App</span>
-                <button id="shell-preferences-btn" type="button">Preferences</button>
-            </div>
-        </details>
         <nav class="shell-route-switcher" aria-label="Workspace">
             <button
                 id="wall-view-btn"
@@ -50,17 +31,34 @@
                 Lab
             </button>
         </nav>
-        <button
-            id="theme-toggle-btn"
-            class="theme-toggle shell-theme-toggle"
-            type="button"
-            aria-label="Switch to dark mode"
-            aria-pressed="false"
-            title="Switch to dark mode"
-        >
-            <span class="theme-toggle-icon theme-icon-sun" aria-hidden="true">☀</span>
-            <span class="theme-toggle-icon theme-icon-moon" aria-hidden="true">☾</span>
-        </button>
+        <div id="shell-menu" class="shell-menu">
+            <button
+                id="shell-menu-toggle"
+                class="shell-menu-toggle"
+                aria-label="Open app menu"
+                aria-expanded="false"
+                aria-controls="shell-menu-panel"
+                title="Open app menu"
+                type="button"
+            >
+                <span class="shell-menu-glyph" aria-hidden="true">☰</span>
+                <span>Menu</span>
+            </button>
+            <div
+                id="shell-menu-panel"
+                class="shell-menu-panel"
+                role="group"
+                aria-label="App menu"
+                hidden
+            >
+                <div class="shell-menu-navigation">
+                    <span class="shell-menu-heading">Navigate</span>
+                    <button id="shell-menu-compare" type="button">Compare</button>
+                    <button id="shell-menu-lab" type="button">Lab</button>
+                </div>
+                <button id="shell-preferences-btn" type="button">Preferences</button>
+            </div>
+        </div>
     </header>
 
     <dialog
@@ -90,13 +88,34 @@
                     Choose how the Lab and Compare workspaces look. Your choice is saved on this
                     device.
                 </p>
-                <div class="shell-preferences-actions">
-                    <button id="shell-preferences-theme-btn" class="soft-action" type="button">
-                        Use dark mode
-                    </button>
-                    <button id="shell-preferences-system-btn" class="soft-action" type="button">
-                        Follow system
-                    </button>
+                <div class="shell-theme-preferences">
+                    <label class="shell-theme-preference">
+                        <input
+                            id="shell-preferences-theme-light"
+                            name="shell-theme-preference"
+                            type="radio"
+                            value="light"
+                        />
+                        <span>Light</span>
+                    </label>
+                    <label class="shell-theme-preference">
+                        <input
+                            id="shell-preferences-theme-dark"
+                            name="shell-theme-preference"
+                            type="radio"
+                            value="dark"
+                        />
+                        <span>Dark</span>
+                    </label>
+                    <label class="shell-theme-preference">
+                        <input
+                            id="shell-preferences-theme-system"
+                            name="shell-theme-preference"
+                            type="radio"
+                            value="system"
+                        />
+                        <span>Follow System</span>
+                    </label>
                 </div>
                 <span
                     id="shell-preferences-status"

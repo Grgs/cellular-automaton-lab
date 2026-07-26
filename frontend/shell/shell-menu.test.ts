@@ -19,17 +19,22 @@ function storage(): Storage {
 
 function setup() {
     document.body.innerHTML = `
-        <details id="shell-menu"><summary>Menu</summary>
-            <button id="shell-menu-compare" type="button">Compare</button>
-            <button id="shell-menu-lab" type="button">Lab</button>
-            <button id="shell-preferences-btn" type="button">Preferences</button>
-        </details>
+        <div id="shell-menu">
+            <button id="shell-menu-toggle" aria-expanded="false">Menu</button>
+            <div id="shell-menu-panel" hidden>
+                <button id="shell-menu-compare" type="button">Compare</button>
+                <button id="shell-menu-lab" type="button">Lab</button>
+                <button id="shell-preferences-btn" type="button">Preferences</button>
+            </div>
+        </div>
+        <button id="outside" type="button">Outside</button>
         <button id="wall-view-btn" type="button">Compare</button>
         <button id="open-lab-btn" type="button">Lab</button>
         <dialog id="shell-preferences">
             <button id="shell-preferences-close" type="button">Close</button>
-            <button id="shell-preferences-theme-btn" type="button"></button>
-            <button id="shell-preferences-system-btn" type="button">System</button>
+            <label><input name="shell-theme-preference" type="radio" value="light">Light</label>
+            <label><input name="shell-theme-preference" type="radio" value="dark">Dark</label>
+            <label><input name="shell-theme-preference" type="radio" value="system">System</label>
             <span id="shell-preferences-status"></span>
         </dialog>
     `;
@@ -46,16 +51,20 @@ function setup() {
         dispose,
         root,
         stored,
-        menu: document.querySelector<HTMLDetailsElement>("#shell-menu")!,
+        menu: document.querySelector<HTMLElement>("#shell-menu")!,
+        menuButton: document.querySelector<HTMLButtonElement>("#shell-menu-toggle")!,
+        menuPanel: document.querySelector<HTMLElement>("#shell-menu-panel")!,
         compare: document.querySelector<HTMLButtonElement>("#shell-menu-compare")!,
         lab: document.querySelector<HTMLButtonElement>("#shell-menu-lab")!,
         preferences: document.querySelector<HTMLButtonElement>("#shell-preferences-btn")!,
         dialog: document.querySelector<HTMLDialogElement>("#shell-preferences")!,
-        theme: document.querySelector<HTMLButtonElement>("#shell-preferences-theme-btn")!,
-        system: document.querySelector<HTMLButtonElement>("#shell-preferences-system-btn")!,
+        inputs: Array.from(
+            document.querySelectorAll<HTMLInputElement>('input[name="shell-theme-preference"]'),
+        ),
         status: document.querySelector<HTMLElement>("#shell-preferences-status")!,
         wallTrigger: document.querySelector<HTMLButtonElement>("#wall-view-btn")!,
         labTrigger: document.querySelector<HTMLButtonElement>("#open-lab-btn")!,
+        outside: document.querySelector<HTMLButtonElement>("#outside")!,
     };
 }
 
@@ -66,31 +75,55 @@ describe("shell menu", () => {
         const view = setup();
         const compareListener = vi.fn();
         view.wallTrigger.addEventListener("click", compareListener);
-        view.menu.open = true;
+        view.menuButton.click();
         view.compare.click();
         expect(compareListener).toHaveBeenCalledTimes(1);
-        expect(view.menu.open).toBe(false);
-        // The native button click is observable through a listener on the trigger.
+        expect(view.menuPanel.hidden).toBe(true);
+
         const labListener = vi.fn();
         view.labTrigger.addEventListener("click", labListener);
-        view.menu.open = true;
+        view.menuButton.click();
         view.lab.click();
         expect(labListener).toHaveBeenCalledTimes(1);
         view.dispose();
     });
 
-    it("opens preferences and changes or resets the persisted theme", () => {
+    it("supports outside click and Escape with focus restoration", () => {
         const view = setup();
+        view.menuButton.focus();
+        view.menuButton.click();
+        expect(view.menuButton.getAttribute("aria-expanded")).toBe("true");
+        expect(view.menuPanel.hidden).toBe(false);
+
+        view.outside.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+        expect(view.menuPanel.hidden).toBe(true);
+
+        view.menuButton.click();
+        view.preferences.focus();
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        expect(view.menuPanel.hidden).toBe(true);
+        expect(document.activeElement).toBe(view.menuButton);
+        view.dispose();
+    });
+
+    it("opens preferences and applies the three theme preferences", () => {
+        const view = setup();
+        view.menuButton.click();
         view.preferences.click();
         expect(view.dialog.open || view.dialog.hidden === false).toBe(true);
-        expect(view.theme.textContent).toBe("Use dark mode");
-        view.theme.click();
+        expect(view.inputs.find((input) => input.value === "system")?.checked).toBe(true);
+
+        const dark = view.inputs.find((input) => input.value === "dark")!;
+        dark.click();
         expect(view.root.dataset.theme).toBe("dark");
         expect(view.stored.getItem(THEME_STORAGE_KEY)).toBe("dark");
-        expect(view.status.textContent).toBe("Currently using dark mode.");
-        view.system.click();
+        expect(view.status.textContent).toBe("Using dark mode.");
+
+        const system = view.inputs.find((input) => input.value === "system")!;
+        system.click();
         expect(view.root.dataset.theme).toBe("dark");
         expect(view.stored.getItem(THEME_STORAGE_KEY)).toBeNull();
+        expect(view.status.textContent).toContain("Following system preference");
         view.dispose();
     });
 });
