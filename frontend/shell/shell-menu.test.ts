@@ -2,6 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { wireShellMenu } from "./shell-menu.js";
 import { THEME_STORAGE_KEY } from "../theme.js";
+import {
+    COMPARE_LAYOUT_RESET_EVENT,
+    COMPARE_LAYOUT_STORAGE_KEY,
+} from "../compare/compare-workspace-layout.js";
 
 function storage(): Storage {
     const values = new Map<string, string>();
@@ -36,16 +40,22 @@ function setup() {
             <label><input name="shell-theme-preference" type="radio" value="dark">Dark</label>
             <label><input name="shell-theme-preference" type="radio" value="system">System</label>
             <span id="shell-preferences-status"></span>
+            <button id="shell-preferences-reset-compare-layout" type="button">
+                Reset Compare layout
+            </button>
+            <span id="shell-preferences-compare-layout-status"></span>
         </dialog>
     `;
     const root = document.createElement("html");
     root.dataset.theme = "light";
     const stored = storage();
+    const compareLayoutEventTarget = new EventTarget();
     const media = () => ({ matches: true }) as MediaQueryList;
     const dispose = wireShellMenu({
         root,
         storage: stored,
         media,
+        compareLayoutEventTarget,
     });
     return {
         dispose,
@@ -62,6 +72,13 @@ function setup() {
             document.querySelectorAll<HTMLInputElement>('input[name="shell-theme-preference"]'),
         ),
         status: document.querySelector<HTMLElement>("#shell-preferences-status")!,
+        compareLayoutReset: document.querySelector<HTMLButtonElement>(
+            "#shell-preferences-reset-compare-layout",
+        )!,
+        compareLayoutStatus: document.querySelector<HTMLElement>(
+            "#shell-preferences-compare-layout-status",
+        )!,
+        compareLayoutEventTarget,
         wallTrigger: document.querySelector<HTMLButtonElement>("#wall-view-btn")!,
         labTrigger: document.querySelector<HTMLButtonElement>("#open-lab-btn")!,
         outside: document.querySelector<HTMLButtonElement>("#outside")!,
@@ -124,6 +141,22 @@ describe("shell menu", () => {
         expect(view.root.dataset.theme).toBe("dark");
         expect(view.stored.getItem(THEME_STORAGE_KEY)).toBeNull();
         expect(view.status.textContent).toContain("Following system preference");
+        view.dispose();
+    });
+
+    it("resets only the Compare layout preference and announces the immediate reset", () => {
+        const view = setup();
+        const resetListener = vi.fn();
+        view.compareLayoutEventTarget.addEventListener(COMPARE_LAYOUT_RESET_EVENT, resetListener);
+        view.stored.setItem(COMPARE_LAYOUT_STORAGE_KEY, '{"setupWidth":340}');
+        view.stored.setItem("saved-runs", "keep");
+
+        view.compareLayoutReset.click();
+
+        expect(view.stored.getItem(COMPARE_LAYOUT_STORAGE_KEY)).toBeNull();
+        expect(view.stored.getItem("saved-runs")).toBe("keep");
+        expect(resetListener).toHaveBeenCalledTimes(1);
+        expect(view.compareLayoutStatus.textContent).toBe("Compare layout reset.");
         view.dispose();
     });
 });

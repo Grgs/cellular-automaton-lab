@@ -4,6 +4,7 @@ import {
     readThemePreference,
     type ThemePreference,
 } from "../theme.js";
+import { resetStoredCompareWorkspaceLayout } from "../compare/compare-workspace-layout.js";
 
 interface ShellMenuOptions {
     menu?: HTMLElement | null;
@@ -17,10 +18,13 @@ interface ShellMenuOptions {
     preferencesDialog?: HTMLDialogElement | null;
     preferencesThemeInputs?: readonly HTMLInputElement[];
     preferencesStatus?: HTMLElement | null;
+    preferencesResetCompareLayoutButton?: HTMLButtonElement | null;
+    preferencesCompareLayoutStatus?: HTMLElement | null;
     preferencesCloseButton?: HTMLButtonElement | null;
     root?: HTMLElement;
     documentNode?: Document;
     storage?: Storage;
+    compareLayoutEventTarget?: EventTarget;
     media?: ((query: string) => MediaQueryList) | undefined;
 }
 
@@ -41,12 +45,19 @@ export function wireShellMenu({
         document.querySelectorAll<HTMLInputElement>('input[name="shell-theme-preference"]'),
     ),
     preferencesStatus = document.getElementById("shell-preferences-status"),
+    preferencesResetCompareLayoutButton = document.getElementById(
+        "shell-preferences-reset-compare-layout",
+    ) as HTMLButtonElement | null,
+    preferencesCompareLayoutStatus = document.getElementById(
+        "shell-preferences-compare-layout-status",
+    ),
     preferencesCloseButton = document.getElementById(
         "shell-preferences-close",
     ) as HTMLButtonElement | null,
     root = document.documentElement,
     documentNode = document,
     storage = window.localStorage,
+    compareLayoutEventTarget = window,
     media = typeof window !== "undefined" ? window.matchMedia?.bind(window) : undefined,
 }: ShellMenuOptions = {}): () => void {
     let menuOpen = false;
@@ -116,6 +127,15 @@ export function wireShellMenu({
         applyThemePreference(input.value as ThemePreference, { root, storage, media });
         syncPreferences();
     };
+    const onResetCompareLayout = (): void => {
+        resetStoredCompareWorkspaceLayout({
+            storage,
+            eventTarget: compareLayoutEventTarget,
+        });
+        if (preferencesCompareLayoutStatus) {
+            preferencesCompareLayoutStatus.textContent = "Compare layout reset.";
+        }
+    };
     const onClose = (): void => closePreferences();
     const onPreferencesClosed = (): void => menuButton?.focus();
     const onDocumentPointerDown = (event: PointerEvent): void => {
@@ -136,6 +156,7 @@ export function wireShellMenu({
     labButton?.addEventListener("click", onLab);
     preferencesButton?.addEventListener("click", onPreferences);
     preferencesThemeInputs.forEach((input) => input.addEventListener("change", onThemePreference));
+    preferencesResetCompareLayoutButton?.addEventListener("click", onResetCompareLayout);
     preferencesCloseButton?.addEventListener("click", onClose);
     preferencesDialog?.addEventListener("close", onPreferencesClosed);
     documentNode.addEventListener("pointerdown", onDocumentPointerDown);
@@ -162,6 +183,7 @@ export function wireShellMenu({
         preferencesThemeInputs.forEach((input) =>
             input.removeEventListener("change", onThemePreference),
         );
+        preferencesResetCompareLayoutButton?.removeEventListener("click", onResetCompareLayout);
         preferencesCloseButton?.removeEventListener("click", onClose);
         preferencesDialog?.removeEventListener("close", onPreferencesClosed);
         documentNode.removeEventListener("pointerdown", onDocumentPointerDown);

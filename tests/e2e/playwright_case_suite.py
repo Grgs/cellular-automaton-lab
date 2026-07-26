@@ -403,6 +403,199 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         ]
         case.assertEqual(unexpected_console, [])
 
+    def test_compare_resizable_layout_persists_resets_and_preserves_narrow_drawers(
+        self,
+    ) -> None:
+        case = self._case()
+        layout_key = "cellular-automaton-lab.compare-layout.v1"
+        case.page.set_viewport_size({"width": 1280, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [1280, 800])
+        case.page.evaluate("(key) => window.localStorage.removeItem(key)", layout_key)
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        setup = case.page.locator(".compare-setup-sidebar")
+        inspector = case.page.locator(".compare-inspector")
+        setup_toggle = case.page.get_by_role("button", name="Configure the run")
+        inspector_toggle = case.page.get_by_role("button", name="Inspect selected board")
+        setup_splitter = case.page.get_by_role("separator", name="Resize Setup panel")
+        inspector_splitter = case.page.get_by_role("separator", name="Resize Inspector panel")
+        expect(setup_splitter).not_to_be_visible()
+        expect(inspector_splitter).not_to_be_visible()
+
+        setup_toggle.click()
+        inspector_toggle.click()
+        expect(setup).to_be_visible()
+        expect(inspector).to_be_visible()
+        expect(setup_splitter).to_be_visible()
+        expect(inspector_splitter).to_be_visible()
+        expect(setup_splitter).to_have_attribute("aria-orientation", "vertical")
+        expect(setup_splitter).to_have_attribute("aria-valuemin", "220")
+        expect(setup_splitter).to_have_attribute("aria-valuemax", "420")
+        expect(setup_splitter).to_have_attribute("aria-valuenow", "250")
+        expect(inspector_splitter).to_have_attribute("aria-valuenow", "270")
+
+        # Exercise a full pointer sequence against the rendered hit target.
+        setup_box = setup_splitter.bounding_box()
+        if setup_box is None:
+            raise AssertionError("Setup splitter rectangle was unavailable")
+        pointer_y = setup_box["y"] + setup_box["height"] / 2
+        pointer_x = setup_box["x"] + setup_box["width"] / 2
+        case.page.mouse.move(pointer_x, pointer_y)
+        case.page.mouse.down()
+        case.page.mouse.move(pointer_x + 60, pointer_y, steps=4)
+        case.page.mouse.up()
+        expect(setup_splitter).to_have_attribute("aria-valuenow", "310")
+
+        # Setup grows rightward; Inspector grows leftward. Shift modifies the
+        # normal 10px step to 40px, while Home/End select truthful limits.
+        setup_splitter.focus()
+        setup_splitter.press("ArrowRight")
+        expect(setup_splitter).to_have_attribute("aria-valuenow", "320")
+        setup_splitter.press("Shift+ArrowLeft")
+        expect(setup_splitter).to_have_attribute("aria-valuenow", "280")
+        setup_splitter.press("Home")
+        expect(setup_splitter).to_have_attribute("aria-valuenow", "220")
+        setup_splitter.press("End")
+        expect(setup_splitter).to_have_attribute("aria-valuenow", "420")
+
+        inspector_splitter.focus()
+        inspector_splitter.press("ArrowLeft")
+        expect(inspector_splitter).to_have_attribute("aria-valuenow", "280")
+        inspector_splitter.press("Shift+ArrowRight")
+        expect(inspector_splitter).to_have_attribute("aria-valuenow", "240")
+        inspector_splitter.press("Home")
+        expect(inspector_splitter).to_have_attribute("aria-valuenow", "240")
+        inspector_splitter.press("End")
+        expect(inspector_splitter).to_have_attribute("aria-valuenow", "440")
+        expect(setup_splitter).to_have_attribute("aria-valuemax", "420")
+
+        wall_width = case.page.locator(".compare-wall-workspace").bounding_box()
+        if wall_width is None:
+            raise AssertionError("Compare wall rectangle was unavailable")
+        case.assertGreaterEqual(wall_width["width"], 400)
+
+        stored_before_reload = case.page.evaluate(
+            "(key) => window.localStorage.getItem(key)", layout_key
+        )
+        if not isinstance(stored_before_reload, str):
+            raise AssertionError(f"invalid stored Compare layout: {stored_before_reload!r}")
+        case.reload_page(wait_until="load")
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [1280, 800])
+        self._expect(".wall-page").to_be_visible()
+        setup = case.page.locator(".compare-setup-sidebar")
+        inspector = case.page.locator(".compare-inspector")
+        setup_splitter = case.page.get_by_role("separator", name="Resize Setup panel")
+        inspector_splitter = case.page.get_by_role("separator", name="Resize Inspector panel")
+        expect(setup).to_be_visible()
+        expect(inspector).to_be_visible()
+        expect(setup_splitter).to_have_attribute("aria-valuenow", "420")
+        expect(inspector_splitter).to_have_attribute("aria-valuenow", "440")
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", layout_key),
+            stored_before_reload,
+        )
+
+        # The splitter states follow both themes and survive the existing
+        # Compare -> Lab -> Compare route round trip.
+        menu_toggle = case.page.get_by_role("button", name="Open app menu")
+        menu_toggle.click()
+        case.page.click("#shell-preferences-btn")
+        preferences = case.page.get_by_role("dialog", name="Preferences")
+        expect(preferences).to_be_visible()
+        case.page.get_by_role("radio", name="Light").check()
+        light_splitter_color = setup_splitter.evaluate(
+            "(node) => getComputedStyle(node).backgroundColor"
+        )
+        case.page.get_by_role("radio", name="Dark").check()
+        dark_splitter_color = setup_splitter.evaluate(
+            "(node) => getComputedStyle(node).backgroundColor"
+        )
+        case.assertNotEqual(light_splitter_color, dark_splitter_color)
+        case.page.click("#shell-preferences-close")
+        case.page.click("#open-lab-btn")
+        case.page.wait_for_function("() => window.location.hash === '#/lab'")
+        self._expect("#grid").to_be_visible()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        expect(setup_splitter).to_have_attribute("aria-valuenow", "420")
+        expect(inspector_splitter).to_have_attribute("aria-valuenow", "440")
+
+        # Global Preferences resets only this layout and applies immediately.
+        menu_toggle.click()
+        case.page.click("#shell-preferences-btn")
+        case.page.get_by_role("button", name="Reset Compare layout").click()
+        self._expect("#shell-preferences-compare-layout-status").to_have_text(
+            "Compare layout reset."
+        )
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", layout_key),
+            None,
+        )
+        expect(setup).not_to_be_visible()
+        expect(inspector).not_to_be_visible()
+        expect(setup_splitter).not_to_be_visible()
+        expect(inspector_splitter).not_to_be_visible()
+        case.page.click("#shell-preferences-close")
+
+        # Store a fresh desktop layout, then prove that narrow overlay activity
+        # is exclusive and does not mutate it.
+        setup_toggle = case.page.get_by_role("button", name="Configure the run")
+        inspector_toggle = case.page.get_by_role("button", name="Inspect selected board")
+        setup_toggle.click()
+        inspector_toggle.click()
+        setup_splitter.press("ArrowRight")
+        inspector_splitter.press("ArrowLeft")
+        desktop_layout = case.page.evaluate("(key) => window.localStorage.getItem(key)", layout_key)
+        if not isinstance(desktop_layout, str):
+            raise AssertionError(f"invalid stored desktop Compare layout: {desktop_layout!r}")
+
+        case.page.set_viewport_size({"width": 390, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 800])
+        expect(setup_splitter).not_to_be_visible()
+        expect(inspector_splitter).not_to_be_visible()
+        expect(setup).not_to_be_visible()
+        expect(inspector).not_to_be_visible()
+
+        setup_toggle.click()
+        expect(setup).to_be_visible()
+        expect(inspector).not_to_be_visible()
+        # The open overlay intentionally blocks pointer input to the dock; use
+        # the keyboard path to exercise the controller's exclusive handoff.
+        inspector_toggle.press("Enter")
+        expect(setup).not_to_be_visible()
+        expect(inspector).to_be_visible()
+        case.page.get_by_role("button", name="Close inspector").click()
+        expect(inspector).not_to_be_visible()
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", layout_key),
+            desktop_layout,
+        )
+        case.assertLessEqual(
+            int(case.page.evaluate("() => document.documentElement.scrollWidth")),
+            390,
+        )
+
+        case.page.set_viewport_size({"width": 1280, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [1280, 800])
+        expect(setup).to_be_visible()
+        expect(inspector).to_be_visible()
+        expect(setup_splitter).to_have_attribute("aria-valuenow", "260")
+        expect(inspector_splitter).to_have_attribute("aria-valuenow", "280")
+        case.assertLessEqual(
+            int(case.page.evaluate("() => document.documentElement.scrollWidth")),
+            1280,
+        )
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
     def test_rule_picker_updates_rule_ui(self) -> None:
         case = self._case()
         self._expect("#tiling-family-select").to_have_value("square")
