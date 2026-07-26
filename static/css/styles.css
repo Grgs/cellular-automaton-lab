@@ -7,6 +7,7 @@
     --muted: #6d756f;
     --accent: #bf5a36;
     --accent-dark: #8a3d20;
+    --focus: #8a3d20;
     --line: rgba(31, 36, 48, 0.12);
     --live: #1f2430;
     --dead: #fdf8ef;
@@ -84,6 +85,7 @@
     --muted: #a1aec5;
     --accent: #d67a4c;
     --accent-dark: #f1a275;
+    --focus: #f1a275;
     --line: rgba(231, 237, 248, 0.12);
     --live: #f2f5ff;
     --dead: #f8f1e5;
@@ -372,12 +374,8 @@ h1.wall-brand {
     list-style: none;
 }
 
-.shell-menu-toggle::-webkit-details-marker {
-    display: none;
-}
-
 .shell-menu-toggle:hover,
-.shell-menu[open] .shell-menu-toggle {
+.shell-menu.is-open .shell-menu-toggle {
     background: var(--btn-soft-hover, rgba(0, 0, 0, 0.1));
 }
 
@@ -389,16 +387,28 @@ h1.wall-brand {
 .shell-menu-panel {
     position: absolute;
     top: calc(100% + 7px);
-    left: 0;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
     z-index: 70;
     display: grid;
-    min-width: 180px;
+    width: max-content;
+    min-width: min(180px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
     gap: 3px;
     padding: 8px;
+    box-sizing: border-box;
     border: 1px solid var(--line);
     border-radius: 12px;
     background: var(--panel-strong);
     box-shadow: var(--shadow);
+}
+
+.shell-menu-panel[hidden] {
+    display: none;
+}
+
+.shell-menu-navigation {
+    display: none;
 }
 
 .shell-menu-heading {
@@ -411,6 +421,7 @@ h1.wall-brand {
 }
 
 .shell-menu-panel button {
+    width: 100%;
     border: 0;
     border-radius: 7px;
     padding: 8px;
@@ -419,6 +430,7 @@ h1.wall-brand {
     cursor: pointer;
     text-align: left;
     font-size: 13px;
+    white-space: nowrap;
 }
 
 .shell-menu-panel button:hover,
@@ -448,7 +460,7 @@ h1.wall-brand {
 
 .shell-preferences-heading,
 .shell-preferences-footer,
-.shell-preferences-actions {
+.shell-theme-preferences {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -493,9 +505,42 @@ h1.wall-brand {
     line-height: 1.45;
 }
 
-.shell-preferences-actions {
+.shell-theme-preferences {
     justify-content: flex-start;
     flex-wrap: wrap;
+}
+
+.shell-theme-preference {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 7px 10px;
+    border: 1px solid var(--btn-soft-line);
+    border-radius: 8px;
+    background: var(--btn-soft-bg);
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.shell-theme-preference:hover {
+    background: var(--btn-soft-hover);
+}
+
+.shell-theme-preference:has(input:checked) {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, var(--panel-strong));
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.shell-theme-preference input {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: var(--accent);
 }
 
 .shell-route-tab {
@@ -2226,21 +2271,6 @@ button.theme-toggle .theme-icon-moon {
     margin: 8px 0;
 }
 
-/* The theme toggle sits in the shared header; a touch smaller than the Lab
-   drawer's floating pill so it fits the slim header row. */
-.shell-theme-toggle.theme-toggle {
-    flex: 0 0 auto;
-    width: 34px;
-    min-width: 34px;
-    height: 34px;
-    box-shadow: none;
-    background-color: var(--btn-soft-bg, rgba(0, 0, 0, 0.05));
-    border-color: var(--btn-soft-line, rgba(0, 0, 0, 0.12));
-}
-.shell-theme-toggle.theme-toggle .theme-toggle-icon {
-    font-size: 1rem;
-}
-
 .rule-description,
 .hint {
     margin: 0;
@@ -2924,10 +2954,18 @@ button.theme-toggle .theme-icon-moon {
     }
 }
 
-@media (max-width: 520px) {
-    /* The menu keeps Compare/Lab navigation discoverable without forcing the
-       compact header to scroll horizontally alongside the theme control. */
+@media (max-width: 719px) {
+    /* Compact headers move primary workspace navigation into the controlled
+       app menu while desktop keeps the segmented switcher always visible. */
     .shell-route-switcher {
         display: none;
+    }
+
+    .shell-menu-navigation {
+        display: grid;
+        gap: 3px;
+        padding-bottom: 4px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid var(--line);
     }
 }

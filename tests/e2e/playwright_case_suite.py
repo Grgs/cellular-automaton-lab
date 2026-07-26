@@ -66,12 +66,15 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.emulate_media(color_scheme="dark")
         self._expect("html").to_have_attribute("data-theme", "dark")
 
-        case.page.click("#theme-toggle-btn")
+        case.page.click("#shell-menu-toggle")
+        case.page.click("#shell-preferences-btn")
+        case.page.get_by_role("radio", name="Light").check()
         self._expect("html").to_have_attribute("data-theme", "light")
         case.assertEqual(
             case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),
             "light",
         )
+        case.page.click("#shell-preferences-close")
 
         self._ensure_drawer_open()
         case.page.click('.drawer-nav-pill[href="#advanced-section"]')
@@ -87,6 +90,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_shell_menu_navigates_and_opens_theme_preferences(self) -> None:
         case = self._case()
+        case.page.set_viewport_size({"width": 1280, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [1280, 800])
         storage_key = str(
             case.page.evaluate(
                 """() => window.APP_DEFAULTS?.theme?.storage_key ||
@@ -96,48 +101,138 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.evaluate("(key) => window.localStorage.removeItem(key)", storage_key)
         case.page.emulate_media(color_scheme="light")
         self._expect("#shell-workspace-status").to_have_text("Lab editor")
+        expect(case.page.locator(".shell-route-switcher")).to_be_visible()
+        self._expect("#open-lab-btn").to_have_attribute("aria-current", "page")
 
-        menu = case.page.locator("#shell-menu")
+        menu = case.page.locator("#shell-menu-panel")
         menu_toggle = case.page.get_by_role("button", name="Open app menu")
         expect(menu_toggle).to_be_visible()
         menu_toggle.focus()
         menu_toggle.press("Enter")
-        expect(menu).to_have_attribute("open", "")
+        expect(menu_toggle).to_have_attribute("aria-expanded", "true")
+        expect(menu).to_be_visible()
+        expect(case.page.locator(".shell-menu-navigation")).not_to_be_visible()
         expect(case.page.get_by_role("button", name="Preferences", exact=True)).to_be_visible()
-        case.page.locator("#shell-menu-compare").press("Enter")
+
+        menu_toggle.press("Escape")
+        expect(menu).not_to_be_visible()
+        case.assertEqual(
+            case.page.evaluate("() => document.activeElement?.id"),
+            "shell-menu-toggle",
+        )
+
+        case.page.locator("#wall-view-btn").press("Enter")
         case.page.wait_for_function("() => window.location.hash === ''")
         self._expect(".wall-page").to_be_visible()
         self._expect("#shell-workspace-status").to_have_text("Compare workspace")
+        self._expect("#wall-view-btn").to_have_attribute("aria-current", "page")
 
         menu_toggle.click()
-        case.page.click("#shell-menu-lab")
-        case.page.wait_for_function("() => window.location.hash === '#/lab'")
-        self._expect("#grid").to_be_visible()
-
-        case.page.set_viewport_size({"width": 390, "height": 800})
-        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 800])
+        expect(menu).to_be_visible()
+        desktop_menu_rect = case.page.locator("#shell-menu-panel").bounding_box()
+        if desktop_menu_rect is None:
+            raise AssertionError("desktop app menu rectangle was unavailable")
+        case.assertGreaterEqual(desktop_menu_rect["x"], 0)
+        case.assertLessEqual(
+            desktop_menu_rect["x"] + desktop_menu_rect["width"],
+            1280,
+        )
         case.assertLessEqual(
             int(case.page.evaluate("() => document.documentElement.scrollWidth")),
-            390,
+            1280,
         )
+        case.page.locator(".wall-brand").click()
+        expect(menu).not_to_be_visible()
+
+        def theme_colors() -> dict[str, dict[str, str]]:
+            colors = case.page.evaluate(
+                """() => Object.fromEntries(
+                    Object.entries({
+                        shell: "#shell-header",
+                        wall: ".wall-page",
+                        setup: ".compare-setup-sidebar",
+                        inspector: ".compare-inspector",
+                        dock: ".compare-dock",
+                        overlay: ".compare-analysis-panel",
+                        field: "input.compare-field",
+                        menu: "#shell-menu-panel",
+                    }).map(([name, selector]) => {
+                        const node = document.querySelector(selector);
+                        if (!(node instanceof HTMLElement)) {
+                            throw new Error(`Missing theme surface: ${selector}`);
+                        }
+                        const style = getComputedStyle(node);
+                        return [name, {
+                            background: style.backgroundColor,
+                            color: style.color,
+                            border: style.borderColor,
+                        }];
+                    })
+                )"""
+            )
+            if not isinstance(colors, dict):
+                raise AssertionError(f"invalid theme color snapshot: {colors!r}")
+            return cast(dict[str, dict[str, str]], colors)
+
+        light_colors = theme_colors()
         menu_toggle.click()
         case.page.click("#shell-preferences-btn")
         preferences = case.page.get_by_role("dialog", name="Preferences")
         expect(preferences).to_be_visible()
-        case.page.click("#shell-preferences-theme-btn")
+        case.page.get_by_role("radio", name="Dark").check()
         self._expect("html").to_have_attribute("data-theme", "dark")
         case.assertEqual(
             case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),
             "dark",
         )
-        case.assertNotEqual(
-            case.page.locator("#shell-header").evaluate(
-                "(node) => getComputedStyle(node).backgroundColor"
-            ),
-            "rgba(0, 0, 0, 0)",
+        dark_colors = theme_colors()
+        for surface in ("shell", "wall", "setup", "inspector", "dock", "overlay", "field", "menu"):
+            with case.subTest(theme_surface=surface):
+                case.assertNotEqual(
+                    light_colors[surface]["background"],
+                    dark_colors[surface]["background"],
+                )
+                case.assertNotEqual(
+                    light_colors[surface]["color"],
+                    dark_colors[surface]["color"],
+                )
+
+        case.page.set_viewport_size({"width": 390, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 800])
+        case.page.keyboard.press("Escape")
+        expect(preferences).not_to_be_visible()
+        case.assertEqual(
+            case.page.evaluate("() => document.activeElement?.id"),
+            "shell-menu-toggle",
         )
+        expect(case.page.locator(".shell-route-switcher")).not_to_be_visible()
+        menu_toggle.click()
+        expect(case.page.locator(".shell-menu-navigation")).to_be_visible()
+        mobile_menu_rect = case.page.locator("#shell-menu-panel").bounding_box()
+        if mobile_menu_rect is None:
+            raise AssertionError("mobile app menu rectangle was unavailable")
+        case.assertGreaterEqual(mobile_menu_rect["x"], 0)
+        case.assertLessEqual(
+            mobile_menu_rect["x"] + mobile_menu_rect["width"],
+            390,
+        )
+        case.assertLessEqual(
+            int(case.page.evaluate("() => document.documentElement.scrollWidth")),
+            390,
+        )
+        case.page.locator("#shell-menu-lab").press("Enter")
+        case.page.wait_for_function("() => window.location.hash === '#/lab'")
+        self._expect("#grid").to_be_visible()
+        menu_toggle.click()
+        case.page.locator("#shell-menu-compare").press("Enter")
+        case.page.wait_for_function("() => window.location.hash === ''")
+        self._expect(".wall-page").to_be_visible()
+
+        menu_toggle.click()
+        case.page.click("#shell-preferences-btn")
+        expect(preferences).to_be_visible()
         case.page.emulate_media(color_scheme="light")
-        case.page.click("#shell-preferences-system-btn")
+        case.page.get_by_role("radio", name="Follow System").check()
         self._expect("html").to_have_attribute("data-theme", "light")
         case.assertEqual(
             case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),

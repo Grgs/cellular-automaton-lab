@@ -1,31 +1,34 @@
-import { currentTheme, resetThemeToDefault, toggleTheme } from "../theme.js";
+import {
+    applyThemePreference,
+    currentTheme,
+    readThemePreference,
+    type ThemePreference,
+} from "../theme.js";
 
 interface ShellMenuOptions {
-    menu?: HTMLDetailsElement | null;
+    menu?: HTMLElement | null;
+    menuButton?: HTMLButtonElement | null;
+    menuPanel?: HTMLElement | null;
     compareButton?: HTMLButtonElement | null;
     labButton?: HTMLButtonElement | null;
     wallTrigger?: HTMLButtonElement | null;
     labTrigger?: HTMLButtonElement | null;
     preferencesButton?: HTMLButtonElement | null;
     preferencesDialog?: HTMLDialogElement | null;
-    preferencesThemeButton?: HTMLButtonElement | null;
-    preferencesSystemButton?: HTMLButtonElement | null;
+    preferencesThemeInputs?: readonly HTMLInputElement[];
     preferencesStatus?: HTMLElement | null;
     preferencesCloseButton?: HTMLButtonElement | null;
     root?: HTMLElement;
+    documentNode?: Document;
     storage?: Storage;
     media?: ((query: string) => MediaQueryList) | undefined;
 }
 
-function closeMenu(menu: HTMLDetailsElement | null | undefined): void {
-    if (menu) {
-        menu.open = false;
-    }
-}
-
-/** Wire shell-only navigation and preferences without coupling them to either workspace. */
+/** Wire global navigation, the controlled app-menu disclosure, and Preferences. */
 export function wireShellMenu({
-    menu = document.getElementById("shell-menu") as HTMLDetailsElement | null,
+    menu = document.getElementById("shell-menu"),
+    menuButton = document.getElementById("shell-menu-toggle") as HTMLButtonElement | null,
+    menuPanel = document.getElementById("shell-menu-panel"),
     compareButton = document.getElementById("shell-menu-compare") as HTMLButtonElement | null,
     labButton = document.getElementById("shell-menu-lab") as HTMLButtonElement | null,
     wallTrigger = document.getElementById("wall-view-btn") as HTMLButtonElement | null,
@@ -34,22 +37,33 @@ export function wireShellMenu({
         "shell-preferences-btn",
     ) as HTMLButtonElement | null,
     preferencesDialog = document.getElementById("shell-preferences") as HTMLDialogElement | null,
-    preferencesThemeButton = document.getElementById(
-        "shell-preferences-theme-btn",
-    ) as HTMLButtonElement | null,
-    preferencesSystemButton = document.getElementById(
-        "shell-preferences-system-btn",
-    ) as HTMLButtonElement | null,
+    preferencesThemeInputs = Array.from(
+        document.querySelectorAll<HTMLInputElement>('input[name="shell-theme-preference"]'),
+    ),
     preferencesStatus = document.getElementById("shell-preferences-status"),
     preferencesCloseButton = document.getElementById(
         "shell-preferences-close",
     ) as HTMLButtonElement | null,
     root = document.documentElement,
+    documentNode = document,
     storage = window.localStorage,
     media = typeof window !== "undefined" ? window.matchMedia?.bind(window) : undefined,
 }: ShellMenuOptions = {}): () => void {
+    let menuOpen = false;
+
+    const setMenuOpen = (open: boolean, { restoreFocus = false } = {}): void => {
+        menuOpen = open;
+        if (menuPanel) {
+            menuPanel.hidden = !open;
+        }
+        menuButton?.setAttribute("aria-expanded", open ? "true" : "false");
+        menu?.classList.toggle("is-open", open);
+        if (!open && restoreFocus) {
+            menuButton?.focus();
+        }
+    };
     const openPreferences = (): void => {
-        closeMenu(menu);
+        setMenuOpen(false);
         if (!preferencesDialog) {
             return;
         }
@@ -70,51 +84,89 @@ export function wireShellMenu({
             preferencesDialog.close();
         } else {
             preferencesDialog.hidden = true;
+            menuButton?.focus();
         }
     };
     const navigate = (trigger: HTMLButtonElement | null | undefined): void => {
-        closeMenu(menu);
+        setMenuOpen(false, { restoreFocus: true });
         trigger?.click();
     };
     const syncPreferences = (): void => {
-        const theme = currentTheme(root);
-        const nextTheme = theme === "dark" ? "light" : "dark";
-        preferencesThemeButton?.replaceChildren(`Use ${nextTheme} mode`);
+        const preference = readThemePreference({ storage });
+        for (const input of preferencesThemeInputs) {
+            input.checked = input.value === preference;
+        }
         if (preferencesStatus) {
-            preferencesStatus.textContent = `Currently using ${theme} mode.`;
+            const theme = currentTheme(root);
+            preferencesStatus.textContent =
+                preference === "system"
+                    ? `Following system preference (currently ${theme} mode).`
+                    : `Using ${theme} mode.`;
         }
     };
+    const onMenuToggle = (): void => setMenuOpen(!menuOpen);
     const onCompare = (): void => navigate(wallTrigger);
     const onLab = (): void => navigate(labTrigger);
     const onPreferences = (): void => openPreferences();
-    const onTheme = (): void => {
-        toggleTheme({ root, storage });
-        syncPreferences();
-    };
-    const onSystem = (): void => {
-        resetThemeToDefault({ root, storage, media });
+    const onThemePreference = (event: Event): void => {
+        const input = event.currentTarget;
+        if (!(input instanceof HTMLInputElement) || !input.checked) {
+            return;
+        }
+        applyThemePreference(input.value as ThemePreference, { root, storage, media });
         syncPreferences();
     };
     const onClose = (): void => closePreferences();
+    const onPreferencesClosed = (): void => menuButton?.focus();
+    const onDocumentPointerDown = (event: PointerEvent): void => {
+        if (menuOpen && menu && event.target instanceof Node && !menu.contains(event.target)) {
+            setMenuOpen(false);
+        }
+    };
+    const onDocumentKeyDown = (event: KeyboardEvent): void => {
+        if (menuOpen && event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            setMenuOpen(false, { restoreFocus: true });
+        }
+    };
 
+    menuButton?.addEventListener("click", onMenuToggle);
     compareButton?.addEventListener("click", onCompare);
     labButton?.addEventListener("click", onLab);
     preferencesButton?.addEventListener("click", onPreferences);
-    preferencesThemeButton?.addEventListener("click", onTheme);
-    preferencesSystemButton?.addEventListener("click", onSystem);
+    preferencesThemeInputs.forEach((input) => input.addEventListener("change", onThemePreference));
     preferencesCloseButton?.addEventListener("click", onClose);
+    preferencesDialog?.addEventListener("close", onPreferencesClosed);
+    documentNode.addEventListener("pointerdown", onDocumentPointerDown);
+    documentNode.addEventListener("keydown", onDocumentKeyDown, true);
 
     const observer = new MutationObserver(syncPreferences);
     observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+    const systemQuery = media?.("(prefers-color-scheme: dark)") ?? null;
+    const onOsChange = (): void => {
+        if (readThemePreference({ storage }) === "system") {
+            applyThemePreference("system", { root, storage, media });
+            syncPreferences();
+        }
+    };
+    systemQuery?.addEventListener?.("change", onOsChange);
+    setMenuOpen(false);
     syncPreferences();
 
     return () => {
+        menuButton?.removeEventListener("click", onMenuToggle);
         compareButton?.removeEventListener("click", onCompare);
         labButton?.removeEventListener("click", onLab);
         preferencesButton?.removeEventListener("click", onPreferences);
-        preferencesThemeButton?.removeEventListener("click", onTheme);
-        preferencesSystemButton?.removeEventListener("click", onSystem);
+        preferencesThemeInputs.forEach((input) =>
+            input.removeEventListener("change", onThemePreference),
+        );
         preferencesCloseButton?.removeEventListener("click", onClose);
+        preferencesDialog?.removeEventListener("close", onPreferencesClosed);
+        documentNode.removeEventListener("pointerdown", onDocumentPointerDown);
+        documentNode.removeEventListener("keydown", onDocumentKeyDown, true);
         observer.disconnect();
+        systemQuery?.removeEventListener?.("change", onOsChange);
     };
 }

@@ -12,42 +12,27 @@
 /* The wall fills the shared shell's content slot beneath the static header;
    the shell (styles.css) owns the header and the dock idiom. */
 .wall-page {
-    --compare-bg: #101820;
-    --compare-panel: #182431;
-    --compare-panel-strong: #20303d;
-    --compare-surface: #0d141c;
-    --compare-text: #edf5f7;
-    --compare-muted: #9fb2bf;
-    --compare-line: rgba(197, 215, 224, 0.18);
-    --compare-live: #2ec4b6;
-    --compare-coral: #ff7a59;
-    --compare-coral-hover: #ff8d70;
-    --compare-coral-line: rgba(255, 122, 89, 0.58);
-    --panel-strong: var(--compare-bg);
-    --panel: var(--compare-panel);
-    --ink: var(--compare-text);
-    --muted: var(--compare-muted);
-    --line: var(--compare-line);
-    --help-bg: rgba(255, 255, 255, 0.055);
-    --field-bg: #0d141c;
-    --field-text: var(--compare-text);
-    --field-border: rgba(197, 215, 224, 0.2);
-    --cell-dead: #eef4f6;
-    --accent: var(--compare-coral);
-    --accent-dark: #d65f43;
-    --focus: #5cc8ff;
-    --btn-primary-bg: var(--compare-coral);
-    --btn-primary-line: var(--compare-coral-line);
-    --btn-primary-text: #111820;
-    --btn-soft-bg: rgba(255, 255, 255, 0.075);
-    --btn-soft-hover: rgba(255, 255, 255, 0.13);
-    --btn-soft-line: rgba(197, 215, 224, 0.2);
-    --btn-disabled-bg: rgba(197, 215, 224, 0.11);
-    --btn-disabled-text: rgba(237, 245, 247, 0.45);
-    --btn-disabled-line: rgba(197, 215, 224, 0.11);
-    --chrome-bg: rgba(8, 13, 18, 0.84);
-    --border-warning: rgba(255, 122, 89, 0.56);
-    --bg-warning: rgba(255, 122, 89, 0.12);
+    /* Compare aliases the root warm-technical theme. It must not establish a
+       second, fixed-dark palette: shell, panels, fields, focus, and controls
+       all resolve from the same semantic tokens as Lab. Tile-tone variables
+       remain root-owned and intentionally identical in both themes. */
+    --compare-bg: var(--bg);
+    --compare-panel: var(--panel);
+    --compare-panel-strong: var(--panel-strong);
+    --compare-surface: var(--field-bg);
+    --compare-surface-strong: var(--panel-strong);
+    --compare-text: var(--ink);
+    --compare-muted: var(--muted);
+    --compare-muted-ink: var(--muted);
+    --compare-line: var(--line);
+    --compare-live: var(--live);
+    --compare-coral: var(--accent);
+    --compare-coral-hover: var(--btn-primary-hover);
+    --compare-coral-line: var(--btn-primary-line);
+    --compare-teal: var(--accent-dark);
+    --chrome-bg: var(--panel-strong);
+    --border-warning: color-mix(in srgb, var(--accent) 56%, transparent);
+    --bg-warning: color-mix(in srgb, var(--accent) 12%, var(--panel));
     height: 100%;
     min-height: 0;
     display: flex;
@@ -107,7 +92,7 @@
     border: 1px solid var(--compare-line);
     border-radius: 10px;
     background: var(--compare-panel);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    box-shadow: var(--shadow);
 }
 .compare-setup-item {
     flex: 1 1 0;
@@ -118,12 +103,12 @@
     gap: 3px;
     padding: 7px 9px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.055);
-    border: 1px solid rgba(197, 215, 224, 0.1);
+    background: var(--btn-soft-bg);
+    border: 1px solid var(--btn-soft-line);
 }
 .compare-setup-status {
-    background: rgba(255, 255, 255, 0.025);
-    border-color: rgba(197, 215, 224, 0.06);
+    background: color-mix(in srgb, var(--help-bg) 82%, transparent);
+    border-color: var(--line);
 }
 .compare-setup-action {
     appearance: none;
@@ -132,12 +117,12 @@
     font-family: inherit;
     cursor: pointer;
     color: inherit;
-    background: rgba(45, 212, 191, 0.08);
-    border-color: rgba(45, 212, 191, 0.24);
+    background: color-mix(in srgb, var(--accent) 8%, var(--panel-strong));
+    border-color: color-mix(in srgb, var(--accent) 24%, var(--line));
 }
 .compare-setup-action:hover {
-    background: rgba(45, 212, 191, 0.13);
-    border-color: rgba(45, 212, 191, 0.42);
+    background: color-mix(in srgb, var(--accent) 13%, var(--panel-strong));
+    border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
 }
 .compare-setup-action:focus-visible {
     outline: 2px solid var(--focus, #5cc8ff);
@@ -164,7 +149,7 @@
     padding: 0;
     border: 0;
     background: transparent;
-    color-scheme: dark;
+    color-scheme: inherit;
     font-family: inherit;
     font-weight: 700;
     cursor: pointer;
@@ -201,8 +186,8 @@
 }
 .compare-setup-run.is-current {
     color: var(--compare-muted);
-    background: rgba(255, 255, 255, 0.025);
-    border-color: rgba(197, 215, 224, 0.08);
+    background: color-mix(in srgb, var(--help-bg) 82%, transparent);
+    border-color: var(--line);
     box-shadow: none;
 }
 .compare-setup-run.is-stale {
@@ -363,8 +348,8 @@
     gap: 3px;
     padding: 9px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.045);
-    border: 1px solid rgba(197, 215, 224, 0.09);
+    background: var(--btn-soft-bg);
+    border: 1px solid var(--btn-soft-line);
 }
 .compare-explainer-key {
     color: var(--compare-text);
@@ -424,7 +409,7 @@
     justify-items: center;
     gap: 16px;
     pointer-events: none;
-    background: rgba(13, 20, 28, 0.48);
+    background: color-mix(in srgb, var(--compare-bg) 76%, transparent);
     color: var(--compare-text);
     font-size: 14px;
     font-weight: 700;
@@ -441,17 +426,17 @@
 }
 .compare-wall-loading-card {
     min-height: 94px;
-    border: 1px solid rgba(197, 215, 224, 0.18);
+    border: 1px solid var(--compare-line);
     border-radius: 9px;
     background:
         linear-gradient(
             110deg,
-            rgba(255, 255, 255, 0.05),
-            rgba(255, 255, 255, 0.11),
-            rgba(255, 255, 255, 0.05)
+            color-mix(in srgb, var(--accent) 5%, var(--panel)),
+            color-mix(in srgb, var(--accent) 13%, var(--panel)),
+            color-mix(in srgb, var(--accent) 5%, var(--panel))
         ),
-        rgba(255, 255, 255, 0.035);
-    box-shadow: inset 0 0 0 1px rgba(13, 20, 28, 0.28);
+        var(--panel);
+    box-shadow: inset 0 0 0 1px var(--line);
 }
 .compare-filmstrip-area.is-loading .compare-filmstrip {
     filter: saturate(0.7) brightness(0.72);
@@ -774,17 +759,17 @@
     align-items: center;
     gap: 6px;
     padding: 5px 8px;
-    border: 1px solid rgba(45, 212, 191, 0.28);
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
     border-radius: 999px;
-    background: rgba(45, 212, 191, 0.1);
+    background: color-mix(in srgb, var(--accent) 10%, var(--panel));
     color: var(--ink, #1f2430);
     font-family: var(--sans, sans-serif);
     font-size: 12px;
     cursor: pointer;
 }
 .compare-selected-chip:hover {
-    border-color: rgba(45, 212, 191, 0.48);
-    background: rgba(45, 212, 191, 0.16);
+    border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+    background: color-mix(in srgb, var(--accent) 16%, var(--panel));
 }
 .compare-selected-chip:focus-visible {
     outline: 2px solid var(--focus, #7aa7ff);
@@ -883,7 +868,7 @@
     background: var(--btn-soft-bg, rgba(0, 0, 0, 0.05));
 }
 .compare-tiling.is-selected {
-    background: rgba(45, 212, 191, 0.08);
+    background: color-mix(in srgb, var(--accent) 8%, var(--panel));
 }
 .compare-tiling.is-disabled {
     color: var(--muted, #6d756f);
@@ -975,8 +960,8 @@
 }
 .compare-setup-run.is-current:disabled {
     color: var(--compare-muted);
-    background: rgba(255, 255, 255, 0.025);
-    border-color: rgba(197, 215, 224, 0.08);
+    background: color-mix(in srgb, var(--help-bg) 82%, transparent);
+    border-color: var(--line);
     box-shadow: none;
     opacity: 0.82;
 }
@@ -1331,18 +1316,18 @@
     gap: 7px;
     min-height: 34px;
     padding: 6px 12px;
-    border: 1px solid rgba(237, 245, 247, 0.32);
+    border: 1px solid var(--btn-soft-line);
     border-radius: 9px;
-    background: rgba(16, 20, 24, 0.82);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.24);
-    color: var(--compare-text, #f2ede0);
+    background: var(--panel-strong);
+    box-shadow: var(--shadow);
+    color: var(--compare-text);
     font: 600 12px var(--sans, sans-serif);
     cursor: pointer;
 }
 .compare-filmstrip-add:hover,
 .compare-filmstrip-add:focus-visible {
     border-color: var(--focus, #7aa7ff);
-    background: rgba(16, 20, 24, 0.96);
+    background: var(--btn-soft-hover);
 }
 .compare-filmstrip-add:focus-visible {
     outline: 2px solid var(--focus, #7aa7ff);
@@ -1428,9 +1413,9 @@
     place-items: center;
     width: 26px;
     height: 26px;
-    border: 1px solid rgba(237, 245, 247, 0.22);
-    background: rgba(16, 20, 24, 0.72);
-    color: #f2ede0;
+    border: 1px solid var(--btn-soft-line);
+    background: var(--panel-strong);
+    color: var(--compare-text);
     font-size: 17px;
     line-height: 1;
     padding: 0;
@@ -1445,7 +1430,7 @@
 .compare-filmstrip-remove:hover:not(:disabled),
 .compare-filmstrip-remove:focus-visible {
     opacity: 1;
-    background: rgba(16, 20, 24, 0.95);
+    background: var(--btn-soft-hover);
 }
 .compare-filmstrip-remove:focus-visible {
     outline: 2px solid var(--focus, #7aa7ff);
@@ -1507,15 +1492,15 @@
     gap: 5px;
     padding: 5px 11px;
     border-radius: 8px;
-    border: 1px solid rgba(237, 245, 247, 0.28);
-    background: rgba(16, 20, 24, 0.78);
-    color: var(--compare-text, #f2ede0);
+    border: 1px solid var(--btn-soft-line);
+    background: var(--panel-strong);
+    color: var(--compare-text);
     font-family: var(--sans, sans-serif);
     font-size: 12px;
     cursor: pointer;
 }
 .compare-hero-tool:hover {
-    background: rgba(16, 20, 24, 0.95);
+    background: var(--btn-soft-hover);
 }
 .compare-hero-tool:disabled {
     opacity: 0.5;
@@ -1592,11 +1577,11 @@
     gap: 8px;
     padding: 10px;
     overflow: hidden;
-    border: 1px solid var(--compare-line, rgba(237, 245, 247, 0.28));
+    border: 1px solid var(--compare-line);
     border-radius: 10px;
-    background: var(--compare-surface-strong, #182025);
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.32);
-    color: var(--compare-text, #f2ede0);
+    background: var(--compare-surface-strong);
+    box-shadow: var(--shadow);
+    color: var(--compare-text);
     pointer-events: auto;
 }
 .compare-board-tiling-picker.is-add-picker {
@@ -1627,10 +1612,10 @@
     width: 100%;
     box-sizing: border-box;
     padding: 6px 8px;
-    border: 1px solid var(--compare-line, rgba(237, 245, 247, 0.28));
+    border: 1px solid var(--compare-line);
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.08);
-    color: inherit;
+    background: var(--field-bg);
+    color: var(--field-text);
 }
 .compare-board-tiling-picker-list {
     display: grid;
@@ -1647,7 +1632,7 @@
     padding: 5px;
     border: 1px solid transparent;
     border-radius: 7px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--btn-soft-bg);
     color: inherit;
     text-align: left;
     cursor: pointer;
@@ -1656,7 +1641,7 @@
 .compare-board-tiling-choice:focus-visible,
 .compare-board-tiling-choice.is-current {
     border-color: var(--focus, #7aa7ff);
-    background: rgba(122, 167, 255, 0.16);
+    background: color-mix(in srgb, var(--focus) 16%, var(--panel));
 }
 .compare-board-tiling-choice:disabled {
     opacity: 0.42;
@@ -1847,8 +1832,8 @@
     display: none;
 }
 .compare-filmstrip-board:not(.is-hero) .compare-focus-pane-badge {
-    background: var(--chrome-bg, rgba(16, 20, 24, 0.72));
-    color: #f2ede0;
+    background: var(--chrome-bg);
+    color: var(--compare-text);
     border: none;
 }
 .compare-filmstrip-board:not(.is-hero) .compare-focus-pane-viewport {

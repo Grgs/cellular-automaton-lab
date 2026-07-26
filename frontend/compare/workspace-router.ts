@@ -220,6 +220,14 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
                 options.wallTrigger.removeAttribute("aria-current");
             }
         }
+        const menuCompare = document.getElementById("shell-menu-compare");
+        const menuLab = document.getElementById("shell-menu-lab");
+        if (menuCompare) {
+            menuCompare.toggleAttribute("aria-current", route === "wall");
+        }
+        if (menuLab) {
+            menuLab.toggleAttribute("aria-current", route === "lab");
+        }
     }
 
     /** Keep the wall populated; first visit autoplays, later visits load paused. */
