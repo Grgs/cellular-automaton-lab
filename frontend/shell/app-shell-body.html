@@ -4,12 +4,32 @@
         <h1 class="wall-brand">
             Cellular Automaton Lab
             <span
+                id="shell-workspace-status"
+                class="shell-workspace-status"
+                aria-live="polite"
+            >
+                Compare workspace
+            </span>
+            <span
                 id="shell-route-context"
                 class="shell-route-context"
                 aria-live="polite"
                 hidden
             ></span>
         </h1>
+        <details id="shell-menu" class="shell-menu">
+            <summary class="shell-menu-toggle" aria-label="Open app menu" title="Open app menu">
+                <span class="shell-menu-glyph" aria-hidden="true">☰</span>
+                <span>Menu</span>
+            </summary>
+            <div class="shell-menu-panel" role="group" aria-label="App menu">
+                <span class="shell-menu-heading">Navigate</span>
+                <button id="shell-menu-compare" type="button">Compare</button>
+                <button id="shell-menu-lab" type="button">Lab</button>
+                <span class="shell-menu-heading">App</span>
+                <button id="shell-preferences-btn" type="button">Preferences</button>
+            </div>
+        </details>
         <nav class="shell-route-switcher" aria-label="Workspace">
             <button
                 id="wall-view-btn"
@@ -40,6 +60,45 @@
             <span class="theme-toggle-icon theme-icon-moon" aria-hidden="true">☾</span>
         </button>
     </header>
+
+    <dialog id="shell-preferences" class="shell-preferences" aria-labelledby="shell-preferences-title">
+        <form method="dialog" class="shell-preferences-card">
+            <div class="shell-preferences-heading">
+                <div>
+                    <span class="shell-menu-heading">App settings</span>
+                    <h2 id="shell-preferences-title">Preferences</h2>
+                </div>
+                <button
+                    id="shell-preferences-close"
+                    class="shell-preferences-close"
+                    type="submit"
+                    aria-label="Close preferences"
+                    title="Close preferences"
+                >
+                    ×
+                </button>
+            </div>
+            <fieldset class="shell-preferences-fieldset">
+                <legend>Appearance</legend>
+                <p class="shell-preferences-copy">
+                    Choose how the Lab and Compare workspaces look. Your choice is saved on this
+                    device.
+                </p>
+                <div class="shell-preferences-actions">
+                    <button id="shell-preferences-theme-btn" class="soft-action" type="button">
+                        Use dark mode
+                    </button>
+                    <button id="shell-preferences-system-btn" class="soft-action" type="button">
+                        Follow system
+                    </button>
+                </div>
+                <span id="shell-preferences-status" class="shell-preferences-status" aria-live="polite"></span>
+            </fieldset>
+            <div class="shell-preferences-footer">
+                <button class="primary-action" type="submit">Done</button>
+            </div>
+        </form>
+    </dialog>
 
     <div id="shell-content" class="shell-content">
         <section id="lab-root" class="lab-root" aria-label="Single-board editor">

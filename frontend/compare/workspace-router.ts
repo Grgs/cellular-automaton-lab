@@ -184,6 +184,10 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
 
     function showRoute(route: ShellRoute): void {
         document.documentElement.dataset.workspaceRoute = route;
+        const workspaceStatus = document.getElementById("shell-workspace-status");
+        if (workspaceStatus) {
+            workspaceStatus.textContent = route === "lab" ? "Lab editor" : "Compare workspace";
+        }
         const routeContext = document.getElementById("shell-route-context");
         const sharedBoardOpen = route === "lab" && window.location.hash.includes("share=");
         if (routeContext) {

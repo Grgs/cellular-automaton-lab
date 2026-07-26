@@ -62,6 +62,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         case.page.emulate_media(color_scheme="light")
         self._expect("html").to_have_attribute("data-theme", "light")
+
         case.page.emulate_media(color_scheme="dark")
         self._expect("html").to_have_attribute("data-theme", "dark")
 
@@ -83,6 +84,64 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         case.page.emulate_media(color_scheme="light")
         self._expect("html").to_have_attribute("data-theme", "light")
+
+    def test_shell_menu_navigates_and_opens_theme_preferences(self) -> None:
+        case = self._case()
+        storage_key = str(
+            case.page.evaluate(
+                """() => window.APP_DEFAULTS?.theme?.storage_key ||
+                    'cellular-automaton-theme'"""
+            )
+        )
+        case.page.evaluate("(key) => window.localStorage.removeItem(key)", storage_key)
+        case.page.emulate_media(color_scheme="light")
+        self._expect("#shell-workspace-status").to_have_text("Lab editor")
+
+        menu = case.page.locator("#shell-menu")
+        case.page.locator(".shell-menu-toggle").click()
+        expect(menu).to_have_attribute("open", "")
+        case.page.click("#shell-menu-compare")
+        case.page.wait_for_function("() => window.location.hash === ''")
+        self._expect(".wall-page").to_be_visible()
+        self._expect("#shell-workspace-status").to_have_text("Compare workspace")
+
+        case.page.locator(".shell-menu-toggle").click()
+        case.page.click("#shell-menu-lab")
+        case.page.wait_for_function("() => window.location.hash === '#/lab'")
+        self._expect("#grid").to_be_visible()
+
+        case.page.locator(".shell-menu-toggle").click()
+        case.page.click("#shell-preferences-btn")
+        preferences = case.page.get_by_role("dialog", name="Preferences")
+        expect(preferences).to_be_visible()
+        case.page.click("#shell-preferences-theme-btn")
+        self._expect("html").to_have_attribute("data-theme", "dark")
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),
+            "dark",
+        )
+        case.assertNotEqual(
+            case.page.locator("#shell-header").evaluate(
+                "(node) => getComputedStyle(node).backgroundColor"
+            ),
+            "rgba(0, 0, 0, 0)",
+        )
+        case.page.emulate_media(color_scheme="light")
+        case.page.click("#shell-preferences-system-btn")
+        self._expect("html").to_have_attribute("data-theme", "light")
+        case.assertEqual(
+            case.page.evaluate("(key) => window.localStorage.getItem(key)", storage_key),
+            None,
+        )
+        case.page.click("#shell-preferences-close")
+        expect(preferences).not_to_be_visible()
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
 
     def test_rule_picker_updates_rule_ui(self) -> None:
         case = self._case()
