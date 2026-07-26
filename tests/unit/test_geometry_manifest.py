@@ -400,7 +400,8 @@ class GeometryManifestTests(unittest.TestCase):
 
     def test_new_substitution_tilings_use_aperiodic_patch_depth_defaults(self) -> None:
         expected = {
-            HAT_MONOTILE_GEOMETRY: {"default": 2, "min": 0, "max": 3},
+            HAT_MONOTILE_GEOMETRY: {"default": 3, "min": 0, "max": 3},
+            SPECTRE_GEOMETRY: {"default": 4, "min": 0, "max": 4},
             TUEBINGEN_TRIANGLE_GEOMETRY: {"default": 3, "min": 0, "max": 5},
             DODECAGONAL_SQUARE_TRIANGLE_GEOMETRY: {
                 "default": 3,

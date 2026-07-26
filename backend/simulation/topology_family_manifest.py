@@ -364,11 +364,15 @@ TOPOLOGY_FAMILY_MANIFEST: dict[str, TopologyFamilyManifestEntry] = {
     ),
     SPECTRE_GEOMETRY: _translated_aperiodic_family(
         SPECTRE_GEOMETRY,
-        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
+        # Depth 4 is the first showcase-sized Spectre patch whose interior
+        # reads as a continuous field at the default viewport.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 4, 0, 4),
     ),
     HAT_MONOTILE_GEOMETRY: _translated_aperiodic_family(
         HAT_MONOTILE_GEOMETRY,
-        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 2, 0, 3),
+        # The H8 seed needs one additional substitution for the default patch
+        # to use the canvas as a showcase instead of leaving sparse arms.
+        SizingPolicyDefinition(PATCH_DEPTH_CONTROL, 3, 0, 3),
     ),
     TURTLE_MONOTILE_GEOMETRY: _translated_aperiodic_family(
         TURTLE_MONOTILE_GEOMETRY,

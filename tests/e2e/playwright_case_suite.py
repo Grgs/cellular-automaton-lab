@@ -188,6 +188,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect("#tiling-family-select").to_have_value("spectre")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
+        self._expect("#patch-depth-input").to_have_value("4")
         # The one-shell stage is taller than the old top-bar layout, so the
         # fitted patch's bounding box covers slightly less width (~0.949);
         # 0.9 matches the other aperiodic patch cases.
@@ -257,6 +258,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect("#tiling-family-select").to_have_value("hat-monotile")
         self._expect("#patch-depth-field").to_be_visible()
         self._expect("#grid-size-text").to_contain_text("Depth")
+        self._expect("#patch-depth-input").to_have_value("3")
         self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
 
     def test_tuebingen_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
