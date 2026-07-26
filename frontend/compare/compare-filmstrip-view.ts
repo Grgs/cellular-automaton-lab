@@ -18,7 +18,6 @@ import type {
     TopologyPreview,
     TopologySpec,
 } from "../types/domain.js";
-import { MIN_WALL_TILINGS } from "./compare-capacity.js";
 import { buildBoardThumbnailSvg, updateBoardThumbnailSvg } from "./compare-thumbnail.js";
 import { FilmstripPlayer, type FilmstripPlayerState } from "./filmstrip-player.js";
 import type { FilmstripTransportController } from "./compare-transport.js";
@@ -41,14 +40,9 @@ export interface FilmstripViewOptions {
     onFocusChange?: (geometry: string | null) => void;
     /** Called when a board cell is clicked while edit mode is on. */
     onPaintCell?: (geometry: string, cellId: string) => void;
-    /**
-     * Called when a board's × chrome is clicked. The affordance is disabled at
-     * the two-board minimum because the backend needs at least two to compare.
-     */
-    onRemoveBoard?: (geometry: string) => void;
-    /** Tiling catalog used by the per-board replacement picker. */
+    /** Tiling catalog used by the selected-board replacement and wall-add pickers. */
     tilingOptions?: readonly TopologyOption[];
-    /** Replace a board's tiling from its caption picker. */
+    /** Replace the selected board from the Inspector's visual picker. */
     onReplaceBoard?: (previousGeometry: string, nextGeometry: string) => void;
     /** Add a new tiling from the wall's searchable picker. */
     onAddBoard?: (geometry: string) => void;
@@ -82,6 +76,8 @@ export interface FilmstripViewController {
     load(filmstrip: SeedFilmstripResult, options?: FilmstripLoadOptions): Promise<void>;
     /** Enlarge one board (speaker view) or return to the gallery (null). */
     focus(geometry: string | null): void;
+    /** Mark the board that Inspector actions target without changing speaker focus. */
+    setSelectedBoard(geometry: string | null): void;
     /**
      * Toggle edit mode: board clicks paint cells (via `onPaintCell`) instead of
      * focusing; the expand glyph becomes the only zoom affordance.
@@ -96,13 +92,6 @@ export interface FilmstripViewController {
     setManagementBlocked(reason: string | null): void;
     /** Re-evaluate the add affordance after capacity inputs such as viewport width change. */
     refreshAddControl(): void;
-    /**
-     * Immediately enable/disable every board's remove control to match the
-     * pending selection, before the debounced authoritative rebuild swaps the
-     * displayed strip. Prevents a burst of removals from dropping below the
-     * two-board minimum while the strip still shows the pre-removal boards.
-     */
-    setBoardsRemovable(removable: boolean): void;
     /** Replace one board's immutable result data and re-render its current frame. */
     updateBoardData(tiling: TopologyFilmstrip): void;
     /**
@@ -124,6 +113,13 @@ export interface FilmstripViewController {
     setBoardOverlay(geometry: string, node: HTMLElement | null): boolean;
     /** Persistent toolbelt overlaid on the hero in speaker view (null to clear). */
     setHeroToolbelt(node: HTMLElement | null): void;
+    /** Change the stable gallery/loading home used by the persistent toolbelt. */
+    setHeroToolbeltHome(parent: HTMLElement): void;
+    /**
+     * Open the existing searchable visual picker for one selected board.
+     * Returns false when that geometry is no longer on the wall.
+     */
+    openReplacePicker(geometry: string, anchor: HTMLElement): boolean;
     /** Close an open board tiling picker; returns whether one was open. */
     closeTilingPicker(): boolean;
     /**
@@ -201,7 +197,9 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     let boards: BoardEntry[] = [];
     let lastRenderedIndex = -1;
     let focusedGeometry: string | null = null;
+    let selectedGeometry: string | null = null;
     let heroToolbelt: HTMLElement | null = null;
+    let heroToolbeltParent: HTMLElement | null = null;
     let editMode = false;
     let managementBusy = false;
     let managementBlockedReason: string | null = null;
@@ -228,6 +226,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 : undefined;
         if (hero) {
             hero.cell.append(heroToolbelt);
+        } else if (heroToolbeltParent) {
+            heroToolbeltParent.append(heroToolbelt);
         } else {
             heroToolbelt.remove();
         }
@@ -239,8 +239,15 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         root.classList.toggle("compare-filmstrip--speaker", speaker);
         for (const entry of boards) {
             const isHero = speaker && entry.tiling.geometry === focusedGeometry;
+            const isSelected = entry.tiling.geometry === selectedGeometry;
             entry.cell.classList.toggle("is-hero", isHero);
             entry.cell.classList.toggle("is-strip", speaker && !isHero);
+            entry.cell.classList.toggle("is-selected", isSelected);
+            if (isSelected) {
+                entry.cell.setAttribute("aria-current", "true");
+            } else {
+                entry.cell.removeAttribute("aria-current");
+            }
             if (editMode) {
                 entry.cell.title = "Paint cells (⤢ zooms)";
                 entry.cell.setAttribute("aria-label", `${boardName(entry.tiling)}: paint cells`);
@@ -289,8 +296,19 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             return;
         }
         focusedGeometry = next;
+        if (next !== null) {
+            selectedGeometry = next;
+        }
         applyFocusLayout();
         options.onFocusChange?.(focusedGeometry);
+    }
+
+    function setSelectedBoard(geometry: string | null): void {
+        selectedGeometry =
+            geometry !== null && boards.some((entry) => entry.tiling.geometry === geometry)
+                ? geometry
+                : null;
+        applyFocusLayout();
     }
 
     function renderBoard(entry: BoardEntry, index: number): void {
@@ -358,6 +376,10 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         // A fresh run starts in the gallery; silent so it doesn't fire onFocusChange.
         focusedGeometry = null;
         root.classList.remove("compare-filmstrip--speaker");
+        // The selected-tiling actions belong to the Inspector in gallery and
+        // loading states. Return the same DOM node before old board slots are
+        // replaced so it never becomes detached during a wall transition.
+        placeHeroToolbelt();
     }
 
     function detachPlayer(): void {
@@ -415,15 +437,29 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                     type: "button",
                 });
                 const disabledReason = managementDisabledReason();
-                choice.disabled =
-                    disabledReason !== null ||
-                    (option.value !== tiling?.geometry &&
-                        boards.some((board) => board.tiling.geometry === option.value)) ||
-                    options.isTilingAvailable?.(option.value) === false ||
-                    (adding && options.canAddBoard?.() === false);
-                if (disabledReason) {
-                    choice.title = disabledReason;
-                }
+                const isCurrent = option.value === tiling?.geometry;
+                const isDuplicate = boards.some(
+                    (board) =>
+                        board.tiling.geometry === option.value &&
+                        board.tiling.geometry !== tiling?.geometry,
+                );
+                const isIncompatible = options.isTilingAvailable?.(option.value) === false;
+                const isAtCapacity = adding && options.canAddBoard?.() === false;
+                const unavailableReason =
+                    disabledReason ??
+                    (isCurrent
+                        ? `${option.label} is the current tiling`
+                        : isDuplicate
+                          ? `${option.label} is already on the wall`
+                          : isIncompatible
+                            ? `${option.label} is incompatible with the selected rule`
+                            : isAtCapacity
+                              ? (options.addBoardDisabledReason?.() ??
+                                "The wall is at its tiling limit")
+                              : null);
+                choice.disabled = unavailableReason !== null;
+                choice.title =
+                    unavailableReason ?? (adding ? `Add ${option.label}` : `Use ${option.label}`);
                 choice.classList.toggle("is-current", option.value === tiling?.geometry);
                 choice.append(
                     element(
@@ -456,6 +492,15 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         openTilingPicker = picker;
         renderChoices();
         search.focus();
+    }
+
+    function openReplacePicker(geometry: string, anchor: HTMLElement): boolean {
+        const entry = entryFor(geometry);
+        if (!entry || !options.tilingOptions || !options.onReplaceBoard) {
+            return false;
+        }
+        openBoardTilingPicker(anchor, entry.tiling);
+        return true;
     }
 
     function updateAddControlState(addButton: HTMLButtonElement): void {
@@ -507,21 +552,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
 
     function refreshManagementControls(): void {
         const disabledReason = managementDisabledReason();
-        for (const label of root.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-label")) {
-            label.disabled = disabledReason !== null;
-            label.title = disabledReason ?? `Replace ${label.textContent ?? "tiling"}`;
-        }
-        for (const removeButton of root.querySelectorAll<HTMLButtonElement>(
-            ".compare-filmstrip-remove",
-        )) {
-            const removable = removeButton.dataset.removable === "true";
-            removeButton.disabled = disabledReason !== null || !removable;
-            removeButton.title = disabledReason
-                ? disabledReason
-                : removable
-                  ? "Remove from the wall"
-                  : "Keep at least two tilings on the wall";
-        }
         const addButton = wallActions.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
         if (addButton) {
             updateAddControlState(addButton);
@@ -530,14 +560,9 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         }
     }
 
-    function createBoardEntry(tiling: TopologyFilmstrip, removable: boolean): BoardEntry {
+    function createBoardEntry(tiling: TopologyFilmstrip): BoardEntry {
         const slot = el("div", "compare-filmstrip-slot", "…");
-        const label = el("button", "compare-filmstrip-label", boardName(tiling));
-        label.setAttribute("type", "button");
-        const managementReason = managementDisabledReason();
-        (label as HTMLButtonElement).disabled = managementReason !== null;
-        label.title = managementReason ?? `Replace ${boardName(tiling)}`;
-        label.setAttribute("aria-label", `Replace ${boardName(tiling)}`);
+        const label = el("span", "compare-filmstrip-label", boardName(tiling));
         const countLabel = el("div", "compare-filmstrip-count");
         const cell = el("div", "compare-filmstrip-board");
         cell.setAttribute("role", "listitem");
@@ -548,30 +573,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         expandGlyph.setAttribute("aria-hidden", "true");
         const chrome = el("div", "compare-filmstrip-board-chrome");
         chrome.append(label, countLabel, expandGlyph);
-        if (options.onRemoveBoard) {
-            // A real <button> so the cell's click handler ignores it (its
-            // early-return on buttons), in edit mode included.
-            const removeButton = el("button", "compare-filmstrip-remove", "×") as HTMLButtonElement;
-            removeButton.setAttribute("type", "button");
-            removeButton.dataset.removable = removable ? "true" : "false";
-            removeButton.disabled = managementReason !== null || !removable;
-            removeButton.title = managementReason
-                ? managementReason
-                : removable
-                  ? "Remove from the wall"
-                  : "Keep at least two tilings on the wall";
-            removeButton.setAttribute("aria-label", `Remove ${boardName(tiling)} from the wall`);
-            removeButton.addEventListener("click", () => {
-                options.onRemoveBoard?.(tiling.geometry);
-            });
-            chrome.append(removeButton);
-        }
         cell.append(slot, chrome);
-        label.addEventListener("click", (event) => {
-            event.stopPropagation();
-            if (!options.tilingOptions || !options.onReplaceBoard) return;
-            openBoardTilingPicker(cell, tiling);
-        });
         const toggleFocus = () => {
             focus(focusedGeometry === tiling.geometry ? null : tiling.geometry);
         };
@@ -631,8 +633,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             const tiling = filmstrip.tilings[index]!;
             entry.tiling = tiling;
             entry.label.textContent = boardName(tiling);
-            entry.label.title = `Replace ${boardName(tiling)}`;
-            entry.label.setAttribute("aria-label", `Replace ${boardName(tiling)}`);
             entry.overlaid = false;
             if (entry.preview) {
                 delete entry.error;
@@ -672,11 +672,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         } else {
             teardownRun();
             boardsArea.replaceChildren();
-            // Keep the remove control visible at the two-board minimum, but
-            // disable it so the action and its current limit remain legible.
-            const removable =
-                Boolean(options.onRemoveBoard) && filmstrip.tilings.length > MIN_WALL_TILINGS;
-            boards = filmstrip.tilings.map((tiling) => createBoardEntry(tiling, removable));
+            boards = filmstrip.tilings.map((tiling) => createBoardEntry(tiling));
         }
         wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
         createAddControl();
@@ -709,6 +705,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         element: root,
         load,
         focus,
+        setSelectedBoard,
         setEditMode(enabled: boolean): void {
             if (editMode === enabled) {
                 return;
@@ -740,14 +737,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
                 createAddControl();
             }
         },
-        setBoardsRemovable(removable: boolean): void {
-            for (const removeButton of root.querySelectorAll<HTMLButtonElement>(
-                ".compare-filmstrip-remove",
-            )) {
-                removeButton.dataset.removable = removable ? "true" : "false";
-            }
-            refreshManagementControls();
-        },
         updateBoardData(tiling: TopologyFilmstrip): void {
             const entry = entryFor(tiling.geometry);
             if (entry) {
@@ -778,26 +767,12 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             boards.splice(index, 1);
             removedEntry.cell.remove();
             // Survivors keep their frames and the clock keeps ticking; just
-            // refresh the floor/capacity affordances for the new count and
-            // re-lay-out the (possibly speaker) stage.
-            const removable = Boolean(options.onRemoveBoard) && boards.length > MIN_WALL_TILINGS;
-            for (const removeButton of root.querySelectorAll<HTMLButtonElement>(
-                ".compare-filmstrip-remove",
-            )) {
-                removeButton.dataset.removable = removable ? "true" : "false";
-            }
+            // refresh capacity affordances and re-lay-out the stage.
             refreshManagementControls();
             applyFocusLayout();
             if (restoreBoardFocus) {
                 const successor = boards[Math.min(index, boards.length - 1)];
-                const successorRemove = successor?.cell.querySelector<HTMLButtonElement>(
-                    ".compare-filmstrip-remove",
-                );
-                if (successorRemove && !successorRemove.disabled) {
-                    successorRemove.focus();
-                } else {
-                    successor?.cell.focus();
-                }
+                successor?.cell.focus();
             } else if (restoreAddFocus) {
                 wallActions.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.focus();
             }
@@ -823,10 +798,19 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         setHeroToolbelt(node: HTMLElement | null): void {
             if (heroToolbelt && heroToolbelt !== node) {
                 heroToolbelt.remove();
+                heroToolbeltParent = null;
+            }
+            if (!heroToolbelt && node) {
+                heroToolbeltParent = node.parentElement;
             }
             heroToolbelt = node;
             placeHeroToolbelt();
         },
+        setHeroToolbeltHome(parent: HTMLElement): void {
+            heroToolbeltParent = parent;
+            placeHeroToolbelt();
+        },
+        openReplacePicker,
         closeTilingPicker,
         detachPlayer,
         dispose(): void {

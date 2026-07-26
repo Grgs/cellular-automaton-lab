@@ -234,7 +234,7 @@ function twoBoardFilmstrip(): SeedFilmstripResult {
     };
 }
 
-/** Three boards: above the two-board minimum, so per-board removal is offered. */
+/** Three boards: above the two-board minimum, so selected-board removal is safe. */
 function threeBoardFilmstrip(): SeedFilmstripResult {
     const base = twoBoardFilmstrip();
     const third = { ...base.tilings[0]!, geometry: "tri", tiling_family: "tri" };
@@ -1335,6 +1335,58 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("renders one connected tabset with roving focus and linked tabpanels", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+        document
+            .querySelector<HTMLButtonElement>('.compare-dock-icon[aria-label="Configure the run"]')
+            ?.click();
+
+        const tablist = document.querySelector<HTMLElement>(".compare-config-tabs");
+        const tabs = [...document.querySelectorAll<HTMLButtonElement>(".compare-config-tab")];
+        expect(tablist?.getAttribute("role")).toBe("tablist");
+        expect(tablist?.getAttribute("aria-orientation")).toBe("horizontal");
+        expect(tabs.map((tab) => tab.textContent)).toEqual(["Setup", "Tilings", "Help", "Saved"]);
+        expect(tabs.map((tab) => tab.getAttribute("aria-selected"))).toEqual([
+            "true",
+            "false",
+            "false",
+            "false",
+        ]);
+        expect(tabs.map((tab) => tab.tabIndex)).toEqual([0, -1, -1, -1]);
+        expect(tabs[0]?.classList.contains("is-active")).toBe(true);
+
+        tabs[0]?.focus();
+        tabs[0]?.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+        expect(document.activeElement).toBe(tabs[1]);
+        expect(tabs[1]?.getAttribute("aria-selected")).toBe("true");
+        expect(document.querySelector<HTMLElement>("#compare-config-panel-tilings")?.hidden).toBe(
+            false,
+        );
+
+        tabs[1]?.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+        expect(document.activeElement).toBe(tabs[3]);
+        expect(document.querySelector<HTMLElement>("#compare-config-panel-saved")?.hidden).toBe(
+            false,
+        );
+        tabs[3]?.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+        expect(document.activeElement).toBe(tabs[0]);
+        tabs[0]?.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+        expect(document.activeElement).toBe(tabs[3]);
+
+        for (const tab of tabs) {
+            const panel = document.getElementById(tab.getAttribute("aria-controls") ?? "");
+            expect(panel?.getAttribute("role")).toBe("tabpanel");
+            expect(panel?.getAttribute("aria-labelledby")).toBe(tab.id);
+        }
+        handle.dispose();
+    });
+
     it("keeps tiling-specific rules out of the comparison wall", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
@@ -2158,7 +2210,7 @@ describe("mountComparePanel", () => {
             )?.disabled,
         ).toBe(false);
         for (const control of document.querySelectorAll<HTMLButtonElement>(
-            ".compare-filmstrip-add, .compare-filmstrip-label, .compare-filmstrip-remove",
+            ".compare-filmstrip-add",
         )) {
             expect(control.disabled).toBe(true);
             expect(control.title).toBe("Retry the failed update before editing this wall");
@@ -3030,10 +3082,35 @@ describe("mountComparePanel", () => {
 
         const filmstrip = () => document.querySelector<HTMLElement>(".compare-filmstrip");
         const page = () => document.querySelector<HTMLElement>(".wall-page");
+        const toolbelt = document.querySelector<HTMLElement>(".compare-hero-toolbelt");
+        const toolbeltActions = () =>
+            [...(toolbelt?.querySelectorAll<HTMLButtonElement>("button") ?? [])].map(
+                (button) => button.textContent,
+            );
+        const initialToolbeltActions = toolbeltActions();
+        expect(toolbelt).not.toBeNull();
+        expect(document.querySelector(".compare-inspector-body > .compare-hero-toolbelt")).toBe(
+            toolbelt,
+        );
+        expect(initialToolbeltActions).toContain("Replace selected");
+        expect(initialToolbeltActions).toContain("Remove selected");
 
         // Focus the first board -> speaker view, mirrored into the hash.
         document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
         expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(true);
+        expect(
+            document.querySelector(".compare-filmstrip-board.is-hero .compare-hero-toolbelt"),
+        ).toBe(toolbelt);
+        expect(toolbelt?.isConnected).toBe(true);
+        expect(toolbeltActions()).toEqual(initialToolbeltActions);
+        expect(
+            document
+                .querySelector<HTMLButtonElement>(".compare-inspector-replace")
+                ?.getAttribute("aria-label"),
+        ).toContain("square");
+        expect(document.querySelector<HTMLButtonElement>(".compare-inspector-remove")?.title).toBe(
+            "Keep at least two tilings on the wall",
+        );
         expect(window.location.hash).toContain("focus=square");
 
         // Escape returns to the gallery (and clears the focus slot) without closing.
@@ -3041,6 +3118,11 @@ describe("mountComparePanel", () => {
         expect(filmstrip()?.classList.contains("compare-filmstrip--speaker")).toBe(false);
         expect(window.location.hash).not.toContain("focus=");
         expect(page()?.hidden).toBe(false);
+        expect(document.querySelector(".compare-inspector-body > .compare-hero-toolbelt")).toBe(
+            toolbelt,
+        );
+        expect(toolbelt?.isConnected).toBe(true);
+        expect(toolbeltActions()).toEqual(initialToolbeltActions);
 
         // The wall is the page: a further Escape does not leave it.
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
@@ -3282,15 +3364,25 @@ describe("mountComparePanel", () => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
         });
         expect(requestFilmstrip).toHaveBeenCalledTimes(1);
+        expect(document.querySelectorAll(".compare-filmstrip-remove")).toHaveLength(0);
 
         // Every survivor's frames are already here, so removal drops the board
         // in place -- instantly, with no second request to the backend.
-        document
-            .querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
-            ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-inspector-remove")?.click();
 
         expect(document.querySelector(".compare-status")?.textContent).toContain("Removed");
         expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        expect(
+            [...document.querySelectorAll(".compare-filmstrip-label")].map(
+                (label) => label.textContent,
+            ),
+        ).toEqual(["hex", "tri"]);
+        expect(
+            document.querySelector(".compare-filmstrip-board.is-selected .compare-filmstrip-label")
+                ?.textContent,
+        ).toBe("hex");
+        expect(window.location.hash).not.toContain("focus=");
         expect(document.querySelector(".compare-stage-caption")?.textContent).toContain(
             "2 tilings",
         );
@@ -3343,9 +3435,10 @@ describe("mountComparePanel", () => {
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
         });
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
         await vi.waitFor(() => {
             expect(
-                document.querySelector<HTMLButtonElement>(".compare-filmstrip-remove")?.disabled,
+                document.querySelector<HTMLButtonElement>(".compare-inspector-remove")?.disabled,
             ).toBe(false);
         });
 
@@ -3355,7 +3448,7 @@ describe("mountComparePanel", () => {
         if (!wallGenerations) throw new Error("missing wall generations input");
         wallGenerations.value = "13";
         wallGenerations.dispatchEvent(new Event("input", { bubbles: true }));
-        document.querySelector<HTMLButtonElement>(".compare-filmstrip-remove")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-inspector-remove")?.click();
 
         expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2), {
@@ -3379,7 +3472,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("holds the two-board floor against a rapid removal burst", async () => {
+    it("keeps the selected Remove action visible, disabled, and explained at the floor", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
         const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => threeBoardFilmstrip());
@@ -3405,21 +3498,18 @@ describe("mountComparePanel", () => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
         });
 
-        // Fire the whole burst in one task. Local removal drops the first board
-        // instantly; the follow-up clicks are judged against the pending
-        // two-board selection and refused, so the wall settles at exactly two
-        // boards rather than collapsing below its floor -- and never rebuilds.
-        const removeButtons = [
-            ...document.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-remove"),
-        ];
-        removeButtons.forEach((button) =>
-            button.dispatchEvent(new MouseEvent("click", { bubbles: true })),
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        const removeSelected = document.querySelector<HTMLButtonElement>(
+            ".compare-inspector-remove",
         );
+        expect(removeSelected?.disabled).toBe(false);
+        removeSelected?.click();
 
         expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
-        expect(document.querySelector(".compare-status")?.textContent).toContain(
-            "Keep at least two tilings",
-        );
+        expect(removeSelected?.isConnected).toBe(true);
+        expect(removeSelected?.disabled).toBe(true);
+        expect(removeSelected?.title).toBe("Keep at least two tilings on the wall");
+        expect(removeSelected?.getAttribute("aria-label")).toContain("selected");
         await new Promise((resolve) => window.setTimeout(resolve, 900));
         expect(requestFilmstrip).toHaveBeenCalledTimes(1);
         handle.dispose();
@@ -3428,20 +3518,43 @@ describe("mountComparePanel", () => {
     it("keeps a replacement in the selected board's wall position", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
-        const requestFilmstrip = vi.fn(async (_request: FilmstripRequest) => threeBoardFilmstrip());
+        const template = twoBoardFilmstrip().tilings[0]!;
+        const requestFilmstrip = vi.fn(async (request: FilmstripRequest) => ({
+            ...threeBoardFilmstrip(),
+            tilings: request.geometries.map((geometry) => ({
+                ...template,
+                geometry,
+                tiling_family: geometry,
+            })),
+        }));
         const handle = mountComparePanel({
             backend: { ...backend, requestFilmstrip },
             bootstrapData: bootstrapData(),
         });
         handle.open();
-        [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]
-            .find((button) => button.textContent === "Run comparison")
-            ?.click();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 16,
+            geometries: ["square", "hex", "kagome"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
         await vi.waitFor(() => {
             expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
         });
 
-        document.querySelectorAll<HTMLButtonElement>(".compare-filmstrip-label")[1]?.click();
+        document.querySelectorAll<HTMLElement>(".compare-filmstrip-board")[1]?.click();
+        const replaceSelected = document.querySelector<HTMLButtonElement>(
+            ".compare-inspector-replace",
+        );
+        expect(replaceSelected?.textContent).toBe("Replace selected");
+        expect(replaceSelected?.getAttribute("aria-label")).toContain("hex");
+        replaceSelected?.click();
+        expect(
+            document.querySelector<HTMLInputElement>(".compare-board-tiling-picker-search"),
+        ).toBe(document.activeElement);
         const penroseChoice = [
             ...document.querySelectorAll<HTMLButtonElement>(".compare-board-tiling-choice"),
         ].find((choice) => choice.textContent?.includes("Penrose"));
@@ -3453,9 +3566,22 @@ describe("mountComparePanel", () => {
             "square",
             "penrose",
             "kagome",
-            "periodic-face",
-            "spectre",
         ]);
+        await vi.waitFor(() =>
+            expect(
+                [...document.querySelectorAll(".compare-filmstrip-label")].map(
+                    (label) => label.textContent,
+                ),
+            ).toEqual(["square", "penrose", "kagome"]),
+        );
+        expect(window.location.hash).toContain("focus=penrose");
+        await vi.waitFor(() =>
+            expect(
+                document.querySelector(
+                    ".compare-filmstrip-board.is-selected .compare-filmstrip-label",
+                )?.textContent,
+            ).toBe("penrose"),
+        );
         handle.dispose();
     });
 
@@ -3782,13 +3908,19 @@ describe("mountComparePanel", () => {
         });
         expect(backendFactory).toHaveBeenCalledWith("sess-focus-square");
         expect(backendFactory).toHaveBeenCalledWith("sess-focus-hex");
+        expect(window.location.hash).toContain("focus=hex");
+        expect(document.querySelector(".compare-filmstrip--speaker")).not.toBeNull();
+        expect(
+            document.querySelector(".compare-filmstrip-board.is-hero .compare-filmstrip-label")
+                ?.textContent,
+        ).toBe("hex");
 
         // Discarding one (the current hero, hex) leaves the other running.
-        document
-            .querySelector<HTMLButtonElement>(
-                ".compare-filmstrip-board.is-hero .compare-focus-pane-discard",
-            )
-            ?.click();
+        const heroDiscard = document.querySelector<HTMLButtonElement>(
+            ".compare-filmstrip-board.is-hero .compare-focus-pane-discard",
+        );
+        expect(heroDiscard).not.toBeNull();
+        heroDiscard?.click();
         expect(document.querySelectorAll(".compare-focus-pane")).toHaveLength(1);
         expect(
             document.querySelector(".compare-filmstrip-board.is-hero .compare-focus-pane"),

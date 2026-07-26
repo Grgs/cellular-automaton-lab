@@ -611,20 +611,6 @@ export function createComparePanelContent(
         return inspectedBoard(workspaceStore.getState());
     }
 
-    function selectedBoardElement(): HTMLElement | null {
-        const geometry = selectedBoardGeometry();
-        const filmstrip = workspaceStore.getState().results.filmstrip;
-        if (!geometry || !filmstrip || !filmstripView) {
-            return null;
-        }
-        const index = filmstrip.tilings.findIndex((tiling) => tiling.geometry === geometry);
-        return index < 0
-            ? null
-            : (filmstripView.element.querySelectorAll<HTMLElement>(".compare-filmstrip-board")[
-                  index
-              ] ?? null);
-    }
-
     const workspaceScheduler = createLatestConfigScheduler<ScheduledCompareRun>({
         delayMs: 400,
         validate: (scheduled) =>
@@ -884,10 +870,9 @@ export function createComparePanelContent(
         scheduleWallRerun();
     }
 
-    // Selection editing from the wall itself: a board's × chrome drops that
-    // tiling instantly (the filmstrip view disables it at the two-board
-    // minimum). If setup work is already queued, replace that pending run with
-    // the same latest settings applied to the survivor set.
+    // Inspector removal drops the selected tiling instantly. If setup work is
+    // already queued, replace that pending run with the same latest settings
+    // applied to the survivor set.
     function removeBoardFromWall(geometry: string): void {
         if (!selected.has(geometry)) {
             return;
@@ -896,9 +881,10 @@ export function createComparePanelContent(
         // displayed strip. Removal is local and instant now, so a rapid burst of
         // clicks simply stops at the floor -- there is no debounced rebuild to
         // outrun (the earlier race that collapsed the wall to the empty hero).
-        if (selected.size <= MIN_WALL_TILINGS) {
+        const displayedBoardCount =
+            workspaceStore.getState().results.filmstrip?.tilings.length ?? selected.size;
+        if (selected.size <= MIN_WALL_TILINGS || displayedBoardCount <= MIN_WALL_TILINGS) {
             statusLine.textContent = "Keep at least two tilings on the wall.";
-            filmstripView?.setBoardsRemovable(false);
             return;
         }
         const beforeRemoval = workspaceStore.getState();
@@ -940,6 +926,19 @@ export function createComparePanelContent(
         }
     }
 
+    function removeSelectedBoard(): void {
+        const geometry = selectedBoardGeometry();
+        if (!geometry) {
+            statusLine.textContent = "Select a tiling before removing it.";
+            return;
+        }
+        const restoreActionFocus = document.activeElement === inspectorRemoveButton;
+        removeBoardFromWall(geometry);
+        if (restoreActionFocus && !inspectorRemoveButton.disabled) {
+            inspectorRemoveButton.focus({ preventScroll: true });
+        }
+    }
+
     function replaceBoardOnWall(previousGeometry: string, nextGeometry: string): void {
         if (previousGeometry === nextGeometry || !selected.has(previousGeometry)) {
             return;
@@ -957,6 +956,28 @@ export function createComparePanelContent(
         orderedSelection.forEach((geometry, index) => {
             selected.add(index === replacedIndex ? nextGeometry : geometry);
         });
+        const wasFocused = workspaceStore.getState().focusedBoard === previousGeometry;
+        workspaceStore.update((state) => ({
+            ...state,
+            orderedBoards: [...selected],
+            selectedBoard:
+                state.selectedBoard === previousGeometry ? nextGeometry : state.selectedBoard,
+            focusedBoard: wasFocused ? nextGeometry : state.focusedBoard,
+        }));
+        if (wasFocused) {
+            // The replacement is not on the currently rendered wall yet.
+            // Update the route without firing hashchange against that stale
+            // wall; the authoritative result will apply this focus once the
+            // replacement board is installed.
+            window.history.replaceState(
+                null,
+                "",
+                `${window.location.pathname}${window.location.search}${hashWithFocus(
+                    window.location.hash,
+                    nextGeometry,
+                )}`,
+            );
+        }
         statusLine.textContent = `Replaced a board with ${next.label} — updating the wall…`;
         renderTilingChecklist();
         refreshPreview();
@@ -1311,7 +1332,7 @@ export function createComparePanelContent(
             type: "button",
             title: "Replace the selected board",
         },
-        ["Replace"],
+        ["Replace selected"],
     );
     const inspectorRemoveButton = el(
         "button",
@@ -1320,20 +1341,63 @@ export function createComparePanelContent(
             type: "button",
             title: "Remove the selected board",
         },
-        ["Remove"],
+        ["Remove selected"],
     );
+    const heroTargetContext = el("span", {
+        class: "compare-hero-target-context",
+        "aria-live": "polite",
+        "aria-atomic": "true",
+        hidden: true,
+    });
+    function heroActionGroup(name: string, children: Array<Node | string>): HTMLElement {
+        return el(
+            "div",
+            {
+                class: `compare-hero-tool-group compare-hero-tool-group-${name.toLowerCase()}`,
+                role: "group",
+                "aria-label": `${name} actions`,
+            },
+            [
+                el("span", {
+                    class: "compare-hero-tool-group-label",
+                    textContent: name,
+                    "aria-hidden": "true",
+                }),
+                ...children,
+            ],
+        );
+    }
     copyRunButton.classList.add("compare-hero-tool");
-    const heroToolbelt = el("div", { class: "compare-hero-toolbelt" }, [
-        heroBackButton,
-        heroOpenLabButton,
-        ...(focusLiveEnabled ? [heroForkButton] : []),
-        inspectorReplaceButton,
-        inspectorRemoveButton,
-        copyRunButton,
-    ]);
+    const heroToolbelt = el(
+        "div",
+        {
+            class: "compare-hero-toolbelt",
+            role: "group",
+            "aria-label": "Selected tiling actions",
+        },
+        [
+            heroTargetContext,
+            heroActionGroup("Navigate", [heroBackButton, heroOpenLabButton]),
+            heroActionGroup("Edit", [
+                ...(focusLiveEnabled ? [heroForkButton] : []),
+                inspectorReplaceButton,
+            ]),
+            heroActionGroup("Share", [copyRunButton]),
+            heroActionGroup("Remove", [inspectorRemoveButton]),
+        ],
+    );
+    // The toolbelt is reparented into the selected hero in speaker view.
+    // Own its pointer events so no action bubbles into the board tile's
+    // click-to-return-to-gallery behavior.
+    heroToolbelt.addEventListener("click", (event) => event.stopPropagation());
+    const compactToolbeltHome = el("div", {
+        class: "compare-selected-actions-home",
+        "aria-label": "Selected tiling actions",
+    });
 
     const stageMain = el("div", { class: "compare-stage-main" }, [
         staleResultNotice,
+        compactToolbeltHome,
         filmstripArea,
     ]);
     const explainerTitle = el("summary", {
@@ -1375,7 +1439,12 @@ export function createComparePanelContent(
     const configTabPanels = new Map<ConfigTab, HTMLElement>();
     const configTabs = el(
         "div",
-        { class: "compare-config-tabs", role: "tablist", "aria-label": "Configuration sections" },
+        {
+            class: "compare-config-tabs",
+            role: "tablist",
+            "aria-label": "Configuration views",
+            "aria-orientation": "horizontal",
+        },
         [
             configTabButton("setup", "Setup"),
             configTabButton("tilings", "Tilings"),
@@ -1487,6 +1556,10 @@ export function createComparePanelContent(
             ]),
         ],
     );
+    const inspectorBody = el("div", { class: "compare-inspector-body" }, [
+        heroToolbelt,
+        explainerPanel,
+    ]);
     const inspector = el(
         "aside",
         {
@@ -1499,9 +1572,11 @@ export function createComparePanelContent(
                 el("strong", { textContent: "Inspector" }),
                 inspectorCloseButton,
             ]),
-            el("div", { class: "compare-inspector-body" }, [heroToolbelt, explainerPanel]),
+            inspectorBody,
         ],
     );
+    const toolbeltGalleryHome = (): HTMLElement =>
+        window.innerWidth < 960 ? compactToolbeltHome : inspectorBody;
     activateConfigTab("setup");
 
     const boardWall = el("main", { class: "compare-stage compare-board-wall" }, [stageFrame]);
@@ -2097,17 +2172,51 @@ export function createComparePanelContent(
         // undo it, so the toolbelt's fork button hides rather than offering a
         // confusing second fork.
         const inspectedGeometry = selectedBoardGeometry();
+        filmstripView?.setSelectedBoard(inspectedGeometry);
         heroForkButton.hidden = inspectedGeometry !== null && forkedBoards.has(inspectedGeometry);
         heroForkButton.disabled = running;
         heroOpenLabButton.disabled = running || inspectedGeometry === null;
         heroBackButton.disabled = workspaceStore.getState().focusedBoard === null;
         inspectorButton.disabled = wallFilmstrip === null;
-        const inspectedBoard = selectedBoardElement();
-        inspectorReplaceButton.disabled = running || inspectedBoard === null;
-        inspectorRemoveButton.disabled =
-            running ||
-            inspectedBoard?.querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
-                ?.disabled !== false;
+        const inspectedLabel =
+            wallFilmstrip?.tilings.find((tiling) => tiling.geometry === inspectedGeometry)?.label ??
+            inspectedGeometry;
+        heroTargetContext.hidden = inspectedGeometry === null;
+        heroTargetContext.textContent = inspectedLabel ? `Selected: ${inspectedLabel}` : "";
+        inspectorReplaceButton.disabled =
+            running || operation.wallUpdateFailed || inspectedGeometry === null;
+        inspectorReplaceButton.setAttribute(
+            "aria-label",
+            inspectedLabel ? `Replace selected ${inspectedLabel}` : "Replace selected tiling",
+        );
+        inspectorReplaceButton.title = running
+            ? WAIT_FOR_WALL_UPDATE
+            : operation.wallUpdateFailed
+              ? FAILED_UPDATE_MANAGEMENT_REASON
+              : inspectedLabel
+                ? `Replace selected ${inspectedLabel}`
+                : "Select a tiling to replace";
+        const canRemoveSelected =
+            !running &&
+            !operation.wallUpdateFailed &&
+            inspectedGeometry !== null &&
+            (wallFilmstrip?.tilings.length ?? 0) > MIN_WALL_TILINGS;
+        inspectorRemoveButton.disabled = !canRemoveSelected;
+        inspectorRemoveButton.setAttribute(
+            "aria-label",
+            inspectedLabel
+                ? `Remove selected ${inspectedLabel} from the wall`
+                : "Remove selected tiling",
+        );
+        inspectorRemoveButton.title = canRemoveSelected
+            ? `Remove selected ${inspectedLabel} from the wall`
+            : inspectedGeometry === null
+              ? "Select a tiling to remove"
+              : (wallFilmstrip?.tilings.length ?? 0) <= MIN_WALL_TILINGS
+                ? "Keep at least two tilings on the wall"
+                : operation.wallUpdateFailed
+                  ? FAILED_UPDATE_MANAGEMENT_REASON
+                  : WAIT_FOR_WALL_UPDATE;
         // Painting needs boards on the stage; the toggle waits for a run.
         editModeButton.disabled = running || !wallFilmstrip;
         editModeButton.title = running ? WAIT_FOR_WALL_UPDATE : "Edit the seed by painting boards";
@@ -2712,7 +2821,6 @@ export function createComparePanelContent(
                 noteDetachedForksOnClockMove();
             },
             onPaintCell: handlePaintCell,
-            onRemoveBoard: removeBoardFromWall,
             tilingOptions: wallTilingPickerOptions(allTilings),
             onReplaceBoard: replaceBoardOnWall,
             onAddBoard: addBoardToWall,
@@ -2728,6 +2836,8 @@ export function createComparePanelContent(
                 ),
         });
         filmstripView = view;
+        view.setHeroToolbelt(heroToolbelt);
+        view.setHeroToolbeltHome(toolbeltGalleryHome());
         const operation = workspaceStore.getState().operation;
         view.setManagementBusy(operation.executing);
         view.setManagementBlocked(
@@ -2808,6 +2918,7 @@ export function createComparePanelContent(
             }
             // Honour a deep-linked focus (e.g. #/compare&focus=square) now that boards exist.
             applyFocusFromHash();
+            filmstripView?.setSelectedBoard(selectedBoardGeometry());
             clearFailedWallUpdate();
             updateStageCaption(runConfig);
             statusLine.textContent = filmstripReadyStatus(
@@ -3001,15 +3112,14 @@ export function createComparePanelContent(
     heroForkButton.addEventListener("click", () => void forkFocusedBoardLive());
     heroBackButton.addEventListener("click", () => filmstripView?.focus(null));
     inspectorReplaceButton.addEventListener("click", () => {
-        selectedBoardElement()
-            ?.querySelector<HTMLButtonElement>(".compare-filmstrip-label")
-            ?.click();
+        const geometry = selectedBoardGeometry();
+        const pickerAnchor =
+            heroToolbelt.closest<HTMLElement>(".compare-filmstrip-board") ?? inspectorBody;
+        if (!geometry || !filmstripView?.openReplacePicker(geometry, pickerAnchor)) {
+            statusLine.textContent = "Select a tiling before replacing it.";
+        }
     });
-    inspectorRemoveButton.addEventListener("click", () => {
-        selectedBoardElement()
-            ?.querySelector<HTMLButtonElement>(".compare-filmstrip-remove")
-            ?.click();
-    });
+    inspectorRemoveButton.addEventListener("click", removeSelectedBoard);
     copyRunButton.addEventListener("click", copyRunLink);
     configButton.addEventListener("click", () => {
         if (!workspaceLayout.closeSetup()) {
@@ -3038,6 +3148,7 @@ export function createComparePanelContent(
     const onWallCapacityChange = (): void => {
         renderTilingChecklist();
         filmstripView?.refreshAddControl();
+        filmstripView?.setHeroToolbeltHome(toolbeltGalleryHome());
     };
     window.addEventListener("resize", onWallCapacityChange);
 
