@@ -40,6 +40,15 @@ Enable the repository-managed hooks with:
 git config core.hooksPath .githooks
 ```
 
+Git does not copy this local setting when cloning a repository. Run it once for
+every new clone, then verify it with:
+
+```powershell
+git config --get core.hooksPath
+```
+
+The expected output is `.githooks`.
+
 The tracked hook launchers use `python -m pre_commit` (or an available
 `pre-commit` executable), so install the development requirements before
 enabling them. Do not run `pre-commit install` while `core.hooksPath` points at
@@ -50,7 +59,12 @@ Run them manually with:
 ```powershell
 python -m pre_commit run --all-files
 python -m pre_commit run --hook-stage pre-push --all-files
+npm run check:privacy
 ```
+
+The change-aware `npm run check:ci-local` gate starts with the same full-repository
+privacy scan. This provides backup coverage when hook setup is missing or broken;
+it does not replace enabling the commit and push hooks.
 
 When changed files can affect the standalone artifact, the pre-push stage
 rebuilds the standalone frontend and enforces its bundle-size budget, so a stale
