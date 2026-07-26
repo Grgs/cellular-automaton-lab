@@ -140,7 +140,7 @@ log/diff. Do not rediscover or reimplement completed phases.
 
 | Phase | Issue | Branch | PR | Merge SHA | Verification | Next phase |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 — Shell, menus, themes | #262 | `fix/ui-shell-theme-foundation` | This draft PR | — | Complete locally: focused server/standalone journeys, frontend checks, doc links, and full local PR gate pass | Phase 2: start fresh from latest `origin/main`; implement only #263 editable summary and canonical Rule control |
+| 1 — Shell, menus, themes | #262 | `fix/ui-shell-theme-foundation` | #269 (draft) | — | Complete locally: focused server/standalone journeys, frontend checks, doc links, and full local PR gate pass | Phase 2: start fresh from latest `origin/main`; implement only #263 editable summary and canonical Rule control |
 | 2 — Editable summary | #263 | `feat/compare-editable-summary` | — | — | Not started | Phase 3 |
 | 3 — Resizable panels | #264 | `feat/compare-resizable-panels` | — | — | Not started | Phase 4 |
 | 4 — Action scope | #265 | `feat/compare-action-scope` | — | — | Not started | Phase 5 |
