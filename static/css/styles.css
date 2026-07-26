@@ -2594,6 +2594,10 @@ button.theme-toggle .theme-icon-moon {
         display: none;
     }
 
+    .shell-workspace-status {
+        display: none;
+    }
+
     .shell-route-tab {
         min-width: 62px;
         padding-inline: 8px;
@@ -2917,5 +2921,13 @@ button.theme-toggle .theme-icon-moon {
 
     .patterns-share-btn {
         width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    /* The menu keeps Compare/Lab navigation discoverable without forcing the
+       compact header to scroll horizontally alongside the theme control. */
+    .shell-route-switcher {
+        display: none;
     }
 }

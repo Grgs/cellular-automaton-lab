@@ -98,19 +98,29 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect("#shell-workspace-status").to_have_text("Lab editor")
 
         menu = case.page.locator("#shell-menu")
-        case.page.locator(".shell-menu-toggle").click()
+        menu_toggle = case.page.get_by_role("button", name="Open app menu")
+        expect(menu_toggle).to_be_visible()
+        menu_toggle.focus()
+        menu_toggle.press("Enter")
         expect(menu).to_have_attribute("open", "")
-        case.page.click("#shell-menu-compare")
+        expect(case.page.get_by_role("button", name="Preferences", exact=True)).to_be_visible()
+        case.page.locator("#shell-menu-compare").press("Enter")
         case.page.wait_for_function("() => window.location.hash === ''")
         self._expect(".wall-page").to_be_visible()
         self._expect("#shell-workspace-status").to_have_text("Compare workspace")
 
-        case.page.locator(".shell-menu-toggle").click()
+        menu_toggle.click()
         case.page.click("#shell-menu-lab")
         case.page.wait_for_function("() => window.location.hash === '#/lab'")
         self._expect("#grid").to_be_visible()
 
-        case.page.locator(".shell-menu-toggle").click()
+        case.page.set_viewport_size({"width": 390, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 800])
+        case.assertLessEqual(
+            int(case.page.evaluate("() => document.documentElement.scrollWidth")),
+            390,
+        )
+        menu_toggle.click()
         case.page.click("#shell-preferences-btn")
         preferences = case.page.get_by_role("dialog", name="Preferences")
         expect(preferences).to_be_visible()
