@@ -203,9 +203,9 @@ export function createComparePanelContent(
     let analysisOverlayOpen = false;
     let analysisFocusReturn: HTMLElement | null = null;
 
-    // Rule and seed live in the always-visible quick strip (one authoritative
-    // control each), so they carry the strip styling and the accessible names
-    // the strip advertises rather than being duplicated in the Setup tab.
+    // Rule remains the one authoritative, always-visible control. Seed source
+    // stays canonical in Setup; the toolbar exposes a summary button that
+    // opens and focuses that real editor rather than mirroring its value.
     const ruleSelect = el("select", {
         class: "compare-field compare-setup-value compare-setup-select",
         "aria-label": "Comparison rule",
@@ -460,6 +460,17 @@ export function createComparePanelContent(
         textContent: "Loading",
         title: "Loading",
     });
+    const setupSeedValue = el("strong", {
+        class: "compare-setup-value",
+        textContent: "Bits",
+        title: "Bits",
+    });
+    const setupState = el("span", {
+        class: "compare-setup-state",
+        role: "status",
+        "aria-live": "polite",
+        textContent: "Not run",
+    });
     const setupRunButton = el(
         "button",
         {
@@ -468,6 +479,22 @@ export function createComparePanelContent(
             title: "Run every selected tiling on a shared clock",
         },
         ["Run comparison"],
+    );
+    const setupSeedItem = el(
+        "button",
+        {
+            class: "compare-setup-item compare-setup-action compare-seed-summary",
+            type: "button",
+            title: "Edit the shared seed",
+            "aria-label": "Edit comparison seed",
+        },
+        [
+            el("span", { class: "compare-setup-label", textContent: "Seed" }),
+            el("span", { class: "compare-setup-action-row" }, [
+                setupSeedValue,
+                el("span", { class: "compare-setup-action-text", textContent: "Edit" }),
+            ]),
+        ],
     );
     const setupTilingsItem = el(
         "button",
@@ -489,10 +516,10 @@ export function createComparePanelContent(
         "section",
         { class: "compare-setup-strip", "aria-label": "Comparison setup" },
         [
-            setupItem("Seed", shapeSelect),
+            setupSeedItem,
             setupItem("Rule", ruleSelect),
             setupTilingsItem,
-            setupRunButton,
+            el("div", { class: "compare-setup-commit" }, [setupState, setupRunButton]),
         ],
     );
     const retryWallUpdateButton = el("button", {
@@ -1356,10 +1383,11 @@ export function createComparePanelContent(
             configTabButton("saved", "Saved"),
         ],
     );
-    // Rule and seed source now live only in the always-visible quick strip; the
-    // Setup tab keeps the deeper knobs and the seed pad.
+    // Seed source is edited only here. The toolbar button opens this panel and
+    // focuses this canonical select; Rule remains visible in the toolbar.
     const setupConfigPanel = configPanel("setup", [
         el("div", { class: "compare-form" }, [
+            labeledField("Seed", shapeSelect),
             labeledField("Traversal", traversalSelect),
             labeledField("Wall generations", wallGenerationsInput),
             labeledField("Analysis steps", analysisStepsInput),
@@ -1452,7 +1480,6 @@ export function createComparePanelContent(
             ]),
             configTabs,
             el("div", { class: "compare-config-sheet-body" }, [
-                setupStrip,
                 setupConfigPanel,
                 tilingsConfigPanel,
                 helpConfigPanel,
@@ -1478,6 +1505,7 @@ export function createComparePanelContent(
     activateConfigTab("setup");
 
     const boardWall = el("main", { class: "compare-stage compare-board-wall" }, [stageFrame]);
+    const wallWorkspace = el("div", { class: "compare-wall-workspace" }, [setupStrip, boardWall]);
     const dock = el("div", { class: "compare-dock" }, [
         filmstripTransport.element,
         editModeButton,
@@ -1489,7 +1517,7 @@ export function createComparePanelContent(
     ]);
     const workspaceLayout = createCompareWorkspaceLayout({
         setup: configSheet,
-        boardWall,
+        boardWall: wallWorkspace,
         inspector,
         dock,
         setupToggle: configButton,
@@ -1983,6 +2011,8 @@ export function createComparePanelContent(
             operation.status === "pending" || (operation.status === "updating" && !running);
         const pendingFilmstrip = queued && operation.kind === "filmstrip";
         const pendingAnalysis = queued && operation.kind === "analysis";
+        const filmstripRunning = running && operation.kind === "filmstrip";
+        const actionVerb = wallFilmstrip ? "Update" : "Run";
         runButton.disabled = !canAnalyze;
         runButton.textContent = failedAnalysis
             ? "Retry analysis"
@@ -1998,20 +2028,49 @@ export function createComparePanelContent(
         setupRunButton.classList.toggle("is-current", current && !running);
         setupRunButton.classList.toggle("is-stale", stale && !running);
         setupRunButton.textContent = failedFilmstrip
-            ? "Retry"
+            ? `Retry ${actionVerb.toLowerCase()}`
             : pendingFilmstrip
-              ? "Run now"
-              : running
+              ? `${actionVerb} now`
+              : filmstripRunning
                 ? wallFilmstrip
-                    ? "Applying..."
-                    : "Running..."
+                    ? "Updating…"
+                    : "Running…"
                 : wallProblem
                   ? "Check setup"
                   : current
                     ? "Up to date"
                     : stale
-                      ? "Apply changes"
+                      ? "Update comparison"
                       : "Run comparison";
+        const stateText = wallProblem
+            ? "Needs attention"
+            : failedFilmstrip
+              ? `${actionVerb} failed`
+              : pendingFilmstrip
+                ? `${actionVerb} queued`
+                : filmstripRunning
+                  ? wallFilmstrip
+                      ? "Updating"
+                      : "Running"
+                  : current
+                    ? "Current"
+                    : stale
+                      ? "Changes pending"
+                      : "Not run";
+        setupState.textContent = stateText;
+        setupState.classList.toggle("is-current", current && !running);
+        setupState.classList.toggle("is-stale", stale && !running);
+        setupState.classList.toggle(
+            "is-error",
+            wallProblem !== null || (failedFilmstrip && !running),
+        );
+        setupStrip.dataset.state = current
+            ? "current"
+            : stale
+              ? "stale"
+              : wallProblem
+                ? "invalid"
+                : "not-run";
         const playTitle = (() => {
             if (running) {
                 return WAIT_FOR_WALL_UPDATE;
@@ -2120,7 +2179,16 @@ export function createComparePanelContent(
 
     function updateSetupSummary(): void {
         const ruleLabel = selectedRule()?.display_name ?? selectedRuleName();
+        const selectedSeedLabel =
+            shapeSelect.selectedOptions[0]?.textContent?.replace(/^Shape:\s*/, "") ?? "Bits";
+        const bits = normalizedSeedBits();
+        const liveCells = (bits.match(/1/g) ?? []).length;
+        const seedLabel = isShapeMode() ? selectedSeedLabel : `Bits · ${liveCells} live`;
         const tilingLabel = `${selected.size} selected`;
+        setupSeedValue.textContent = seedLabel;
+        setupSeedValue.title = isShapeMode()
+            ? `Named seed: ${selectedSeedLabel}`
+            : `${liveCells} live cells across ${bits.length} bits`;
         setupTilingsValue.textContent = tilingLabel;
         ruleSelect.title = ruleLabel;
         setupTilingsValue.title = summaryText();
@@ -2903,6 +2971,22 @@ export function createComparePanelContent(
         window.requestAnimationFrame(focusTilingSearchIfOpen);
     }
 
+    function focusSeedEditorIfOpen(): void {
+        if (
+            configSheet.classList.contains("is-open") &&
+            !configTabPanels.get("setup")?.hidden &&
+            !shapeSelect.disabled
+        ) {
+            shapeSelect.focus();
+        }
+    }
+
+    function openSeedSheet(): void {
+        openConfigSheet("setup");
+        focusSeedEditorIfOpen();
+        window.requestAnimationFrame(focusSeedEditorIfOpen);
+    }
+
     runButton.addEventListener("click", () => void runComparison());
     retryWallUpdateButton.addEventListener("click", () => void workspaceScheduler.retry());
     setupRunButton.addEventListener("click", () => {
@@ -2945,6 +3029,7 @@ export function createComparePanelContent(
     analysisCloseButton.addEventListener("click", () => closeAnalysisOverlayIfOpen());
     analysisBackdrop.addEventListener("click", () => closeAnalysisOverlayIfOpen());
     analysisOverlay.addEventListener("keydown", trapAnalysisFocus);
+    setupSeedItem.addEventListener("click", openSeedSheet);
     setupTilingsItem.addEventListener("click", openTilingsSheet);
     tilingsButton.addEventListener("click", openTilingsSheet);
     configSheetCloseButton.addEventListener("click", workspaceLayout.closeSetup);

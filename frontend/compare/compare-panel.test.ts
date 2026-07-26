@@ -802,10 +802,11 @@ describe("mountComparePanel", () => {
         expect(setupStrip?.textContent).toContain("Rule");
         expect(setupStrip?.textContent).toContain("Tilings");
         expect(setupStrip?.textContent).toContain("Run comparison");
-        expect(setupStrip?.querySelectorAll(".compare-setup-status")).toHaveLength(2);
-        expect(
-            setupStrip?.querySelector<HTMLButtonElement>(".compare-setup-action")?.textContent,
-        ).toContain("Edit");
+        expect(setupStrip?.closest(".compare-wall-workspace")).not.toBeNull();
+        expect(setupStrip?.closest(".compare-setup-sidebar")).toBeNull();
+        expect(setupStrip?.querySelectorAll(".compare-setup-status")).toHaveLength(1);
+        expect(setupStrip?.querySelectorAll(".compare-setup-action")).toHaveLength(2);
+        expect(setupStrip?.querySelector(".compare-setup-state")?.textContent).toBe("Not run");
         const explainer = document.querySelector<HTMLElement>(".compare-explainer");
         expect(explainer?.textContent).toContain("Same seed");
         expect(explainer?.textContent).toContain("Same rule");
@@ -837,7 +838,7 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
-    it("edits the comparison seed and rule from the setup strip", async () => {
+    it("keeps Rule canonical in the toolbar and Seed canonical in Setup", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend, compareSeed } = fakeBackend();
         const handle = mountComparePanel({
@@ -846,18 +847,37 @@ describe("mountComparePanel", () => {
             bootstrapData: bootstrapData(),
         });
 
-        await vi.waitFor(() => {
-            expect(document.querySelectorAll(".compare-setup-select")).toHaveLength(2);
-        });
-        const [seedSelect, ruleSelect] = [
-            ...document.querySelectorAll<HTMLSelectElement>(".compare-setup-select"),
-        ];
-        if (!seedSelect || !ruleSelect) {
-            throw new Error("missing setup strip selects");
+        await vi.waitFor(() =>
+            expect(document.querySelectorAll('select[aria-label="Comparison rule"]')).toHaveLength(
+                1,
+            ),
+        );
+        const seedSummary = document.querySelector<HTMLButtonElement>(".compare-seed-summary");
+        const seedSelect = document.querySelector<HTMLSelectElement>(
+            'select[aria-label="Comparison seed"]',
+        );
+        const ruleSelect = document.querySelector<HTMLSelectElement>(
+            'select[aria-label="Comparison rule"]',
+        );
+        if (!seedSummary || !seedSelect || !ruleSelect) {
+            throw new Error("missing canonical setup controls");
         }
+
+        expect(seedSelect.closest(".compare-config-panel-setup")).not.toBeNull();
+        expect(ruleSelect.closest(".compare-setup-strip")).not.toBeNull();
+        expect(seedSummary.textContent).toContain("Bits");
+        seedSummary.click();
+        expect(document.querySelector(".compare-config-sheet")?.classList.contains("is-open")).toBe(
+            true,
+        );
+        expect(document.querySelector<HTMLElement>("#compare-config-panel-setup")?.hidden).toBe(
+            false,
+        );
+        expect(document.activeElement).toBe(seedSelect);
 
         seedSelect.value = "glider";
         seedSelect.dispatchEvent(new Event("change"));
+        expect(seedSummary.textContent).toContain("glider");
         ruleSelect.value = "wireworld";
         ruleSelect.dispatchEvent(new Event("change"));
 
@@ -1107,9 +1127,10 @@ describe("mountComparePanel", () => {
         seedField!.value = "10101";
         seedField!.dispatchEvent(new Event("input", { bubbles: true }));
 
-        expect(setupRun?.textContent).toBe("Run now");
+        expect(setupRun?.textContent).toBe("Update now");
         expect(setupRun?.classList.contains("is-stale")).toBe(true);
         expect(setupRun?.disabled).toBe(false);
+        expect(document.querySelector(".compare-setup-state")?.textContent).toBe("Update queued");
         setupRun?.click();
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
         await vi.waitFor(() => expect(setupRun?.textContent).toBe("Up to date"));
@@ -1141,7 +1162,8 @@ describe("mountComparePanel", () => {
         ruleSelect.value = "wireworld";
         ruleSelect.dispatchEvent(new Event("change", { bubbles: true }));
 
-        expect(applyButton?.textContent).toBe("Run now");
+        expect(applyButton?.textContent).toBe("Update now");
+        expect(document.querySelector(".compare-setup-state")?.textContent).toBe("Update queued");
         applyButton?.click();
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
         expect(requestFilmstrip.mock.calls[1]?.[0]?.rule).toBe("wireworld");
@@ -1227,7 +1249,7 @@ describe("mountComparePanel", () => {
         });
         const run = document.querySelector<HTMLButtonElement>(".compare-setup-run");
         run?.click();
-        expect(run?.textContent).toBe("Running...");
+        expect(run?.textContent).toBe("Running…");
 
         await vi.waitFor(() => {
             expect(document.querySelector<HTMLElement>(".compare-wall-loading")?.hidden).toBe(
@@ -1249,9 +1271,9 @@ describe("mountComparePanel", () => {
         );
         seedField!.value = "1110";
         seedField!.dispatchEvent(new Event("input", { bubbles: true }));
-        expect(run?.textContent).toBe("Run now");
+        expect(run?.textContent).toBe("Update now");
         run?.click();
-        expect(run?.textContent).toBe("Applying...");
+        expect(run?.textContent).toBe("Updating…");
         await vi.waitFor(() => {
             expect(document.querySelector(".compare-wall-loading")?.textContent).toContain(
                 "Updating comparison...",
@@ -1289,7 +1311,10 @@ describe("mountComparePanel", () => {
         expect(document.querySelector<HTMLElement>("#compare-config-panel-setup")?.hidden).toBe(
             false,
         );
-        expect(sheet?.textContent).toContain("Run comparison");
+        expect(sheet?.textContent).not.toContain("Run comparison");
+        expect(
+            document.querySelector(".compare-setup-strip")?.closest(".compare-wall-workspace"),
+        ).not.toBeNull();
 
         // The sheet's remaining tabs still work; analysis is no longer among them.
         document.querySelector<HTMLButtonElement>("#compare-config-tab-help")?.click();
@@ -1883,7 +1908,14 @@ describe("mountComparePanel", () => {
                 ".compare-form .compare-field, .compare-seedbits .compare-field",
             ),
         ];
-        expect(fields.map((field) => field.value)).toEqual(["row-major", "12", "50", "8", "101"]);
+        expect(fields.map((field) => field.value)).toEqual([
+            "glider",
+            "row-major",
+            "12",
+            "50",
+            "8",
+            "101",
+        ]);
         expect(checkedTilingLabels()).toEqual(["Kagome"]);
         expect(compareSeed).not.toHaveBeenCalled();
         expect(document.querySelector<HTMLElement>(".compare-status")?.textContent).toBe(

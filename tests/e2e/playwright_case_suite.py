@@ -248,6 +248,161 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         ]
         case.assertEqual(unexpected_console, [])
 
+    def test_compare_summary_toolbar_edits_canonical_configuration_at_both_widths(
+        self,
+    ) -> None:
+        case = self._case()
+        case.page.set_viewport_size({"width": 1280, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [1280, 800])
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        toolbar = case.page.locator(".compare-setup-strip")
+        expect(toolbar).to_be_visible()
+        case.assertEqual(toolbar.locator('select[aria-label="Comparison rule"]').count(), 1)
+        case.assertEqual(
+            case.page.locator('select[aria-label="Comparison rule"]').count(),
+            1,
+        )
+        case.assertTrue(
+            bool(
+                toolbar.evaluate(
+                    "(node) => node.closest('.compare-wall-workspace') !== null "
+                    "&& node.closest('.compare-setup-sidebar') === null"
+                )
+            )
+        )
+        expect(case.page.locator(".compare-setup-state")).to_have_text("Current")
+        expect(case.page.locator(".compare-setup-run")).to_have_text("Up to date")
+        expect(case.page.locator(".compare-setup-run")).to_be_disabled()
+
+        seed_summary = case.page.get_by_role("button", name="Edit comparison seed")
+        seed_summary.click()
+        expect(case.page.locator(".compare-config-sheet")).to_have_class(re.compile(r"\bis-open\b"))
+        expect(case.page.locator("#compare-config-panel-setup")).to_be_visible()
+        seed_editor = case.page.locator('select[aria-label="Comparison seed"]')
+        expect(seed_editor).to_be_focused()
+        self._expect(".compare-filmstrip-board").to_have_count(4)
+        case.page.click(".compare-config-sheet-close")
+
+        tilings_summary = case.page.get_by_role("button", name="Choose tilings on the wall")
+        tilings_summary.click()
+        expect(case.page.locator("#compare-config-panel-tilings")).to_be_visible()
+        expect(case.page.locator(".compare-tilings-search")).to_be_focused()
+        self._expect(".compare-filmstrip-board").to_have_count(4)
+        case.page.click(".compare-config-sheet-close")
+
+        rule = case.page.locator('select[aria-label="Comparison rule"]')
+        rule.select_option("wireworld")
+        expect(rule).to_have_value("wireworld")
+        expect(case.page.locator(".compare-setup-state")).to_have_text("Update queued")
+        expect(case.page.locator(".compare-setup-run")).to_have_text("Update now")
+        case.page.click(".compare-setup-run")
+        expect(case.page.locator(".compare-setup-state")).to_have_text("Current", timeout=60_000)
+        expect(case.page.locator(".compare-setup-run")).to_have_text("Up to date")
+
+        # The canonical control and finished wall survive the existing route
+        # round trip; returning does not reconstruct a second Rule select.
+        case.page.click("#open-lab-btn")
+        case.page.wait_for_function("() => window.location.hash === '#/lab'")
+        self._expect("#grid").to_be_visible()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        expect(rule).to_have_value("wireworld")
+        case.assertEqual(
+            case.page.locator('select[aria-label="Comparison rule"]').count(),
+            1,
+        )
+
+        def toolbar_colors() -> dict[str, str]:
+            colors = case.page.evaluate(
+                """() => {
+                    const toolbar = document.querySelector(".compare-setup-strip");
+                    const seed = document.querySelector(".compare-seed-summary");
+                    const rule = document.querySelector(
+                        'select[aria-label="Comparison rule"]'
+                    );
+                    if (!(toolbar instanceof HTMLElement)
+                        || !(seed instanceof HTMLElement)
+                        || !(rule instanceof HTMLElement)) {
+                        throw new Error("Missing Compare summary toolbar surface");
+                    }
+                    return {
+                        toolbar: getComputedStyle(toolbar).backgroundColor,
+                        seed: getComputedStyle(seed).backgroundColor,
+                        rule: getComputedStyle(rule).color,
+                    };
+                }"""
+            )
+            if not isinstance(colors, dict):
+                raise AssertionError(f"invalid toolbar color snapshot: {colors!r}")
+            return cast(dict[str, str], colors)
+
+        menu_toggle = case.page.get_by_role("button", name="Open app menu")
+        menu_toggle.click()
+        case.page.click("#shell-preferences-btn")
+        case.page.get_by_role("radio", name="Light").check()
+        self._expect("html").to_have_attribute("data-theme", "light")
+        light_colors = toolbar_colors()
+        case.page.get_by_role("radio", name="Dark").check()
+        self._expect("html").to_have_attribute("data-theme", "dark")
+        dark_colors = toolbar_colors()
+        for surface in ("toolbar", "seed", "rule"):
+            with case.subTest(toolbar_theme_surface=surface):
+                case.assertNotEqual(light_colors[surface], dark_colors[surface])
+        case.page.click("#shell-preferences-close")
+
+        case.page.set_viewport_size({"width": 390, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 800])
+        expect(toolbar).to_be_visible()
+        expect(rule).to_be_visible()
+        expect(seed_summary).to_be_visible()
+        expect(tilings_summary).to_be_visible()
+        expect(case.page.locator(".compare-setup-run")).to_be_visible()
+        case.assertLessEqual(
+            int(case.page.evaluate("() => document.documentElement.scrollWidth")),
+            390,
+        )
+        toolbar_rects = case.page.evaluate(
+            """() => [
+                document.querySelector(".compare-setup-strip"),
+                ...document.querySelectorAll(".compare-setup-strip > *"),
+            ].map((node) => {
+                if (!(node instanceof HTMLElement)) {
+                    throw new Error("Missing Compare toolbar item");
+                }
+                const rect = node.getBoundingClientRect();
+                return { left: rect.left, right: rect.right };
+            })"""
+        )
+        if not isinstance(toolbar_rects, list):
+            raise AssertionError(f"invalid toolbar rectangles: {toolbar_rects!r}")
+        for rect in toolbar_rects:
+            if not isinstance(rect, dict):
+                raise AssertionError(f"invalid toolbar rectangle: {rect!r}")
+            case.assertGreaterEqual(float(rect["left"]), 0)
+            case.assertLessEqual(float(rect["right"]), 390)
+
+        seed_summary.click()
+        expect(seed_editor).to_be_focused()
+        case.page.click(".compare-config-sheet-close")
+        tilings_summary.click()
+        expect(case.page.locator(".compare-tilings-search")).to_be_focused()
+        case.page.click(".compare-config-sheet-close")
+        case.assertLessEqual(
+            int(case.page.evaluate("() => document.documentElement.scrollWidth")),
+            390,
+        )
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
     def test_rule_picker_updates_rule_ui(self) -> None:
         case = self._case()
         self._expect("#tiling-family-select").to_have_value("square")
