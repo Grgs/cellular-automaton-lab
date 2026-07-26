@@ -140,9 +140,34 @@ log/diff. Do not rediscover or reimplement completed phases.
 
 | Phase | Issue | Branch | PR | Merge SHA | Verification | Next phase |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 — Shell, menus, themes | #262 | `fix/ui-shell-theme-foundation` | #269 (draft) | — | Complete locally: focused server/standalone journeys, frontend checks, doc links, and full local PR gate pass | Phase 2: start fresh from latest `origin/main`; implement only #263 editable summary and canonical Rule control |
-| 2 — Editable summary | #263 | `feat/compare-editable-summary` | — | — | Not started | Phase 3 |
+| 1 — Shell, menus, themes | #262 | `fix/ui-shell-theme-foundation` | #269 (merged) | `d2d99d65bac3c0216730c3a27883ff2f653e5438` | Full local PR gate passed (575 frontend tests and 140 Playwright journeys), plus focused desktop/narrow shell, menu, theme, and Compare↔Lab checks | Phase 2 started fresh from the merged `origin/main` |
+| 2 — Editable summary | #263 | `feat/compare-editable-summary` | #270 (draft) | — | Complete locally: 575 frontend tests; focused server and freshly built standalone summary journeys at 1280×800 and 390×800; canonical Rule, Seed/Tilings focus, current/stale Run/Update states, themes, overflow, console, and Compare↔Lab checks; one local PR gate run, with its measured bundle-budget stop resolved by a focused budget pass and its remaining catalog/142-browser matrix completed with focused reruns for the corrected picker overlap | Phase 3: only after Phase 2 merges, start fresh from latest `origin/main` and implement #264 |
 | 3 — Resizable panels | #264 | `feat/compare-resizable-panels` | — | — | Not started | Phase 4 |
 | 4 — Action scope | #265 | `feat/compare-action-scope` | — | — | Not started | Phase 5 |
 | 5 — Wall history | #266 | `feat/compare-wall-history` | — | — | Not started | Phase 6 |
 | 6 — Regression gate | #267/#261 | `test/compare-workbench-regression` | — | — | Not started | Close #261 after all merges |
+
+### Exact Phase 3 continuation checkpoint
+
+After the Phase 2 draft PR merges, begin a new bounded Codex task for issue
+#264 only. Issue #63 and Phases 4–6 remain out of scope.
+
+1. Read the repository instructions and
+   `/mnt/c/Users/guirg/.codex/repo-notes/cellular-automaton-lab.md` if present.
+2. Read this document completely and read the latest #261 GitHub checkpoint
+   comment, which must record the merged Phase 2 PR and merge SHA.
+3. Inspect `git status`, the current branch log, and the diff. Preserve
+   unrelated work.
+4. Fetch `origin`, start fresh from the latest `origin/main`, and create/use
+   exactly `feat/compare-resizable-panels`. Do not cherry-pick or reimplement
+   Phase 1 or Phase 2.
+5. Implement only #264: pointer- and keyboard-operable Setup/Inspector
+   separators, the locked default/minimum/maximum widths and 400px wall floor,
+   persisted/clamped layout state, narrow overlay behavior below 960px, and
+   “Reset Compare layout” in Preferences.
+6. Use focused checks while editing, add Vitest and durable server/standalone
+   browser coverage for pointer/keyboard resizing, clamping, persistence,
+   reload, reset, narrow overlays, both themes where relevant, overflow, and
+   console state, then run exactly one change-aware local PR gate before push.
+7. Commit the verified changes, push the branch, and open one draft PR
+   targeting `main` with `Closes #264`. Do not merge it.
