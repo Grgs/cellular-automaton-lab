@@ -152,8 +152,8 @@ log/diff. Do not rediscover or reimplement completed phases.
 After the Phase 3 draft PR merges, begin a new bounded Codex task for issue
 #265 only. Issue #63 and Phases 5–6 remain out of scope.
 
-1. Read the repository instructions and
-   `/mnt/c/Users/guirg/.codex/repo-notes/cellular-automaton-lab.md` if present.
+1. Read the repository instructions and any repository-specific Codex notes
+   available in the current environment.
 2. Read this document completely and read the latest #261 GitHub checkpoint
    comment, which must record the merged Phase 3 PR and merge SHA.
 3. Inspect `git status`, the current branch log, and the diff. Preserve
