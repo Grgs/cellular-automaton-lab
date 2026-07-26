@@ -197,6 +197,15 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             minimum_coverage_width_ratio=0.9,
             minimum_coverage_height_ratio=0.9,
         )
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "false")
+        self._assert_browser_visible_aperiodic_patch(
+            minimum_fill_colors=1,
+            minimum_coverage_width_ratio=0.9,
+            minimum_coverage_height_ratio=0.9,
+        )
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "true")
 
     def test_taylor_socolar_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
@@ -260,6 +269,15 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect("#grid-size-text").to_contain_text("Depth")
         self._expect("#patch-depth-input").to_have_value("3")
         self._assert_browser_visible_aperiodic_patch(minimum_fill_colors=2)
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "false")
+        self._assert_browser_visible_aperiodic_patch(
+            minimum_fill_colors=2,
+            minimum_coverage_width_ratio=0.9,
+            minimum_coverage_height_ratio=0.9,
+        )
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "true")
 
     def test_tuebingen_triangle_topology_switch_renders_aperiodic_patch(self) -> None:
         case = self._case()
