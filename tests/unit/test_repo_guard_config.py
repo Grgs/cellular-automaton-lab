@@ -31,6 +31,22 @@ class RepoGuardConfigTests(unittest.TestCase):
         )
         self.assertIn("npm run check:bundle-size:fresh", scripts["check:ci-local"])
 
+    def test_local_ci_gate_starts_with_full_repository_privacy_scan(self) -> None:
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        scripts = package["scripts"]
+
+        self.assertEqual(
+            scripts["check:privacy"],
+            "node ./tools/internal/python_tools_entry.mjs security privacy --all-files",
+        )
+        self.assertTrue(scripts["check:ci-local"].startswith("npm run check:privacy && "))
+
+    def test_security_guide_uses_the_repository_managed_hooks(self) -> None:
+        security_guide = (ROOT / "SECURITY.md").read_text(encoding="utf-8")
+
+        self.assertIn("git config core.hooksPath .githooks", security_guide)
+        self.assertNotIn("pre_commit install", security_guide)
+
     def test_pre_push_runs_the_fresh_bundle_guard(self) -> None:
         config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
         hook = _hook_config(config, "standalone-bundle-budget")
@@ -121,6 +137,16 @@ class RepoGuardConfigTests(unittest.TestCase):
 
         self.assertIn("PRE_COMMIT_HOOK_TYPE=pre-push", dispatcher)
         self.assertIn('exec "$HOOK_DIR/pre-commit" "$@"', dispatcher)
+
+    def test_hook_launcher_prefers_native_pre_commit_before_windows_fallback(self) -> None:
+        launcher = (ROOT / ".githooks" / "pre-commit").read_text(encoding="utf-8")
+
+        self.assertIn('case "$(uname -s)" in', launcher)
+        self.assertIn("MINGW*|MSYS*|CYGWIN*)", launcher)
+        self.assertLess(
+            launcher.index("if command -v pre-commit"),
+            launcher.index('if [ -n "$windows_pre_commit" ]'),
+        )
 
 
 if __name__ == "__main__":
