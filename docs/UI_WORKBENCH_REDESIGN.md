@@ -141,33 +141,42 @@ log/diff. Do not rediscover or reimplement completed phases.
 | Phase | Issue | Branch | PR | Merge SHA | Verification | Next phase |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 — Shell, menus, themes | #262 | `fix/ui-shell-theme-foundation` | #269 (merged) | `d2d99d65bac3c0216730c3a27883ff2f653e5438` | Full local PR gate passed (575 frontend tests and 140 Playwright journeys), plus focused desktop/narrow shell, menu, theme, and Compare↔Lab checks | Phase 2 started fresh from the merged `origin/main` |
-| 2 — Editable summary | #263 | `feat/compare-editable-summary` | #270 (draft) | — | Complete locally: 575 frontend tests; focused server and freshly built standalone summary journeys at 1280×800 and 390×800; canonical Rule, Seed/Tilings focus, current/stale Run/Update states, themes, overflow, console, and Compare↔Lab checks; one local PR gate run, with its measured bundle-budget stop resolved by a focused budget pass and its remaining catalog/142-browser matrix completed with focused reruns for the corrected picker overlap | Phase 3: only after Phase 2 merges, start fresh from latest `origin/main` and implement #264 |
-| 3 — Resizable panels | #264 | `feat/compare-resizable-panels` | — | — | Not started | Phase 4 |
+| 2 — Editable summary | #263 | `feat/compare-editable-summary` | #270 (merged) | `3c1e03dc70772ae4d8295385ff92b6eff43feda6` | 575 frontend tests; focused server and freshly built standalone summary journeys at 1280×800 and 390×800; canonical Rule, Seed/Tilings focus, current/stale Run/Update states, themes, overflow, console, and Compare↔Lab checks; the 142-journey browser matrix exposed and verified the picker/dock overlap fix; focused bundle/catalog checks passed | Phase 3 started fresh from the merged `origin/main` |
+| 3 — Resizable panels | #264 | `feat/compare-resizable-panels` | #271 (draft) | — | Complete locally: 584 frontend tests; frontend/Python typing, lint, formatting, server/standalone builds, bundle budgets, and catalog checks; focused server and freshly built standalone journeys at actual 1280×800 and 390×800 covering pointer and keyboard splitters, coordinated wall-floor clamping, reload persistence, Preferences reset, exclusive narrow overlays without desktop-state mutation, both themes, overflow, Compare↔Lab round trips, and console state; practical screenshot review; one change-aware local PR-gate invocation, with its early shared-test typing stop and measured async bundle-budget stop corrected by focused follow-ups, then all remaining components passed individually including the 144-journey browser matrix | Phase 4: only after Phase 3 merges, start fresh from latest `origin/main` and implement #265 |
 | 4 — Action scope | #265 | `feat/compare-action-scope` | — | — | Not started | Phase 5 |
 | 5 — Wall history | #266 | `feat/compare-wall-history` | — | — | Not started | Phase 6 |
 | 6 — Regression gate | #267/#261 | `test/compare-workbench-regression` | — | — | Not started | Close #261 after all merges |
 
-### Exact Phase 3 continuation checkpoint
+### Exact Phase 4 continuation checkpoint
 
-After the Phase 2 draft PR merges, begin a new bounded Codex task for issue
-#264 only. Issue #63 and Phases 4–6 remain out of scope.
+After the Phase 3 draft PR merges, begin a new bounded Codex task for issue
+#265 only. Issue #63 and Phases 5–6 remain out of scope.
 
 1. Read the repository instructions and
    `/mnt/c/Users/guirg/.codex/repo-notes/cellular-automaton-lab.md` if present.
 2. Read this document completely and read the latest #261 GitHub checkpoint
-   comment, which must record the merged Phase 2 PR and merge SHA.
+   comment, which must record the merged Phase 3 PR and merge SHA.
 3. Inspect `git status`, the current branch log, and the diff. Preserve
    unrelated work.
 4. Fetch `origin`, start fresh from the latest `origin/main`, and create/use
-   exactly `feat/compare-resizable-panels`. Do not cherry-pick or reimplement
-   Phase 1 or Phase 2.
-5. Implement only #264: pointer- and keyboard-operable Setup/Inspector
-   separators, the locked default/minimum/maximum widths and 400px wall floor,
-   persisted/clamped layout state, narrow overlay behavior below 960px, and
-   “Reset Compare layout” in Preferences.
-6. Use focused checks while editing, add Vitest and durable server/standalone
-   browser coverage for pointer/keyboard resizing, clamping, persistence,
-   reload, reset, narrow overlays, both themes where relevant, overflow, and
+   exactly `feat/compare-action-scope`. Do not cherry-pick or reimplement
+   Phases 1–3.
+5. Implement only #265: render Setup/Tilings/Help/Saved as a connected tab
+   group with roving keyboard focus and an unmistakable selected state; remove
+   per-board removal controls; use selection as the action target; provide
+   Inspector “Replace selected” and “Remove selected” actions with the tiling
+   name in labels/tooltips; group Navigate, Edit, Share, and destructive
+   actions; keep Remove separated and truthfully disabled when unsafe; and
+   keep the selected-tiling toolbelt mounted with visible labels through
+   gallery/speaker transitions.
+6. Preserve the Phase 1 shell/themes, Phase 2 editable summary and
+   current/stale behavior, and Phase 3 desktop widths, collapse persistence,
+   splitters, Preferences reset, and narrow overlay restoration. Do not change
+   backend or HTTP APIs.
+7. Use focused checks while editing, add Vitest and durable server/standalone
+   browser coverage for tab semantics/keyboard focus, selected-tiling action
+   scope, labels/tooltips, disabled minimum behavior, gallery/speaker
+   transitions, themes where relevant, overflow, Compare↔Lab round trips, and
    console state, then run exactly one change-aware local PR gate before push.
-7. Commit the verified changes, push the branch, and open one draft PR
-   targeting `main` with `Closes #264`. Do not merge it.
+8. Commit the verified changes, push the branch, and open one draft PR
+   targeting `main` with `Closes #265`. Do not merge it.

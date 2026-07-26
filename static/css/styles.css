@@ -510,6 +510,17 @@ h1.wall-brand {
     flex-wrap: wrap;
 }
 
+.shell-preferences-reset-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.shell-preferences-reset-row .soft-action {
+    flex: 0 0 auto;
+}
+
 .shell-theme-preference {
     display: inline-flex;
     align-items: center;
