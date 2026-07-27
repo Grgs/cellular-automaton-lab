@@ -142,6 +142,6 @@ describe("compare workspace store", () => {
         ]);
         expect(state.results.filmstripKey).toBe("two");
         expect(state.focusedBoard).toBeNull();
-        expect(state.selectedBoard).toBeNull();
+        expect(state.selectedBoard).toBe("tri");
     });
 });

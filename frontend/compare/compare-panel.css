@@ -235,6 +235,9 @@
     flex-direction: column;
     gap: 8px;
 }
+.compare-selected-actions-home {
+    display: none;
+}
 .compare-stale-notice {
     display: flex;
     align-items: center;
@@ -518,7 +521,7 @@
     flex: 0 0 auto;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 0;
     padding: 8px 18px;
     border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.12));
     overflow-x: auto;
@@ -527,22 +530,40 @@
     flex: 0 0 auto;
     min-width: 82px;
     padding: 7px 11px;
-    border-radius: 8px;
+    border-radius: 0;
     border: 1px solid var(--btn-soft-line, rgba(0, 0, 0, 0.12));
-    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
+    margin-left: -1px;
+    background: transparent;
     color: var(--muted, #6d756f);
+    font-weight: 600;
     font-family: var(--sans, sans-serif);
     font-size: 13px;
     cursor: pointer;
+}
+.compare-config-tab:first-child {
+    margin-left: 0;
+    border-radius: 8px 0 0 8px;
+}
+.compare-config-tab:last-child {
+    border-radius: 0 8px 8px 0;
 }
 .compare-config-tab:hover {
     color: var(--ink, #1f2430);
     background: var(--btn-soft-hover, rgba(0, 0, 0, 0.12));
 }
 .compare-config-tab.is-active {
-    color: var(--btn-primary-text, #111820);
+    position: relative;
+    z-index: 1;
+    color: var(--ink, #1f2430);
     border-color: var(--btn-primary-line, rgba(255, 122, 89, 0.58));
-    background: var(--btn-primary-bg, #ff7a59);
+    background: var(--btn-soft-bg, rgba(0, 0, 0, 0.06));
+    box-shadow: inset 0 -3px var(--accent, #ff7a59);
+}
+.compare-config-tab:focus-visible {
+    position: relative;
+    z-index: 2;
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
 }
 .compare-config-sheet-body {
     min-height: 0;
@@ -1390,6 +1411,12 @@
     outline: 2px solid var(--focus, #7aa7ff);
     outline-offset: 2px;
 }
+.compare-filmstrip-board.is-selected {
+    border-color: color-mix(in srgb, var(--accent) 78%, var(--compare-line));
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--accent) 42%, transparent),
+        0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent);
+}
 /* In the gallery the board slot and its SVG fill the tile (the thumbnail is
    vector, so it scales without loss). */
 .compare-filmstrip:not(.compare-filmstrip--speaker) .compare-filmstrip-slot {
@@ -1426,55 +1453,6 @@
     font-size: 13px;
     opacity: 0.85;
 }
-/* The × is a persistent, conventional tile action. It sits in the upper-right
-   corner in the gallery and returns to the caption row for the focused hero,
-   where the hero toolbelt already owns that corner. */
-.compare-filmstrip-remove {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    z-index: 4;
-    display: grid;
-    place-items: center;
-    width: 26px;
-    height: 26px;
-    border: 1px solid var(--btn-soft-line);
-    background: var(--panel-strong);
-    color: var(--compare-text);
-    font-size: 17px;
-    line-height: 1;
-    padding: 0;
-    border-radius: 7px;
-    cursor: pointer;
-    opacity: 0.78;
-    pointer-events: auto;
-    transition:
-        opacity 0.12s ease,
-        background 0.12s ease;
-}
-.compare-filmstrip-remove:hover:not(:disabled),
-.compare-filmstrip-remove:focus-visible {
-    opacity: 1;
-    background: var(--btn-soft-hover);
-}
-.compare-filmstrip-remove:focus-visible {
-    outline: 2px solid var(--focus, #7aa7ff);
-    outline-offset: 2px;
-}
-.compare-filmstrip-remove:disabled {
-    cursor: not-allowed;
-    opacity: 0.32;
-}
-.compare-filmstrip-board.is-hero .compare-filmstrip-remove {
-    position: static;
-    width: 22px;
-    height: 22px;
-    margin-left: 0;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font-size: 15px;
-}
 /* Edit mode: the pointer paints cells, so the cursor says so, hovered cells
    light up, and the chrome becomes interactive so its ⤢ glyph can stay the one
    zoom affordance. */
@@ -1504,11 +1482,53 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 8px;
+    gap: 10px;
     pointer-events: none;
 }
 .compare-hero-open-lab {
+    margin-left: 0;
+}
+.compare-hero-target-context {
+    flex: 0 1 auto;
+    max-width: 20ch;
+    overflow: hidden;
+    color: var(--compare-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.compare-hero-tool-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding-left: 10px;
+    border-left: 1px solid color-mix(in srgb, var(--compare-line) 72%, transparent);
+    pointer-events: auto;
+}
+.compare-hero-tool-group:first-of-type {
+    padding-left: 0;
+    border-left: 0;
+}
+.compare-hero-tool-group-label {
+    color: var(--compare-muted);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.compare-hero-tool-group-remove {
     margin-left: auto;
+    padding-left: 14px;
+    border-left-color: color-mix(in srgb, var(--danger, #dc2626) 48%, transparent);
+}
+.compare-hero-tool-group-remove .compare-hero-tool {
+    border-color: color-mix(in srgb, var(--danger, #dc2626) 48%, var(--btn-soft-line));
+    color: color-mix(in srgb, var(--danger, #dc2626) 78%, var(--compare-text));
 }
 .compare-hero-tool {
     pointer-events: auto;
@@ -1569,26 +1589,16 @@
     max-height: 100%;
 }
 .compare-filmstrip-label {
-    appearance: none;
-    border: 0;
-    padding: 0;
-    background: transparent;
     color: inherit;
     text-align: left;
-    cursor: pointer;
-    pointer-events: auto;
+    cursor: inherit;
+    pointer-events: none;
     font-size: 11px;
     font-family: var(--mono, monospace);
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-.compare-filmstrip-label:hover,
-.compare-filmstrip-label:focus-visible {
-    color: var(--compare-text, #f2ede0);
-    text-decoration: underline;
-    text-underline-offset: 3px;
 }
 .compare-board-tiling-picker {
     position: absolute;
@@ -1937,11 +1947,6 @@
     .compare-explainer {
         display: none;
     }
-    /* Keep the persistent remove action comfortable on touch screens. */
-    .compare-filmstrip-remove {
-        width: 28px;
-        height: 28px;
-    }
     .compare-stage {
         padding: 8px;
     }
@@ -2035,8 +2040,9 @@
         position: static;
         order: -1;
         inset: auto;
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
         gap: 6px;
         padding: 0;
         pointer-events: auto;
@@ -2045,7 +2051,18 @@
         padding-top: 0;
     }
     .compare-filmstrip--speaker .compare-hero-open-lab {
-        justify-self: end;
+        margin-left: 0;
+    }
+    .compare-filmstrip--speaker .compare-hero-target-context {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+    .compare-filmstrip--speaker .compare-hero-tool-group {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding-left: 6px;
+    }
+    .compare-filmstrip--speaker .compare-hero-tool-group-remove {
         margin-left: 0;
     }
     .compare-filmstrip--speaker .compare-hero-tool {
@@ -2284,6 +2301,24 @@
     padding: 0;
     pointer-events: auto;
 }
+.compare-inspector .compare-hero-target-context {
+    flex: 1 1 100%;
+    max-width: none;
+}
+.compare-inspector .compare-hero-tool-group {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding-left: 6px;
+}
+.compare-inspector .compare-hero-tool-group-remove {
+    flex-basis: 100%;
+    margin-top: 6px;
+    margin-left: 0;
+    padding-top: 10px;
+    padding-left: 0;
+    border-top: 1px solid color-mix(in srgb, var(--danger, #dc2626) 38%, transparent);
+    border-left: 0;
+}
 .compare-inspector .compare-hero-tool {
     flex: 1 1 auto;
     justify-content: center;
@@ -2384,6 +2419,48 @@
         min-height: 0;
         display: block;
         overflow: visible;
+    }
+    .compare-selected-actions-home:not(:empty) {
+        display: block;
+        padding: 8px;
+        border: 1px solid var(--compare-line);
+        border-radius: 10px;
+        background: var(--compare-panel);
+    }
+    .compare-selected-actions-home .compare-hero-toolbelt {
+        position: static;
+        inset: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 0;
+        pointer-events: auto;
+    }
+    .compare-selected-actions-home .compare-hero-target-context {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+    .compare-selected-actions-home .compare-hero-tool-group {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding-left: 6px;
+    }
+    .compare-selected-actions-home .compare-hero-tool-group-remove {
+        flex-basis: 100%;
+        margin-top: 6px;
+        margin-left: 0;
+        padding-top: 10px;
+        padding-left: 0;
+        border-top: 1px solid color-mix(in srgb, var(--danger, #dc2626) 38%, transparent);
+        border-left: 0;
+    }
+    .compare-selected-actions-home .compare-hero-tool {
+        flex: 1 1 auto;
+        justify-content: center;
+        min-height: 34px;
+        border-color: var(--btn-soft-line);
+        background: var(--btn-soft-bg);
+        color: var(--compare-text);
     }
     .compare-board-wall.compare-stage {
         min-height: 460px;

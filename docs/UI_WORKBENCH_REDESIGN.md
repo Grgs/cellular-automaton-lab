@@ -142,41 +142,50 @@ log/diff. Do not rediscover or reimplement completed phases.
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 — Shell, menus, themes | #262 | `fix/ui-shell-theme-foundation` | #269 (merged) | `d2d99d65bac3c0216730c3a27883ff2f653e5438` | Full local PR gate passed (575 frontend tests and 140 Playwright journeys), plus focused desktop/narrow shell, menu, theme, and Compare↔Lab checks | Phase 2 started fresh from the merged `origin/main` |
 | 2 — Editable summary | #263 | `feat/compare-editable-summary` | #270 (merged) | `3c1e03dc70772ae4d8295385ff92b6eff43feda6` | 575 frontend tests; focused server and freshly built standalone summary journeys at 1280×800 and 390×800; canonical Rule, Seed/Tilings focus, current/stale Run/Update states, themes, overflow, console, and Compare↔Lab checks; the 142-journey browser matrix exposed and verified the picker/dock overlap fix; focused bundle/catalog checks passed | Phase 3 started fresh from the merged `origin/main` |
-| 3 — Resizable panels | #264 | `feat/compare-resizable-panels` | #271 (draft) | — | Complete locally: 584 frontend tests; frontend/Python typing, lint, formatting, server/standalone builds, bundle budgets, and catalog checks; focused server and freshly built standalone journeys at actual 1280×800 and 390×800 covering pointer and keyboard splitters, coordinated wall-floor clamping, reload persistence, Preferences reset, exclusive narrow overlays without desktop-state mutation, both themes, overflow, Compare↔Lab round trips, and console state; practical screenshot review; one change-aware local PR-gate invocation, with its early shared-test typing stop and measured async bundle-budget stop corrected by focused follow-ups, then all remaining components passed individually including the 144-journey browser matrix | Phase 4: only after Phase 3 merges, start fresh from latest `origin/main` and implement #265 |
-| 4 — Action scope | #265 | `feat/compare-action-scope` | — | — | Not started | Phase 5 |
+| 3 — Resizable panels | #264 | `feat/compare-resizable-panels` | #271 (merged) | `d717b45876e728e5c820473d4ce7e82936c5c98e` | 584 frontend tests and 144 Playwright journeys; frontend/Python typing, lint, formatting, server/standalone builds, bundle budgets, catalog checks, focused desktop/narrow splitter, persistence, reset, overlay, theme, overflow, Compare↔Lab, and console checks; practical screenshot review | Phase 4 started fresh from the merged `origin/main` |
+| 4 — Action scope | #265 | `feat/compare-action-scope` | #272 (draft) | — | Complete locally: 586 frontend tests; frontend/Python typing, lint, and formatting; server and freshly built standalone bundles; measured standalone bundle budgets and catalog validation/reference verification; focused server and standalone Chromium journeys at actual 1280×800 and 390×800 covering connected tab semantics and roving focus, light/dark selected states, selection-scoped Replace/Remove labels and reasons, picker search focus and truthful unavailable choices, replacement/removal order, selection/focus/hash outcomes, two-board minimum, persistent labeled toolbelt identity, overflow, Compare↔Lab round trips, and console/page errors; one change-aware local PR-gate invocation stopped on new-journey lint, corrected by focused follow-ups, with all remaining components verified individually; the 146-journey browser matrix had two in-scope test defects and one isolated transient failure across five cases, and all five targeted server/standalone reruns pass; interactive Chrome handoff unavailable in this desktop session, so both real Playwright runtimes provide the practical browser coverage | Phase 5: only after Phase 4 merges, start fresh from latest `origin/main` and implement #266 |
 | 5 — Wall history | #266 | `feat/compare-wall-history` | — | — | Not started | Phase 6 |
 | 6 — Regression gate | #267/#261 | `test/compare-workbench-regression` | — | — | Not started | Close #261 after all merges |
 
-### Exact Phase 4 continuation checkpoint
+### Exact Phase 5 continuation checkpoint
 
-After the Phase 3 draft PR merges, begin a new bounded Codex task for issue
-#265 only. Issue #63 and Phases 5–6 remain out of scope.
+After the Phase 4 draft PR merges, begin a new bounded Codex task for issue
+#266 only. Issue #63 and Phase 6 remain out of scope.
 
 1. Read the repository instructions and any repository-specific Codex notes
    available in the current environment.
 2. Read this document completely and read the latest #261 GitHub checkpoint
-   comment, which must record the merged Phase 3 PR and merge SHA.
+   comment, which must record the merged Phase 4 PR and merge SHA.
 3. Inspect `git status`, the current branch log, and the diff. Preserve
    unrelated work.
 4. Fetch `origin`, start fresh from the latest `origin/main`, and create/use
-   exactly `feat/compare-action-scope`. Do not cherry-pick or reimplement
-   Phases 1–3.
-5. Implement only #265: render Setup/Tilings/Help/Saved as a connected tab
-   group with roving keyboard focus and an unmistakable selected state; remove
-   per-board removal controls; use selection as the action target; provide
-   Inspector “Replace selected” and “Remove selected” actions with the tiling
-   name in labels/tooltips; group Navigate, Edit, Share, and destructive
-   actions; keep Remove separated and truthfully disabled when unsafe; and
-   keep the selected-tiling toolbelt mounted with visible labels through
-   gallery/speaker transitions.
+   exactly `feat/compare-wall-history`. Do not cherry-pick or reimplement
+   Phases 1–4.
+5. Implement only #266: add a session-only, 20-entry wall history for
+   successful add, remove, and replace operations using immutable before/after
+   snapshots of configuration, ordered filmstrip data, result key,
+   selection/focus, frame index, and play state.
 6. Preserve the Phase 1 shell/themes, Phase 2 editable summary and
    current/stale behavior, and Phase 3 desktop widths, collapse persistence,
-   splitters, Preferences reset, and narrow overlay restoration. Do not change
-   backend or HTTP APIs.
-7. Use focused checks while editing, add Vitest and durable server/standalone
-   browser coverage for tab semantics/keyboard focus, selected-tiling action
-   scope, labels/tooltips, disabled minimum behavior, gallery/speaker
-   transitions, themes where relevant, overflow, Compare↔Lab round trips, and
-   console state, then run exactly one change-aware local PR gate before push.
-8. Commit the verified changes, push the branch, and open one draft PR
-   targeting `main` with `Closes #265`. Do not merge it.
+   splitters, Preferences reset, and narrow overlay restoration, plus the Phase
+   4 connected tabs, selection-scoped actions, ordering, and persistent
+   toolbelt. Do not change backend or HTTP APIs.
+7. Capture add/replace only after authoritative async results install. Failed,
+   cancelled, and stale operations add no history. Undo/redo must cancel queued
+   work, invalidate active tickets, restore locally, and dispose incompatible
+   live forks.
+8. Provide a status snackbar with Undo and, after undo, Redo. Support
+   Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, and Ctrl+Y while yielding to inputs, selects,
+   textareas, contenteditable controls, and already-handled events. Clear
+   history on reload, saved/deep-linked run replacement, or non-membership
+   configuration changes, while preserving it through playback, focus changes,
+   and Compare/Lab round trips.
+9. Use focused checks while editing, add Vitest and durable shared
+   server/standalone browser coverage for add/remove/replace → undo → redo,
+   exact order and selection/focus/playback restoration, pending/failed/stale
+   work, shortcut yielding, snackbar discoverability, desktop 1280×800 and
+   narrow 390×800, themes where relevant, overflow, Compare↔Lab round trips,
+   and console/page errors, then run exactly one change-aware local PR gate
+   before push. Rebuild standalone artifacts for standalone UI coverage.
+10. Commit the verified changes, push the branch, and open one draft PR
+    targeting `main` with `Closes #266`. Do not merge it.

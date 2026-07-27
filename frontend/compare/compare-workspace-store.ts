@@ -80,11 +80,19 @@ export function removeWorkspaceBoard(
 ): CompareWorkspaceState {
     const { geometry, configuration, filmstripKey } = removal;
     const filmstrip = state.results.filmstrip;
+    const removedIndex = filmstrip?.tilings.findIndex((entry) => entry.geometry === geometry) ?? -1;
+    const survivorTilings =
+        filmstrip?.tilings.filter((entry) => entry.geometry !== geometry) ?? null;
+    const nextSelectedBoard =
+        state.selectedBoard === geometry
+            ? (survivorTilings?.[Math.min(Math.max(removedIndex, 0), survivorTilings.length - 1)]
+                  ?.geometry ?? null)
+            : state.selectedBoard;
     return {
         ...state,
         configuration,
         orderedBoards: configuration.geometries,
-        selectedBoard: state.selectedBoard === geometry ? null : state.selectedBoard,
+        selectedBoard: nextSelectedBoard,
         focusedBoard: state.focusedBoard === geometry ? null : state.focusedBoard,
         results: {
             ...state.results,
@@ -93,7 +101,7 @@ export function removeWorkspaceBoard(
                     ? null
                     : {
                           ...filmstrip,
-                          tilings: filmstrip.tilings.filter((entry) => entry.geometry !== geometry),
+                          tilings: survivorTilings ?? [],
                       },
             filmstripKey,
         },

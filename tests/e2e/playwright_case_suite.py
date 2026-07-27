@@ -50,6 +50,21 @@ def _encode_compare_run_fragment(config: dict[str, object]) -> str:
 
 
 class SharedUiFlowMixin(SharedUiFlowHelpers):
+    def _select_compare_board(self, index: int) -> None:
+        case = self._case()
+        board = case.page.locator(".compare-filmstrip-board").nth(index)
+        board.focus()
+        board.press("Enter")
+        expect(board).to_have_class(re.compile(r"\bis-selected\b"))
+
+    def _remove_selected_compare_board(self, index: int) -> None:
+        case = self._case()
+        self._select_compare_board(index)
+        remove = case.page.locator(".compare-inspector-remove")
+        expect(remove).to_be_visible()
+        expect(remove).to_be_enabled(timeout=60_000)
+        remove.click()
+
     def test_theme_reset_immediately_resumes_following_the_os_scheme(self) -> None:
         case = self._case()
         storage_key = str(
@@ -587,6 +602,259 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.assertLessEqual(
             int(case.page.evaluate("() => document.documentElement.scrollWidth")),
             1280,
+        )
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
+    def test_compare_tabs_and_selected_actions_preserve_order_focus_and_toolbelt(
+        self,
+    ) -> None:
+        case = self._case()
+        case.page.set_viewport_size({"width": 1280, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [1280, 800])
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        setup_toggle = case.page.get_by_role("button", name="Configure the run")
+        setup_toggle.click()
+        tablist = case.page.get_by_role("tablist", name="Configuration views")
+        expect(tablist).to_be_visible()
+        expect(tablist).to_have_attribute("aria-orientation", "horizontal")
+        tabs = {
+            name: case.page.get_by_role("tab", name=name, exact=True)
+            for name in ("Setup", "Tilings", "Help", "Saved")
+        }
+        expect(tabs["Setup"]).to_have_attribute("aria-selected", "true")
+        expect(tabs["Setup"]).to_have_attribute("tabindex", "0")
+        for name in ("Tilings", "Help", "Saved"):
+            expect(tabs[name]).to_have_attribute("aria-selected", "false")
+            expect(tabs[name]).to_have_attribute("tabindex", "-1")
+
+        tab_rects = tablist.locator('[role="tab"]').evaluate_all(
+            """tabs => tabs.map((tab) => {
+                const rect = tab.getBoundingClientRect();
+                return { left: rect.left, right: rect.right };
+            })"""
+        )
+        for previous, following in zip(tab_rects, tab_rects[1:], strict=False):
+            case.assertLessEqual(abs(float(previous["right"]) - float(following["left"])), 1.5)
+
+        tabs["Setup"].focus()
+        tabs["Setup"].press("ArrowRight")
+        expect(tabs["Tilings"]).to_be_focused()
+        expect(tabs["Tilings"]).to_have_attribute("aria-selected", "true")
+        expect(case.page.get_by_role("tabpanel", name="Tilings")).to_be_visible()
+        tabs["Tilings"].press("ArrowRight")
+        expect(tabs["Help"]).to_be_focused()
+        expect(case.page.get_by_role("tabpanel", name="Help")).to_be_visible()
+        tabs["Help"].press("End")
+        expect(tabs["Saved"]).to_be_focused()
+        expect(case.page.get_by_role("tabpanel", name="Saved")).to_be_visible()
+        tabs["Saved"].press("Home")
+        expect(tabs["Setup"]).to_be_focused()
+        tabs["Setup"].press("ArrowLeft")
+        expect(tabs["Saved"]).to_be_focused()
+
+        def selected_tab_colors() -> list[str]:
+            return cast(
+                list[str],
+                tabs["Saved"].evaluate(
+                    """selected => {
+                        const other = selected.parentElement?.querySelector(
+                            '[role="tab"]:not([aria-selected="true"])'
+                        );
+                        if (!(other instanceof HTMLElement)) {
+                            throw new Error("missing unselected Compare tab");
+                        }
+                        const selectedStyle = getComputedStyle(selected);
+                        const otherStyle = getComputedStyle(other);
+                        return [
+                            selectedStyle.backgroundColor,
+                            selectedStyle.borderBottomColor,
+                            selectedStyle.boxShadow,
+                            otherStyle.backgroundColor,
+                            otherStyle.borderBottomColor,
+                        ];
+                    }"""
+                ),
+            )
+
+        menu_toggle = case.page.get_by_role("button", name="Open app menu")
+        menu_toggle.click()
+        case.page.get_by_role("button", name="Preferences", exact=True).click()
+        case.page.get_by_role("radio", name="Light").check()
+        self._expect("html").to_have_attribute("data-theme", "light")
+        light_tab_colors = selected_tab_colors()
+        case.page.get_by_role("radio", name="Dark").check()
+        self._expect("html").to_have_attribute("data-theme", "dark")
+        dark_tab_colors = selected_tab_colors()
+        case.assertNotEqual(light_tab_colors[0], light_tab_colors[3])
+        case.assertNotEqual(dark_tab_colors[0], dark_tab_colors[3])
+        case.page.get_by_role("button", name="Close preferences").click()
+        case.page.get_by_role("button", name="Close configuration").click()
+
+        labels_before = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        case.assertEqual(case.page.locator(".compare-filmstrip-remove").count(), 0)
+        self._select_compare_board(1)
+        selected_name = labels_before[1]
+        toolbelt = case.page.locator(".compare-hero-toolbelt")
+        expect(toolbelt).to_be_visible()
+        case.page.evaluate(
+            """() => {
+                window.__phase4Toolbelt = document.querySelector('.compare-hero-toolbelt');
+            }"""
+        )
+        replace_selected = case.page.locator(".compare-inspector-replace")
+        remove_selected = case.page.locator(".compare-inspector-remove")
+        expect(replace_selected).to_have_text("Replace selected")
+        expect(remove_selected).to_have_text("Remove selected")
+        expect(replace_selected).to_have_attribute(
+            "aria-label", re.compile(re.escape(selected_name))
+        )
+        expect(remove_selected).to_have_attribute(
+            "aria-label", re.compile(re.escape(selected_name))
+        )
+
+        replace_selected.click()
+        search = case.page.locator(".compare-board-tiling-picker-search")
+        expect(search).to_be_focused()
+        disabled_reasons = case.page.locator(".compare-board-tiling-choice:disabled").evaluate_all(
+            "choices => choices.map((choice) => choice.title)"
+        )
+        case.assertTrue(
+            any(
+                "current tiling" in reason or "already on the wall" in reason
+                for reason in disabled_reasons
+            )
+        )
+        replacement = case.page.locator(".compare-board-tiling-choice:not(:disabled)").first
+        replacement_name = replacement.locator(
+            ".compare-board-tiling-choice-copy > span"
+        ).inner_text()
+        search.fill(replacement_name)
+        replacement = case.page.locator(".compare-board-tiling-choice:not(:disabled)").first
+        replacement.click()
+        expected_after_replace = list(labels_before)
+        expected_after_replace[1] = replacement_name
+        expect(case.page.locator(".compare-setup-run")).to_have_text("Up to date", timeout=60_000)
+        case.assertEqual(
+            case.page.locator(".compare-filmstrip-label").all_text_contents(),
+            expected_after_replace,
+        )
+        expect(
+            case.page.locator(".compare-filmstrip-board.is-selected .compare-filmstrip-label")
+        ).to_have_text(replacement_name)
+        case.assertTrue("focus=" in case.page.evaluate("() => window.location.hash"))
+        case.assertTrue(
+            case.page.evaluate(
+                """() => window.__phase4Toolbelt ===
+                    document.querySelector('.compare-hero-toolbelt') &&
+                    document.querySelector('.compare-hero-toolbelt')?.isConnected === true"""
+            )
+        )
+
+        remove_selected.click()
+        self._expect(".compare-filmstrip-board").to_have_count(3, timeout=60_000)
+        expected_after_remove = [
+            expected_after_replace[0],
+            expected_after_replace[2],
+            expected_after_replace[3],
+        ]
+        case.assertEqual(
+            case.page.locator(".compare-filmstrip-label").all_text_contents(),
+            expected_after_remove,
+        )
+        case.assertTrue("focus=" not in case.page.evaluate("() => window.location.hash"))
+        expect(
+            case.page.locator(".compare-filmstrip-board.is-selected .compare-filmstrip-label")
+        ).to_have_text(expected_after_remove[1])
+
+        # The nearest survivor remains selected, so one more activation reaches
+        # the floor without a separate per-board action.
+        remove_selected.click()
+        self._expect(".compare-filmstrip-board").to_have_count(2, timeout=60_000)
+        case.assertEqual(
+            case.page.locator(".compare-filmstrip-label").all_text_contents(),
+            [expected_after_remove[0], expected_after_remove[2]],
+        )
+        expect(remove_selected).to_be_visible()
+        expect(remove_selected).to_be_disabled()
+        expect(remove_selected).to_have_attribute("title", "Keep at least two tilings on the wall")
+
+        # One persistent node moves to the speaker hero and back to Inspector,
+        # retaining its visible action labels and current target.
+        self._select_compare_board(0)
+        case.assertTrue(
+            case.page.evaluate(
+                """() => window.__phase4Toolbelt === document.querySelector(
+                    '.compare-filmstrip-board.is-hero .compare-hero-toolbelt'
+                )"""
+            )
+        )
+        expect(toolbelt).to_contain_text("Replace selected")
+        expect(toolbelt).to_contain_text("Remove selected")
+        case.page.locator(".compare-hero-back").click()
+        case.assertTrue(
+            case.page.evaluate(
+                """() => window.__phase4Toolbelt === document.querySelector(
+                    '.compare-inspector-body > .compare-hero-toolbelt'
+                )"""
+            )
+        )
+
+        # Compare -> Lab -> Compare keeps the ordered wall and selected toolbelt.
+        self._select_compare_board(0)
+        case.page.locator(".compare-hero-open-lab").click()
+        self._expect("#grid").to_be_visible(timeout=60_000)
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        case.assertEqual(
+            case.page.locator(".compare-filmstrip-label").all_text_contents(),
+            [expected_after_remove[0], expected_after_remove[2]],
+        )
+        case.assertTrue(
+            case.page.evaluate(
+                """() => window.__phase4Toolbelt ===
+                    document.querySelector('.compare-hero-toolbelt')"""
+            )
+        )
+
+        case.page.set_viewport_size({"width": 390, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 800])
+        setup_toggle.click()
+        expect(tablist).to_be_visible()
+        tabs["Saved"].focus()
+        tabs["Saved"].press("Home")
+        expect(tabs["Setup"]).to_be_focused()
+        tabs["Setup"].press("ArrowRight")
+        expect(tabs["Tilings"]).to_be_focused()
+        case.page.get_by_role("button", name="Close configuration").click()
+        case.assertLessEqual(
+            int(case.page.evaluate("() => document.documentElement.scrollWidth")),
+            390,
+        )
+        self._select_compare_board(1)
+        expect(toolbelt).to_be_visible()
+        expect(remove_selected).to_be_disabled()
+        expect(remove_selected).to_have_attribute("title", "Keep at least two tilings on the wall")
+        case.page.locator(".compare-hero-back").click()
+        case.assertTrue(
+            case.page.evaluate(
+                """() => window.__phase4Toolbelt ===
+                    document.querySelector('.compare-hero-toolbelt') &&
+                    document.querySelector('.compare-hero-toolbelt')?.isConnected === true"""
+            )
+        )
+        case.assertLessEqual(
+            int(case.page.evaluate("() => document.documentElement.scrollWidth")),
+            390,
         )
 
         unexpected_console = [
@@ -1339,7 +1607,9 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         # Search fields keep literal spaces. Escape closes the picker without
         # leaving the wall or touching playback.
-        case.page.locator(".compare-filmstrip-label").first.press("Enter")
+        replace_selected = case.page.locator(".compare-inspector-replace")
+        expect(replace_selected).to_have_attribute("aria-label", re.compile("Square"))
+        replace_selected.press("Enter")
         picker_search = case.page.locator(".compare-board-tiling-picker-search")
         expect(picker_search).to_be_focused()
         picker_search.press("Space")
@@ -1437,7 +1707,9 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         # Keep two inexpensive ordinary representatives and preserve their order.
         for expected_count in (3, 2):
-            case.page.locator(".compare-filmstrip-remove").last.click()
+            self._remove_selected_compare_board(
+                case.page.locator(".compare-filmstrip-board").count() - 1
+            )
             self._expect(".compare-filmstrip-board").to_have_count(expected_count, timeout=60_000)
         labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
 
@@ -1754,9 +2026,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
     def test_wall_names_boards_and_edits_the_selection_in_place(self) -> None:
         # Boards carry their friendly catalog label (not the raw geometry
-        # key), replacing a named board preserves its wall position, the dock's
-        # ⊞ jumps straight to the searchable tiling checklist, and a board's
-        # persistent upper-right × drops it instantly without rebuilding.
+        # key), selected-board replacement preserves its wall position, and
+        # removal stays in the persistent Inspector toolbelt.
         case = self._case()
         case.page.add_init_script(
             "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
@@ -1774,9 +2045,16 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-filmstrip-label >> nth=0").to_have_text("Square")
         self._expect(".compare-filmstrip-label >> nth=2").to_have_text("Penrose P3 Rhombs")
 
-        # A board-local replacement keeps the position the user acted on.
+        # Selection is the sole target; Replace selected keeps that position.
         labels_before = case.page.locator(".compare-filmstrip-label").all_text_contents()
-        case.page.locator(".compare-filmstrip-label").nth(2).click()
+        self._select_compare_board(2)
+        replace_selected = case.page.locator(".compare-inspector-replace")
+        expect(replace_selected).to_have_text("Replace selected")
+        expect(replace_selected).to_have_attribute(
+            "aria-label", re.compile(re.escape(labels_before[2]))
+        )
+        replace_selected.click()
+        self._expect(".compare-board-tiling-picker-search").to_be_focused()
         replacement = case.page.locator(
             ".compare-board-tiling-choice:not(:disabled):not(.is-current)"
         ).first
@@ -1798,19 +2076,14 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect(".compare-tilings-search").to_be_focused()
         case.page.click(".compare-config-sheet-close")
 
-        # The × is visible without hover and sits at the tile's upper-right.
-        first_board = case.page.locator(".compare-filmstrip-board").first
-        first_remove = case.page.locator(".compare-filmstrip-remove").first
+        # Tiles have no mutation controls. The selected action names its target.
+        case.assertEqual(case.page.locator(".compare-filmstrip-remove").count(), 0)
+        first_label = case.page.locator(".compare-filmstrip-label").first.inner_text()
+        self._select_compare_board(0)
+        first_remove = case.page.locator(".compare-inspector-remove")
         expect(first_remove).to_be_visible()
-        board_box = first_board.bounding_box()
-        remove_box = first_remove.bounding_box()
-        if board_box is None or remove_box is None:
-            raise AssertionError("visible board management controls must have layout boxes")
-        case.assertLessEqual(remove_box["y"] - board_box["y"], 12)
-        case.assertLessEqual(
-            (board_box["x"] + board_box["width"]) - (remove_box["x"] + remove_box["width"]),
-            12,
-        )
+        expect(first_remove).to_have_text("Remove selected")
+        expect(first_remove).to_have_attribute("aria-label", re.compile(re.escape(first_label)))
         first_remove.click()
         self._expect(".compare-status").to_contain_text("Removed Square")
         self._expect(".compare-filmstrip-board").to_have_count(3, timeout=60_000)
@@ -1819,23 +2092,20 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         )
 
         # Compact once more to the two-board minimum. Survivor order is stable,
-        # and remove remains visible, keyboard-discoverable, disabled, and explained.
+        # and the single Remove action remains visible, disabled, and explained.
         survivor_labels = case.page.locator(".compare-filmstrip-label").all_text_contents()[1:]
-        second_remove = case.page.locator(".compare-filmstrip-remove").first
+        self._select_compare_board(0)
+        second_remove = case.page.locator(".compare-inspector-remove")
         expect(second_remove).to_be_enabled(timeout=60_000)
         second_remove.press("Enter")
         self._expect(".compare-filmstrip-board").to_have_count(2, timeout=60_000)
         case.assertEqual(
             case.page.locator(".compare-filmstrip-label").all_text_contents(), survivor_labels
         )
-        minimum_remove_buttons = case.page.locator(".compare-filmstrip-remove")
-        case.assertEqual(minimum_remove_buttons.count(), 2)
-        for remove_button in minimum_remove_buttons.all():
-            expect(remove_button).to_be_visible()
-            expect(remove_button).to_be_disabled()
-            expect(remove_button).to_have_attribute(
-                "title", "Keep at least two tilings on the wall"
-            )
+        minimum_remove = case.page.locator(".compare-inspector-remove")
+        expect(minimum_remove).to_be_visible()
+        expect(minimum_remove).to_be_disabled()
+        expect(minimum_remove).to_have_attribute("title", "Keep at least two tilings on the wall")
 
         # Add through the wall-local visual picker up to the capable desktop
         # ceiling. Each addition appends, and the first picker is opened from
@@ -1904,8 +2174,9 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#wall-view-btn")
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
-        expect(case.page.locator(".compare-filmstrip-remove").first).to_be_enabled(timeout=60_000)
         labels_before = case.page.locator(".compare-filmstrip-label").all_text_contents()
+        self._select_compare_board(0)
+        expect(case.page.locator(".compare-inspector-remove")).to_be_enabled(timeout=60_000)
 
         # Reach the setup field through the visible sheet, then dispatch the
         # input and keyboard-focused removal in one task to pin the debounce
@@ -1921,7 +2192,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
                 const generations = [...document.querySelectorAll('.compare-form label')]
                     .find((label) => label.textContent?.includes('Wall generations'))
                     ?.querySelector('input');
-                const remove = document.querySelector('.compare-filmstrip-remove');
+                const remove = document.querySelector('.compare-inspector-remove');
                 if (!(generations instanceof HTMLInputElement) || !(remove instanceof HTMLButtonElement)) {
                     throw new Error('missing pending-removal controls');
                 }
@@ -1936,7 +2207,10 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             }"""
         )
         case.assertEqual(removal_state["count"], 3)
-        case.assertEqual(removal_state["activeLabel"], f"Remove {labels_before[1]} from the wall")
+        case.assertEqual(
+            removal_state["activeLabel"],
+            f"Remove selected {labels_before[1]} from the wall",
+        )
         case.page.click(".compare-config-sheet-close")
 
         # The queued run settles with the setup change and the same three
@@ -1954,7 +2228,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         add_button = case.page.locator(".compare-filmstrip-add")
         add_button.press("Enter")
         self._expect(".compare-board-tiling-picker-search").to_be_focused()
-        case.page.evaluate("() => document.querySelector('.compare-filmstrip-remove')?.click()")
+        case.page.evaluate("() => document.querySelector('.compare-inspector-remove')?.click()")
         self._expect(".compare-filmstrip-board").to_have_count(2)
         case.assertEqual(case.page.locator(".compare-board-tiling-picker").count(), 0)
         expect(add_button).to_be_focused()
@@ -1973,11 +2247,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.assertEqual(unexpected_console, [])
 
     def test_wall_rapid_board_removal_holds_the_two_board_minimum(self) -> None:
-        # Removal is local and instant now (the board drops in place with no
-        # rebuild), so a burst can no longer outrun a debounced rebuild -- but
-        # the two-board floor must still hold. Fire every × in a single JS task,
-        # the way an impatient user drags the wall down, and confirm the wall
-        # settles at exactly two boards instead of collapsing to the empty hero.
+        # Removal is local and instant, but the selected action must still stop
+        # synchronously at the two-board floor during a repeated activation.
         case = self._case()
         case.page.add_init_script(
             "Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => 8 });"
@@ -1987,34 +2258,33 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#wall-view-btn")
         self._expect(".wall-page").to_be_visible()
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
-        # Wait for the wall to go idle (remove controls enabled) so the burst is
+        self._select_compare_board(0)
+        # Wait for the wall to go idle (selected Remove enabled) so the burst is
         # not swallowed by the initial in-flight-rebuild guard.
-        expect(case.page.locator(".compare-filmstrip-remove").first).to_be_enabled(timeout=60_000)
+        expect(case.page.locator(".compare-inspector-remove")).to_be_enabled(timeout=60_000)
 
-        # Dispatch a click on every × captured at once, in one task. The first
-        # two are accepted; the rest are judged against the pending two-board
-        # selection and refused, so the wall cannot drop below its floor.
+        # Reuse the one persistent button. Its target advances to the nearest
+        # survivor, then it disables before the third activation.
         case.page.evaluate(
             """() => {
-                document.querySelectorAll('.compare-filmstrip-remove').forEach((button) => {
-                    button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-                });
+                const remove = document.querySelector('.compare-inspector-remove');
+                if (!(remove instanceof HTMLButtonElement)) {
+                    throw new Error('missing selected Remove action');
+                }
+                remove.click();
+                remove.click();
+                remove.click();
             }"""
         )
 
         # The wall settles at the floor -- two boards, never the collapsed hero
-        # -- and the survivors' remove controls stay visible, disabled, and
-        # explained rather than silently allowing the wall to empty.
+        # -- and Remove stays visible, disabled, and explained.
         self._expect(".compare-filmstrip-board").to_have_count(2, timeout=60_000)
         self._expect(".compare-stage-hero").not_to_be_visible()
-        remove_buttons = case.page.locator(".compare-filmstrip-remove")
-        case.assertEqual(remove_buttons.count(), 2)
-        for remove_button in remove_buttons.all():
-            expect(remove_button).to_be_visible()
-            expect(remove_button).to_be_disabled()
-            expect(remove_button).to_have_attribute(
-                "title", "Keep at least two tilings on the wall"
-            )
+        remove = case.page.locator(".compare-inspector-remove")
+        expect(remove).to_be_visible()
+        expect(remove).to_be_disabled()
+        expect(remove).to_have_attribute("title", "Keep at least two tilings on the wall")
 
         unexpected_console = [
             message
@@ -2091,7 +2361,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         expected_labels = list(desktop_labels)
         removed_labels: list[str] = []
         for index in (0, 2, 1):
-            case.page.locator(".compare-filmstrip-remove").nth(index).click()
+            self._remove_selected_compare_board(index)
             removed_labels.append(expected_labels.pop(index))
             self._expect(".compare-filmstrip-board").to_have_count(
                 len(expected_labels), timeout=60_000
@@ -2142,13 +2412,12 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         # Use two ordinary survivors so the boundary journey remains fast in the
         # standalone worker while still crossing board-management and rerun state.
         for expected_count in (3, 2):
-            remove_buttons = case.page.locator(".compare-filmstrip-remove")
-            remove_buttons.nth(remove_buttons.count() - 1).click()
+            self._remove_selected_compare_board(
+                case.page.locator(".compare-filmstrip-board").count() - 1
+            )
             self._expect(".compare-filmstrip-board").to_have_count(expected_count, timeout=60_000)
             if expected_count > 2:
-                expect(case.page.locator(".compare-filmstrip-remove").last).to_be_enabled(
-                    timeout=60_000
-                )
+                expect(case.page.locator(".compare-inspector-remove")).to_be_enabled(timeout=60_000)
         labels = case.page.locator(".compare-filmstrip-label").all_text_contents()
 
         # The setup form opens on demand from the dock gear.
@@ -2523,6 +2792,7 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
         labels = self.page.locator(".compare-filmstrip-label").all_text_contents()
         self.page.locator('.compare-filmstrip-btn[aria-label="Play / pause"]').click()
+        self._select_compare_board(0)
 
         requests: list[dict[str, Any]] = []
 
@@ -2548,8 +2818,8 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self._expect(".compare-filmstrip-board").to_have_count(4)
         for selector in (
             ".compare-filmstrip-add",
-            ".compare-filmstrip-label",
-            ".compare-filmstrip-remove",
+            ".compare-inspector-replace",
+            ".compare-inspector-remove",
         ):
             controls = self.page.locator(selector)
             for control in controls.all():
