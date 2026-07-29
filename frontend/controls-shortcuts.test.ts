@@ -61,4 +61,31 @@ describe("controls-shortcuts", () => {
 
         expect(actions.setPaintState).toHaveBeenCalledWith(0);
     });
+
+    it("yields to handled events and the Compare workspace", () => {
+        const actions = createActions();
+        const documentNode = document.implementation.createHTMLDocument();
+        bindControlShortcuts(actions, { documentNode });
+
+        const handled = new KeyboardEvent("keydown", {
+            key: "z",
+            ctrlKey: true,
+            bubbles: true,
+            cancelable: true,
+        });
+        handled.preventDefault();
+        documentNode.dispatchEvent(handled);
+
+        documentNode.documentElement.dataset.workspaceRoute = "wall";
+        documentNode.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "z",
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+
+        expect(actions.undoEdit).not.toHaveBeenCalled();
+    });
 });

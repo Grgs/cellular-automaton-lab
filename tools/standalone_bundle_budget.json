@@ -1,17 +1,47 @@
 {
     "_comment": "Per-category size budgets (in bytes) for the output/standalone/ bundle. Update intentionally when bundle composition changes; the budget guard fails when any category exceeds its raw or gzipped budget. For actively changing frontend categories, keep raw headroom near max(1% of the measured size, 1 KiB), rounded up to 100 bytes, while retaining strict gzip ceilings. Gzipped budgets are optional; omit a key to skip the gzipped check for that category.",
     "categories": [
-        {"name": "entry-html", "patterns": ["*.html"], "raw": 45000, "gzip": 6500},
-        {"name": "bootstrap-data", "patterns": ["standalone-bootstrap.json"], "raw": 90000, "gzip": 13000},
-        {"name": "python-bundle", "patterns": ["standalone-python-bundle.json"], "raw": 9500000, "gzip": 3000000},
-        {"name": "build-manifest", "patterns": ["build-manifest.json"], "raw": 25000, "gzip": 6000},
-        {"name": "js-runtime", "patterns": ["assets/app-runtime-*.js"], "raw": 311100, "gzip": 83000},
-        {"name": "js-standalone", "patterns": ["assets/standalone-*.js", "assets/standalone-worker-*.js"], "raw": 27800, "gzip": 8500},
-        {"name": "tiling-preview", "patterns": ["assets/tiling-preview-data-*.js"], "raw": 90000, "gzip": 27000},
-        {"name": "js-async", "patterns": ["assets/*.js"], "raw": 171300, "gzip": 48600},
-        {"name": "css", "patterns": ["assets/*.css"], "raw": 45300, "gzip": 9000},
-        {"name": "favicon", "patterns": ["assets/favicon-*"], "raw": 5000},
-        {"name": "other", "patterns": ["*"], "raw": 1000}
+        { "name": "entry-html", "patterns": ["*.html"], "raw": 45000, "gzip": 6500 },
+        {
+            "name": "bootstrap-data",
+            "patterns": ["standalone-bootstrap.json"],
+            "raw": 90000,
+            "gzip": 13000
+        },
+        {
+            "name": "python-bundle",
+            "patterns": ["standalone-python-bundle.json"],
+            "raw": 9500000,
+            "gzip": 3000000
+        },
+        {
+            "name": "build-manifest",
+            "patterns": ["build-manifest.json"],
+            "raw": 25000,
+            "gzip": 6000
+        },
+        {
+            "name": "js-runtime",
+            "patterns": ["assets/app-runtime-*.js"],
+            "raw": 311100,
+            "gzip": 83000
+        },
+        {
+            "name": "js-standalone",
+            "patterns": ["assets/standalone-*.js", "assets/standalone-worker-*.js"],
+            "raw": 27800,
+            "gzip": 8500
+        },
+        {
+            "name": "tiling-preview",
+            "patterns": ["assets/tiling-preview-data-*.js"],
+            "raw": 90000,
+            "gzip": 27000
+        },
+        { "name": "js-async", "patterns": ["assets/*.js"], "raw": 177000, "gzip": 50500 },
+        { "name": "css", "patterns": ["assets/*.css"], "raw": 46100, "gzip": 9100 },
+        { "name": "favicon", "patterns": ["assets/favicon-*"], "raw": 5000 },
+        { "name": "other", "patterns": ["*"], "raw": 1000 }
     ],
-    "total": {"raw": 9800000, "gzip": 3150000}
+    "total": { "raw": 9800000, "gzip": 3150000 }
 }

@@ -123,7 +123,11 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
     }
 
     function onKeydown(event: KeyboardEvent): void {
-        if (wallPage.hidden) {
+        if (wallPage.hidden || !wallPage.isConnected) {
+            return;
+        }
+        if (content.handleHistoryKey(event)) {
+            event.preventDefault();
             return;
         }
         if (event.key === "Escape") {
