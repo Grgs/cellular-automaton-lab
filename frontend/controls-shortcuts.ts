@@ -18,7 +18,11 @@ export function bindControlShortcuts(
     } = {},
 ): void {
     documentNode.addEventListener("keydown", (event) => {
-        if (isTextInputTargetFn(event.target)) {
+        if (
+            event.defaultPrevented ||
+            documentNode.documentElement.dataset.workspaceRoute === "wall" ||
+            isTextInputTargetFn(event.target)
+        ) {
             return;
         }
 

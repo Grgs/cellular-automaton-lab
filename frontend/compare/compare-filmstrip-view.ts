@@ -194,6 +194,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
 
     let player = new FilmstripPlayer(0, { loop: options.loop ?? false });
     let unsubscribe: (() => void) | null = null;
+    let loadRevision = 0;
     let boards: BoardEntry[] = [];
     let lastRenderedIndex = -1;
     let focusedGeometry: string | null = null;
@@ -367,12 +368,16 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         options.onFrameChange?.(state.index);
     }
 
-    function teardownRun(): void {
+    function detachCurrentPlayer(): void {
         transport.detach();
         unsubscribe?.();
         unsubscribe = null;
-        boards = [];
         lastRenderedIndex = -1;
+    }
+
+    function teardownRun(): void {
+        detachCurrentPlayer();
+        boards = [];
         // A fresh run starts in the gallery; silent so it doesn't fire onFocusChange.
         focusedGeometry = null;
         root.classList.remove("compare-filmstrip--speaker");
@@ -383,10 +388,8 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     }
 
     function detachPlayer(): void {
-        transport.detach();
-        unsubscribe?.();
-        unsubscribe = null;
-        lastRenderedIndex = -1;
+        loadRevision += 1;
+        detachCurrentPlayer();
     }
 
     function openBoardTilingPicker(anchor: HTMLElement, tiling?: TopologyFilmstrip): void {
@@ -664,10 +667,11 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         filmstrip: SeedFilmstripResult,
         loadOptions?: FilmstripLoadOptions,
     ): Promise<void> {
+        const revision = ++loadRevision;
         closeTilingPicker();
         const reuseBoards = Boolean(loadOptions?.preserveBoards) && canReuseBoards(filmstrip);
         if (reuseBoards) {
-            detachPlayer();
+            detachCurrentPlayer();
             syncReusedBoards(filmstrip);
         } else {
             teardownRun();
@@ -676,28 +680,32 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         }
         wallActions.querySelector(".compare-filmstrip-add-anchor")?.remove();
         createAddControl();
-        player = new FilmstripPlayer(filmstrip.frame_count, {
+        const nextPlayer = new FilmstripPlayer(filmstrip.frame_count, {
             loop: options.loop ?? false,
             ...(loadOptions?.loopStart === undefined ? {} : { loopStart: loadOptions.loopStart }),
         });
+        player = nextPlayer;
 
-        unsubscribe = player.subscribe(onPlayerIndex);
-        transport.attach(player);
+        unsubscribe = nextPlayer.subscribe(onPlayerIndex);
+        transport.attach(nextPlayer);
         // Prime the (still "…") board skeletons before previews load.
-        onPlayerIndex(player.state);
+        onPlayerIndex(nextPlayer.state);
         applyFocusLayout();
 
         await Promise.all(boards.map((entry) => ensurePreview(entry)));
+        if (revision !== loadRevision || player !== nextPlayer) {
+            return;
+        }
 
         // Optional post-load playback overrides (used by the featured demo).
         if (loadOptions?.speedMultiplier !== undefined) {
             transport.setSpeed(loadOptions.speedMultiplier);
         }
         if (loadOptions?.initialFrame !== undefined) {
-            player.seek(loadOptions.initialFrame);
+            nextPlayer.seek(loadOptions.initialFrame);
         }
         if (loadOptions?.autoplay) {
-            player.play();
+            nextPlayer.play();
         }
     }
 
@@ -815,6 +823,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
         detachPlayer,
         dispose(): void {
             closeTilingPicker();
+            loadRevision += 1;
             teardownRun();
             root.remove();
         },

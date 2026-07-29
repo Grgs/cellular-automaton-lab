@@ -101,6 +101,17 @@ function manualScheduler(): {
     };
 }
 
+function deferred<T>(): {
+    promise: Promise<T>;
+    resolve(value: T): void;
+} {
+    let resolve!: (value: T) => void;
+    const promise = new Promise<T>((next) => {
+        resolve = next;
+    });
+    return { promise, resolve };
+}
+
 function stubBackend(previewTopology: SimulationBackend["previewTopology"]): SimulationBackend {
     const snapshot = {} as SimulationSnapshot;
     return {
@@ -654,6 +665,31 @@ describe("createFilmstripView", () => {
 
         expect(clock.active()).toBe(0); // paused
         expect(counterText()).toBe("gen 2 / 2");
+    });
+
+    it("does not apply playback options from a superseded async load", async () => {
+        const firstPreview = deferred<TopologyPreview>();
+        const previewTopology = vi.fn(async (): Promise<TopologyPreview> =>
+            previewTopology.mock.calls.length === 1 ? firstPreview.promise : squarePreview(),
+        );
+        const { view, clock } = mountView({ previewTopology });
+
+        const staleLoad = view.load(
+            filmstrip([tiling("square", [{ a: 1 }, { b: 1 }, { c: 1 }])], 3),
+            { autoplay: true, initialFrame: 2 },
+        );
+        await vi.waitFor(() => expect(previewTopology).toHaveBeenCalledTimes(1));
+
+        await view.load(filmstrip([tiling("hex", [{ a: 1 }, { b: 1 }])], 2));
+        expect(counterText()).toBe("gen 0 / 1");
+        expect(clock.active()).toBe(0);
+
+        firstPreview.resolve(squarePreview());
+        await staleLoad;
+
+        expect(counterText()).toBe("gen 0 / 1");
+        expect(clock.active()).toBe(0);
+        expect(boardFor(view, "hex")).toBeTruthy();
     });
 
     it("loops a sub-window back to loopStart instead of the seed", async () => {
