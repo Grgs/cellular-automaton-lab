@@ -886,6 +886,186 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         ]
         case.assertEqual(unexpected_console, [])
 
+    def test_compare_wall_history_restores_membership_playback_and_shortcuts(
+        self,
+    ) -> None:
+        case = self._case()
+        case.page.set_viewport_size({"width": 1280, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [1280, 800])
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        boards = case.page.locator(".compare-filmstrip-board")
+        labels = case.page.locator(".compare-filmstrip-label")
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        initial_labels = labels.all_text_contents()
+
+        case.page.get_by_role("button", name="Step forward one generation").click()
+        expect(case.page.locator(".compare-filmstrip-counter")).to_contain_text("gen 1 /")
+        playback = case.page.locator('.compare-filmstrip-btn[title="Play / pause"]')
+        playback.click()
+        expect(playback).to_contain_text("Pause")
+        self._select_compare_board(1)
+        selected_name = initial_labels[1]
+        case.page.locator(".compare-inspector-replace").click()
+        replacement = case.page.locator(".compare-board-tiling-choice:not(:disabled)").first
+        replacement_name = replacement.locator(
+            ".compare-board-tiling-choice-copy > span"
+        ).inner_text()
+        replacement.click()
+
+        history = case.page.locator(".compare-history-snackbar")
+        history_action = case.page.locator(".compare-history-action")
+        expected_replaced = list(initial_labels)
+        expected_replaced[1] = replacement_name
+        expect(case.page.locator(".compare-setup-run")).to_have_text("Up to date", timeout=60_000)
+        expect(history).to_be_visible()
+        expect(history).to_contain_text(f"Replace {selected_name} with {replacement_name}")
+        expect(history_action).to_have_text("Undo")
+        expect(playback).to_contain_text("Play")
+        case.assertEqual(labels.all_text_contents(), expected_replaced)
+
+        def history_colors() -> list[str]:
+            return cast(
+                list[str],
+                history.evaluate(
+                    """node => {
+                        const style = getComputedStyle(node);
+                        return [style.backgroundColor, style.color, style.borderColor];
+                    }"""
+                ),
+            )
+
+        case.page.click("#shell-menu-toggle")
+        case.page.click("#shell-preferences-btn")
+        case.page.get_by_role("radio", name="Light").check()
+        light_history_colors = history_colors()
+        case.page.get_by_role("radio", name="Dark").check()
+        dark_history_colors = history_colors()
+        case.assertNotEqual(light_history_colors[0], dark_history_colors[0])
+        case.assertNotEqual(light_history_colors[1], dark_history_colors[1])
+        case.assertNotEqual(light_history_colors[0], "rgba(0, 0, 0, 0)")
+        case.assertNotEqual(dark_history_colors[0], "rgba(0, 0, 0, 0)")
+        case.page.get_by_role("button", name="Close preferences").click()
+
+        history_action.click()
+        expect(history_action).to_have_text("Redo", timeout=60_000)
+        case.assertEqual(labels.all_text_contents(), initial_labels)
+        expect(playback).to_contain_text("Pause")
+        expect(
+            case.page.locator(".compare-filmstrip-board.is-selected .compare-filmstrip-label")
+        ).to_have_text(selected_name)
+        case.assertTrue("focus=" in str(case.page.evaluate("() => window.location.hash")))
+        playback.click()
+        expect(playback).to_contain_text("Play")
+
+        history_action.click()
+        expect(history_action).to_have_text("Undo", timeout=60_000)
+        case.assertEqual(labels.all_text_contents(), expected_replaced)
+        expect(playback).to_contain_text("Play")
+        expect(
+            case.page.locator(".compare-filmstrip-board.is-selected .compare-filmstrip-label")
+        ).to_have_text(replacement_name)
+
+        case.page.locator(".compare-inspector-remove").click()
+        expected_removed = [expected_replaced[0], *expected_replaced[2:]]
+        expect(boards).to_have_count(3)
+        case.assertEqual(labels.all_text_contents(), expected_removed)
+        expect(history).to_contain_text(f"Remove {replacement_name}")
+        history_action.click()
+        expect(history_action).to_have_text("Redo", timeout=60_000)
+        case.assertEqual(labels.all_text_contents(), expected_replaced)
+        history_action.click()
+        expect(history_action).to_have_text("Undo", timeout=60_000)
+        case.assertEqual(labels.all_text_contents(), expected_removed)
+
+        case.page.locator(".compare-filmstrip-add").click()
+        add_choice = case.page.locator(".compare-board-tiling-choice:not(:disabled)").first
+        added_name = add_choice.locator(".compare-board-tiling-choice-copy > span").inner_text()
+        add_choice.click()
+        expect(case.page.locator(".compare-setup-run")).to_have_text("Up to date", timeout=60_000)
+        expected_added = [*expected_removed, added_name]
+        case.assertEqual(labels.all_text_contents(), expected_added)
+        expect(history).to_contain_text(f"Add {added_name}")
+
+        wall_page = case.page.locator(".wall-page")
+        wall_page.focus()
+        case.page.keyboard.press("Control+z")
+        expect(history_action).to_have_text("Redo", timeout=60_000)
+        case.assertEqual(labels.all_text_contents(), expected_removed)
+        case.page.keyboard.press("Control+Shift+z")
+        expect(history_action).to_have_text("Undo", timeout=60_000)
+        case.assertEqual(labels.all_text_contents(), expected_added)
+        case.page.keyboard.press("Control+z")
+        expect(history_action).to_have_text("Redo", timeout=60_000)
+        case.assertEqual(labels.all_text_contents(), expected_removed)
+        case.page.keyboard.press("Control+y")
+        expect(history_action).to_have_text("Undo", timeout=60_000)
+        case.assertEqual(labels.all_text_contents(), expected_added)
+
+        # Use the always-visible rule selector for the real-browser editor
+        # check. The seed bit input lives inside a collapsed <details> region,
+        # so attempting to focus it leaves focus on the wall and would
+        # correctly trigger wall undo instead of exercising shortcut yielding.
+        rule_select = case.page.get_by_label("Comparison rule")
+        expect(rule_select).to_be_visible()
+        rule_select.focus()
+        case.page.keyboard.press("Control+z")
+        case.assertEqual(labels.all_text_contents(), expected_added)
+        case.page.evaluate(
+            """() => {
+                const event = new KeyboardEvent('keydown', {
+                    key: 'z',
+                    ctrlKey: true,
+                    bubbles: true,
+                    cancelable: true,
+                });
+                event.preventDefault();
+                document.querySelector('.wall-page')?.dispatchEvent(event);
+            }"""
+        )
+        case.assertEqual(labels.all_text_contents(), expected_added)
+
+        self._select_compare_board(0)
+        case.page.locator(".compare-hero-open-lab").click()
+        self._expect("#grid").to_be_visible(timeout=60_000)
+        case.page.click("#wall-view-btn")
+        self._expect(".wall-page").to_be_visible()
+        case.assertEqual(labels.all_text_contents(), expected_added)
+        expect(history_action).to_have_text("Undo")
+
+        case.page.set_viewport_size({"width": 390, "height": 800})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [390, 800])
+        snackbar_rect = cast(
+            dict[str, float],
+            history.evaluate(
+                """node => {
+                    const rect = node.getBoundingClientRect();
+                    return {
+                        left: rect.left,
+                        right: rect.right,
+                        top: rect.top,
+                        bottom: rect.bottom,
+                    };
+                }"""
+            ),
+        )
+        case.assertGreaterEqual(float(snackbar_rect["left"]), 0)
+        case.assertLessEqual(float(snackbar_rect["right"]), 390)
+        case.assertGreaterEqual(float(snackbar_rect["top"]), 0)
+        case.assertLessEqual(float(snackbar_rect["bottom"]), 800)
+        case.assertLessEqual(
+            int(case.page.evaluate("() => document.documentElement.scrollWidth")),
+            390,
+        )
+
+        unexpected_console = [
+            message
+            for message in case.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        case.assertEqual(unexpected_console, [])
+
     def test_rule_picker_updates_rule_ui(self) -> None:
         case = self._case()
         self._expect("#tiling-family-select").to_have_value("square")
@@ -2862,6 +3042,59 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self.assertEqual(self.page.locator(".compare-filmstrip-label").all_text_contents(), labels)
         expect(self.page.locator(".compare-filmstrip-add")).to_be_enabled()
         self.page.unroute("**/compare/filmstrip", intercept_filmstrip)
+
+        unexpected_console = [
+            message
+            for message in self.console_messages
+            if message.startswith("[console:error]") or message.startswith("[pageerror]")
+        ]
+        self.assertEqual(unexpected_console, [])
+
+    def test_wall_undo_cancels_a_pending_membership_request(self) -> None:
+        self._mark_compare_demo_seen()
+        self.page.click("#wall-view-btn")
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        initial_labels = self.page.locator(".compare-filmstrip-label").all_text_contents()
+        self._remove_selected_compare_board(0)
+        self._expect(".compare-filmstrip-board").to_have_count(3)
+
+        held_routes: list[Any] = []
+
+        def hold_membership_update(route: Any) -> None:
+            held_routes.append(route)
+
+        self.page.route("**/compare/filmstrip", hold_membership_update)
+        self.page.locator(".compare-filmstrip-add").click()
+        self.page.locator(".compare-board-tiling-choice:not(:disabled)").first.click()
+        for _ in range(100):
+            if held_routes:
+                break
+            self.page.wait_for_timeout(25)
+        self.assertEqual(len(held_routes), 1)
+        expect(self.page.locator(".compare-history-action")).to_have_text("Undo")
+
+        self.page.locator(".wall-page").focus()
+        self.page.keyboard.press("Control+z")
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+        expect(self.page.locator(".compare-history-action")).to_have_text("Redo", timeout=60_000)
+        self.assertEqual(
+            self.page.locator(".compare-filmstrip-label").all_text_contents(),
+            initial_labels,
+        )
+
+        # Release the intercepted request after cancellation. Chromium may
+        # suppress the response event entirely for the already-aborted fetch;
+        # either way, the route can no longer replace the restored wall or
+        # create a history entry. The unit suite separately resolves an
+        # aborted backend promise to cover that late-settlement path.
+        held_routes[0].continue_()
+        self.page.wait_for_timeout(500)
+        self.assertEqual(
+            self.page.locator(".compare-filmstrip-label").all_text_contents(),
+            initial_labels,
+        )
+        expect(self.page.locator(".compare-history-action")).to_have_text("Redo")
+        self.page.unroute("**/compare/filmstrip", hold_membership_update)
 
         unexpected_console = [
             message

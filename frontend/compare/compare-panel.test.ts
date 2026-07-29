@@ -251,6 +251,25 @@ function fourBoardFilmstrip(): SeedFilmstripResult {
     return { ...base, tilings: [...base.tilings, ...extra] };
 }
 
+function filmstripFor(
+    geometries: readonly string[],
+    { frameCount = 4 }: { frameCount?: number } = {},
+): SeedFilmstripResult {
+    const template = twoBoardFilmstrip().tilings[0]!;
+    return {
+        ...twoBoardFilmstrip(),
+        frame_count: frameCount,
+        tilings: geometries.map((geometry) => ({
+            ...template,
+            geometry,
+            tiling_family: geometry,
+            frames: Array.from({ length: frameCount }, (_, index) => ({
+                [`c:${index + 1}:1`]: 1,
+            })),
+        })),
+    };
+}
+
 function fakeGridView(): GridView {
     return {
         render: vi.fn(),
@@ -3437,6 +3456,204 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("undoes and redoes a local removal with exact order, focus, and playback frame", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (request: FilmstripRequest) =>
+            filmstripFor(request.geometries),
+        );
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 4,
+            grid_size: 16,
+            geometries: ["square", "hex", "kagome"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+
+        document
+            .querySelector<HTMLButtonElement>(
+                '.compare-filmstrip-btn[aria-label="Step forward one generation"]',
+            )
+            ?.click();
+        expect(document.querySelector(".compare-filmstrip-counter")?.textContent).toBe("gen 1 / 3");
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-inspector-remove")?.click();
+
+        const labels = () =>
+            [...document.querySelectorAll(".compare-filmstrip-label")].map(
+                (label) => label.textContent,
+            );
+        const historyAction = () =>
+            document.querySelector<HTMLButtonElement>(".compare-history-action");
+        expect(labels()).toEqual(["hex", "kagome"]);
+        expect(historyAction()?.textContent).toBe("Undo");
+        expect(document.querySelector(".compare-history-snackbar")?.textContent).toContain(
+            "Remove square",
+        );
+
+        handle.close();
+        handle.open();
+        expect(historyAction()?.textContent).toBe("Undo");
+        historyAction()?.click();
+        await vi.waitFor(() => expect(labels()).toEqual(["square", "hex", "kagome"]));
+        await vi.waitFor(() => expect(historyAction()?.textContent).toBe("Redo"));
+        expect(requestFilmstrip).toHaveBeenCalledTimes(1);
+        expect(document.querySelector(".compare-filmstrip-counter")?.textContent).toBe("gen 1 / 3");
+        expect(
+            document.querySelector(".compare-filmstrip-board.is-selected .compare-filmstrip-label")
+                ?.textContent,
+        ).toBe("square");
+        expect(document.querySelector(".compare-filmstrip--speaker")).not.toBeNull();
+        expect(window.location.hash).toContain("focus=square");
+
+        historyAction()?.click();
+        await vi.waitFor(() => expect(labels()).toEqual(["hex", "kagome"]));
+        await vi.waitFor(() => expect(historyAction()?.textContent).toBe("Undo"));
+        expect(document.querySelector(".compare-filmstrip-counter")?.textContent).toBe("gen 1 / 3");
+        expect(
+            document.querySelector(".compare-filmstrip-board.is-selected .compare-filmstrip-label")
+                ?.textContent,
+        ).toBe("hex");
+        expect(document.querySelector(".compare-filmstrip--speaker")).toBeNull();
+        expect(window.location.hash).not.toContain("focus=");
+        expect(historyAction()?.textContent).toBe("Undo");
+        expect(requestFilmstrip).toHaveBeenCalledTimes(1);
+        handle.dispose();
+    });
+
+    it("restores the wall's playing state through removal undo and redo", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            backend: {
+                ...backend,
+                requestFilmstrip: async (request) =>
+                    filmstripFor(request.geometries, { frameCount: 12 }),
+            },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 12,
+            grid_size: 16,
+            geometries: ["square", "hex", "kagome"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        const playButton = () =>
+            document.querySelector<HTMLButtonElement>(
+                '.compare-filmstrip-btn[aria-label="Play / pause"]',
+            );
+        playButton()?.click();
+        expect(playButton()?.textContent).toBe("⏸ Pause");
+        document.querySelector<HTMLButtonElement>(".compare-inspector-remove")?.click();
+
+        const historyAction = () =>
+            document.querySelector<HTMLButtonElement>(".compare-history-action");
+        historyAction()?.click();
+        await vi.waitFor(() => expect(historyAction()?.textContent).toBe("Redo"));
+        expect(playButton()?.textContent).toBe("⏸ Pause");
+        historyAction()?.click();
+        await vi.waitFor(() => expect(historyAction()?.textContent).toBe("Undo"));
+        expect(playButton()?.textContent).toBe("⏸ Pause");
+        playButton()?.click();
+        handle.dispose();
+    });
+
+    it("cancels a pending membership update when undo restores an earlier wall", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const pendingAdd = deferred<SeedFilmstripResult>();
+        let pendingSignal: AbortSignal | undefined;
+        const requestFilmstrip = vi.fn(
+            async (
+                request: FilmstripRequest,
+                requestOptions?: { signal?: AbortSignal },
+            ): Promise<SeedFilmstripResult> => {
+                if (requestFilmstrip.mock.calls.length === 1) {
+                    return filmstripFor(request.geometries);
+                }
+                pendingSignal = requestOptions?.signal;
+                return pendingAdd.promise;
+            },
+        );
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 4,
+            grid_size: 16,
+            geometries: ["square", "hex", "kagome"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-inspector-remove")?.click();
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.click();
+        const penroseChoice = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-board-tiling-choice"),
+        ].find((choice) => choice.textContent?.includes("Penrose"));
+        penroseChoice?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        expect(
+            document.querySelector<HTMLButtonElement>(".compare-history-action")?.textContent,
+        ).toBe("Undo");
+
+        document.querySelector<HTMLElement>(".wall-page")?.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "z",
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        expect(pendingSignal?.aborted).toBe(true);
+
+        pendingAdd.resolve(filmstripFor(["hex", "kagome", "penrose"]));
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(
+            [...document.querySelectorAll(".compare-filmstrip-label")].map(
+                (label) => label.textContent,
+            ),
+        ).toEqual(["square", "hex", "kagome"]);
+        await vi.waitFor(() =>
+            expect(
+                document.querySelector<HTMLButtonElement>(".compare-history-action")?.textContent,
+            ).toBe("Redo"),
+        );
+        expect(requestFilmstrip).toHaveBeenCalledTimes(2);
+        handle.dispose();
+    });
+
     it("rebases a pending wall rerun onto the survivors of a local removal", async () => {
         const { mountComparePanel } = await import("./compare-panel.js");
         const { backend } = fakeBackend();
@@ -3502,6 +3719,17 @@ describe("mountComparePanel", () => {
         expect(document.querySelector(".compare-stage-caption")?.textContent).toContain(
             "2 tilings",
         );
+        expect(document.querySelector<HTMLElement>(".compare-history-snackbar")?.hidden).toBe(true);
+        document.querySelector<HTMLElement>(".wall-page")?.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "z",
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        expect(wallGenerations.value).toBe("13");
         handle.dispose();
     });
 
@@ -3615,6 +3843,37 @@ describe("mountComparePanel", () => {
                 )?.textContent,
             ).toBe("penrose"),
         );
+        const historyAction = () =>
+            document.querySelector<HTMLButtonElement>(".compare-history-action");
+        expect(document.querySelector(".compare-history-snackbar")?.textContent).toContain(
+            "Replace Hex with Penrose",
+        );
+        historyAction()?.click();
+        await vi.waitFor(() =>
+            expect(
+                [...document.querySelectorAll(".compare-filmstrip-label")].map(
+                    (label) => label.textContent,
+                ),
+            ).toEqual(["square", "hex", "kagome"]),
+        );
+        await vi.waitFor(() => expect(historyAction()?.textContent).toBe("Redo"));
+        expect(window.location.hash).toContain("focus=hex");
+        expect(
+            document.querySelector(".compare-filmstrip-board.is-selected .compare-filmstrip-label")
+                ?.textContent,
+        ).toBe("hex");
+
+        historyAction()?.click();
+        await vi.waitFor(() =>
+            expect(
+                [...document.querySelectorAll(".compare-filmstrip-label")].map(
+                    (label) => label.textContent,
+                ),
+            ).toEqual(["square", "penrose", "kagome"]),
+        );
+        await vi.waitFor(() => expect(historyAction()?.textContent).toBe("Undo"));
+        expect(window.location.hash).toContain("focus=penrose");
+        expect(requestFilmstrip).toHaveBeenCalledTimes(2);
         handle.dispose();
     });
 
@@ -3644,6 +3903,380 @@ describe("mountComparePanel", () => {
 
         await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
         expect(requestFilmstrip.mock.calls.at(1)?.[0]?.geometries.at(-1)).toBe("penrose");
+        handle.dispose();
+    });
+
+    it("commits async add history only after install and yields shortcuts to editors", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const pendingAdd = deferred<SeedFilmstripResult>();
+        const requestFilmstrip = vi.fn(
+            async (request: FilmstripRequest): Promise<SeedFilmstripResult> =>
+                requestFilmstrip.mock.calls.length === 1
+                    ? filmstripFor(request.geometries)
+                    : pendingAdd.promise,
+        );
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 4,
+            grid_size: 16,
+            geometries: ["square", "hex"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.click();
+        const penroseChoice = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-board-tiling-choice"),
+        ].find((choice) => choice.textContent?.includes("Penrose"));
+        penroseChoice?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+        expect(document.querySelector<HTMLElement>(".compare-history-snackbar")?.hidden).toBe(true);
+
+        pendingAdd.resolve(filmstripFor(["square", "hex", "penrose"]));
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        expect(document.querySelector<HTMLElement>(".compare-history-snackbar")?.hidden).toBe(
+            false,
+        );
+        expect(document.querySelector(".compare-history-snackbar")?.textContent).toContain(
+            "Add Penrose",
+        );
+
+        document.querySelector<HTMLElement>(".wall-page")?.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "z",
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        });
+        await vi.waitFor(() =>
+            expect(
+                document.querySelector<HTMLButtonElement>(".compare-history-action")?.textContent,
+            ).toBe("Redo"),
+        );
+
+        document.querySelector<HTMLElement>(".wall-page")?.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "z",
+                metaKey: true,
+                shiftKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        await vi.waitFor(() =>
+            expect(
+                document.querySelector<HTMLButtonElement>(".compare-history-action")?.textContent,
+            ).toBe("Undo"),
+        );
+        document.querySelector<HTMLElement>(".wall-page")?.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "z",
+                metaKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        });
+        await vi.waitFor(() =>
+            expect(
+                document.querySelector<HTMLButtonElement>(".compare-history-action")?.textContent,
+            ).toBe("Redo"),
+        );
+
+        const seedInput = document.querySelector<HTMLInputElement>(
+            '.compare-config-panel-setup input[type="text"]',
+        );
+        seedInput?.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "z",
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+        await Promise.resolve();
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+
+        const wallPage = document.querySelector<HTMLElement>(".wall-page");
+        if (!wallPage) throw new Error("missing wall page");
+        const contenteditable = document.createElement("div");
+        contenteditable.setAttribute("contenteditable", "true");
+        for (const editor of [
+            document.createElement("select"),
+            document.createElement("textarea"),
+            contenteditable,
+        ]) {
+            wallPage.append(editor);
+            editor.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: "y",
+                    ctrlKey: true,
+                    bubbles: true,
+                    cancelable: true,
+                }),
+            );
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+            editor.remove();
+        }
+
+        const alreadyHandled = new KeyboardEvent("keydown", {
+            key: "y",
+            ctrlKey: true,
+            bubbles: true,
+            cancelable: true,
+        });
+        alreadyHandled.preventDefault();
+        document.querySelector<HTMLElement>(".wall-page")?.dispatchEvent(alreadyHandled);
+        await Promise.resolve();
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+
+        document.querySelector<HTMLElement>(".wall-page")?.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "y",
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        expect(requestFilmstrip).toHaveBeenCalledTimes(2);
+        handle.dispose();
+    });
+
+    it("does not resurrect a pending membership history intent after configuration clears it", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const pendingAdd = deferred<SeedFilmstripResult>();
+        const requestFilmstrip = vi.fn(
+            async (request: FilmstripRequest): Promise<SeedFilmstripResult> =>
+                requestFilmstrip.mock.calls.length === 1
+                    ? filmstripFor(request.geometries)
+                    : pendingAdd.promise,
+        );
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 4,
+            grid_size: 16,
+            geometries: ["square", "hex"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.click();
+        [...document.querySelectorAll<HTMLButtonElement>(".compare-board-tiling-choice")]
+            .find((choice) => choice.textContent?.includes("Penrose"))
+            ?.click();
+        await vi.waitFor(() => expect(requestFilmstrip).toHaveBeenCalledTimes(2));
+
+        const seedInput = document.querySelector<HTMLInputElement>(
+            '.compare-config-panel-setup input[type="text"]',
+        );
+        if (!seedInput) throw new Error("missing seed input");
+        seedInput.value = "101";
+        seedInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+        pendingAdd.resolve(filmstripFor(["square", "hex", "penrose"]));
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        expect(document.querySelector<HTMLElement>(".compare-history-snackbar")?.hidden).toBe(true);
+        handle.dispose();
+    });
+
+    it("does not record a failed membership update", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(
+            async (request: FilmstripRequest): Promise<SeedFilmstripResult> => {
+                if (requestFilmstrip.mock.calls.length === 1) {
+                    return filmstripFor(request.geometries);
+                }
+                throw new Error("membership failed");
+            },
+        );
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 4,
+            grid_size: 16,
+            geometries: ["square", "hex"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        });
+
+        document.querySelector<HTMLButtonElement>(".compare-filmstrip-add")?.click();
+        const penroseChoice = [
+            ...document.querySelectorAll<HTMLButtonElement>(".compare-board-tiling-choice"),
+        ].find((choice) => choice.textContent?.includes("Penrose"));
+        penroseChoice?.click();
+
+        await vi.waitFor(() =>
+            expect(document.querySelector(".compare-status")?.textContent).toContain(
+                "membership failed",
+            ),
+        );
+        expect(document.querySelector<HTMLElement>(".compare-history-snackbar")?.hidden).toBe(true);
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+
+        document.querySelector<HTMLElement>(".wall-page")?.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "z",
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+        await Promise.resolve();
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        expect(requestFilmstrip).toHaveBeenCalledTimes(2);
+        handle.dispose();
+    });
+
+    it("clears wall history when a non-membership configuration changes", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (request: FilmstripRequest) =>
+            filmstripFor(request.geometries),
+        );
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 4,
+            grid_size: 16,
+            geometries: ["square", "hex", "kagome"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-inspector-remove")?.click();
+        expect(document.querySelector<HTMLElement>(".compare-history-snackbar")?.hidden).toBe(
+            false,
+        );
+
+        const seedInput = document.querySelector<HTMLInputElement>(
+            '.compare-config-panel-setup input[type="text"]',
+        );
+        if (!seedInput) throw new Error("missing seed input");
+        seedInput.value = "101";
+        seedInput.dispatchEvent(new Event("input", { bubbles: true }));
+        expect(document.querySelector<HTMLElement>(".compare-history-snackbar")?.hidden).toBe(true);
+
+        document.querySelector<HTMLElement>(".wall-page")?.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "z",
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+        expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(2);
+        handle.dispose();
+    });
+
+    it("clears wall history when a loaded run replaces the workspace", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const requestFilmstrip = vi.fn(async (request: FilmstripRequest) =>
+            filmstripFor(request.geometries),
+        );
+        const handle = mountComparePanel({
+            backend: { ...backend, requestFilmstrip },
+            bootstrapData: bootstrapData(),
+        });
+        handle.open();
+        await handle.applyRunConfig({
+            seed: "111",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 4,
+            grid_size: 16,
+            geometries: ["square", "hex", "kagome"],
+        });
+        document.querySelector<HTMLButtonElement>(".compare-setup-run")?.click();
+        await vi.waitFor(() => {
+            expect(document.querySelectorAll(".compare-filmstrip-board")).toHaveLength(3);
+        });
+        document.querySelector<HTMLElement>(".compare-filmstrip-board")?.click();
+        document.querySelector<HTMLButtonElement>(".compare-inspector-remove")?.click();
+        expect(document.querySelector<HTMLElement>(".compare-history-snackbar")?.hidden).toBe(
+            false,
+        );
+
+        await handle.applyRunConfig({
+            seed: "101",
+            rule: "conway",
+            traversal: "bfs",
+            frames: 5,
+            grid_size: 16,
+            geometries: ["square", "hex"],
+        });
+        expect(document.querySelector<HTMLElement>(".compare-history-snackbar")?.hidden).toBe(true);
+        const loadedRunLabels = [...document.querySelectorAll(".compare-filmstrip-label")].map(
+            (label) => label.textContent,
+        );
+        expect(loadedRunLabels).toHaveLength(2);
+
+        document.querySelector<HTMLElement>(".wall-page")?.dispatchEvent(
+            new KeyboardEvent("keydown", {
+                key: "z",
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            }),
+        );
+        expect(
+            [...document.querySelectorAll(".compare-filmstrip-label")].map(
+                (label) => label.textContent,
+            ),
+        ).toEqual(loadedRunLabels);
         handle.dispose();
     });
 

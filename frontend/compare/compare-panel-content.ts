@@ -83,6 +83,13 @@ import { createCompareOperationCoordinator } from "./compare-operation-coordinat
 import { createCompareResultView } from "./compare-result-view.js";
 import { createCompareFilmstripPresentation } from "./compare-filmstrip-presentation.js";
 import type { CompareConfigTab, CompareMenuCommand } from "./compare-menu-command.js";
+import {
+    createCompareWallHistory,
+    createCompareWallSnapshot,
+    type CompareWallHistoryEntry,
+    type CompareWallHistoryOperation,
+    type CompareWallSnapshot,
+} from "./compare-wall-history.js";
 
 const DEFAULT_SEED = "01100 11000 01000";
 const STYLE_ELEMENT_ID = "compare-panel-styles";
@@ -92,6 +99,15 @@ const FAILED_UPDATE_MANAGEMENT_REASON = "Retry the failed update before editing 
 interface RunFilmstripOptions {
     /** Suppress the full-wall loading veil for debounced edits that can refresh in place. */
     quietUpdate?: boolean;
+    /** Record this membership change only after its authoritative result installs. */
+    historyIntent?: CompareWallHistoryIntent;
+}
+
+interface CompareWallHistoryIntent {
+    readonly operation: CompareWallHistoryOperation;
+    readonly label: string;
+    readonly before: CompareWallSnapshot;
+    readonly epoch: number;
 }
 
 interface ScheduledFilmstripRun {
@@ -129,6 +145,19 @@ function isInteractiveShortcutTarget(target: EventTarget | null): boolean {
             "button, a[href], input, select, textarea, summary, " +
                 '[tabindex]:not([tabindex="-1"])',
         ),
+    );
+}
+
+function isEditableShortcutTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) {
+        return false;
+    }
+    return (
+        target.isContentEditable ||
+        target.closest("[contenteditable]:not([contenteditable='false'])") !== null ||
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLSelectElement ||
+        target instanceof HTMLTextAreaElement
     );
 }
 
@@ -170,6 +199,8 @@ export interface ComparePanelContentHandle {
     exitFocusIfAny(): boolean;
     /** Handle a playback shortcut (space/arrows) once a filmstrip is live; true if consumed. */
     handlePlaybackKey(event: KeyboardEvent): boolean;
+    /** Handle wall membership undo/redo shortcuts; true if consumed. */
+    handleHistoryKey(event: KeyboardEvent): boolean;
     dispose(): void;
 }
 
@@ -303,6 +334,7 @@ export function createComparePanelContent(
     const seedPad = createSeedPad({
         getSeed: () => seedInput.value,
         onSeedChange: (formatted) => {
+            clearWallHistory();
             seedInput.value = formatted;
             redrawPreview();
             updateSummary();
@@ -318,21 +350,25 @@ export function createComparePanelContent(
         seedPreview.redraw();
     };
     seedInput.addEventListener("input", () => {
+        clearWallHistory();
         seedPad.syncFromSeed();
         redrawPreview();
         updateSummary();
         scheduleWallRerun();
     });
     traversalSelect.addEventListener("change", () => {
+        clearWallHistory();
         refreshPreview();
         updateSummary();
         scheduleWallRerun();
     });
     wallGenerationsInput.addEventListener("input", () => {
+        clearWallHistory();
         updateSummary();
         scheduleWallRerun();
     });
     wallGenerationsInput.addEventListener("change", () => {
+        clearWallHistory();
         updateSummary();
         scheduleWallRerun();
     });
@@ -349,10 +385,12 @@ export function createComparePanelContent(
         }
     });
     gridInput.addEventListener("input", () => {
+        clearWallHistory();
         updateSummary();
         scheduleWallRerun();
     });
     gridInput.addEventListener("change", () => {
+        clearWallHistory();
         refreshPreview();
         updateSummary();
         scheduleWallRerun();
@@ -458,6 +496,25 @@ export function createComparePanelContent(
         role: "status",
         "aria-live": "polite",
     });
+    const historySnackbarMessage = el("span", {
+        class: "compare-history-message",
+    });
+    const historySnackbarAction = el("button", {
+        class: "compare-history-action",
+        type: "button",
+        textContent: "Undo",
+    });
+    const historySnackbar = el(
+        "div",
+        {
+            class: "compare-history-snackbar",
+            role: "status",
+            "aria-live": "polite",
+            "aria-atomic": "true",
+            hidden: true,
+        },
+        [historySnackbarMessage, historySnackbarAction],
+    );
     const setupTilingsValue = el("strong", {
         class: "compare-setup-value",
         textContent: "Loading",
@@ -565,6 +622,10 @@ export function createComparePanelContent(
         );
     let filmstripView: FilmstripViewController | null = null;
     const workspaceStore = createCompareWorkspaceStore(currentRunConfig());
+    const wallHistory = createCompareWallHistory({ limit: 20 });
+    let historyEpoch = 0;
+    let historyRestoreRevision = 0;
+    let historyRestoring = false;
     const operationCoordinator = createCompareOperationCoordinator({
         onBusyChange(busy): void {
             if (!busy) {
@@ -581,6 +642,7 @@ export function createComparePanelContent(
         selectedGeometries: () => [...selected],
         applyRunConfig,
         applyTilingSet(saved): string {
+            clearWallHistory();
             const knownGeometries = new Set(allTilings.map((tiling) => tiling.geometry));
             const omitted = replaceSelection(
                 new Set(saved.geometries.filter((geometry) => knownGeometries.has(geometry))),
@@ -838,6 +900,7 @@ export function createComparePanelContent(
         if (bitIndex < 0) {
             return;
         }
+        clearWallHistory();
 
         // A named-shape seed has no bit-string; convert it on first paint by
         // pulling this board's generation 0 back through its traversal. The
@@ -891,6 +954,10 @@ export function createComparePanelContent(
             return;
         }
         const beforeRemoval = workspaceStore.getState();
+        const before = captureWallSnapshot();
+        if (!before) {
+            return;
+        }
         const tiling = beforeRemoval.results.filmstrip?.tilings.find(
             (entry) => entry.geometry === geometry,
         );
@@ -921,6 +988,15 @@ export function createComparePanelContent(
         renderTilingChecklist();
         refreshPreview();
         updateSummary();
+        const after = captureWallSnapshot();
+        if (after && pendingKind !== "filmstrip") {
+            recordWallHistory({
+                operation: "remove",
+                label: `Remove ${tiling?.label || geometry}`,
+                before,
+                after,
+            });
+        }
 
         if (pendingKind === "filmstrip") {
             scheduleWallRerun();
@@ -948,6 +1024,10 @@ export function createComparePanelContent(
         }
         const next = allTilings.find((tiling) => tiling.geometry === nextGeometry);
         if (!next || selected.has(nextGeometry) || !tilingCompatibleWithSelectedRule(next)) {
+            return;
+        }
+        const before = captureWallSnapshot();
+        if (!before) {
             return;
         }
         // A Set carries the wall's display order. Deleting and re-adding here
@@ -984,7 +1064,17 @@ export function createComparePanelContent(
         statusLine.textContent = `Replaced a board with ${next.label} — updating the wall…`;
         renderTilingChecklist();
         refreshPreview();
-        void runFilmstrip();
+        const previousLabel =
+            allTilings.find((tiling) => tiling.geometry === previousGeometry)?.label ??
+            previousGeometry;
+        void runFilmstrip(undefined, {
+            historyIntent: {
+                operation: "replace",
+                label: `Replace ${previousLabel} with ${next.label}`,
+                before,
+                epoch: historyEpoch,
+            },
+        });
     }
 
     function addBoardToWall(geometry: string): void {
@@ -1000,11 +1090,22 @@ export function createComparePanelContent(
             filmstripView?.refreshAddControl();
             return;
         }
+        const before = captureWallSnapshot();
+        if (!before) {
+            return;
+        }
         selected.add(geometry);
         statusLine.textContent = `Added ${tiling.label} — updating the wall…`;
         renderTilingChecklist();
         refreshPreview();
-        void runFilmstrip();
+        void runFilmstrip(undefined, {
+            historyIntent: {
+                operation: "add",
+                label: `Add ${tiling.label}`,
+                before,
+                epoch: historyEpoch,
+            },
+        });
     }
 
     editModeButton.addEventListener("click", () => setEditMode(!editMode));
@@ -1027,6 +1128,7 @@ export function createComparePanelContent(
             statusLine.textContent = "This board cannot rebuild the shared seed.";
             return;
         }
+        clearWallHistory();
         if (isShapeMode()) {
             shapeSelect.value = "";
             syncShapeMode();
@@ -1108,6 +1210,196 @@ export function createComparePanelContent(
     function disposeAllForkedBoards(): void {
         for (const geometry of [...forkedBoards.keys()]) {
             disposeForkedBoard(geometry);
+        }
+    }
+
+    function configurationForCurrentFilmstrip(): CompareRunConfig {
+        const state = workspaceStore.getState();
+        const key = state.results.filmstripKey;
+        if (key) {
+            try {
+                const parsed = JSON.parse(key) as CompareRunConfig;
+                if (Array.isArray(parsed.geometries)) {
+                    return parsed;
+                }
+            } catch {
+                // Fall back to the store slice for pre-key or malformed legacy state.
+            }
+        }
+        return {
+            ...state.configuration,
+            geometries: [...state.orderedBoards],
+        };
+    }
+
+    function captureWallSnapshot(): CompareWallSnapshot | null {
+        const state = workspaceStore.getState();
+        if (!state.results.filmstrip || !state.results.filmstripKey) {
+            return null;
+        }
+        return createCompareWallSnapshot({
+            configuration: configurationForCurrentFilmstrip(),
+            orderedBoards: state.results.filmstrip.tilings.map((tiling) => tiling.geometry),
+            filmstrip: state.results.filmstrip,
+            resultKey: state.results.filmstripKey,
+            selectedBoard: state.selectedBoard,
+            focusedBoard: state.focusedBoard,
+            frameIndex: state.playback.frameIndex,
+            playing: state.playback.playing,
+        });
+    }
+
+    function showHistorySnackbar(message: string, action: "undo" | "redo"): void {
+        historySnackbarMessage.textContent = message;
+        historySnackbarAction.textContent = action === "undo" ? "Undo" : "Redo";
+        historySnackbarAction.dataset.historyAction = action;
+        historySnackbarAction.disabled = false;
+        historySnackbar.hidden = false;
+    }
+
+    function clearWallHistory(): void {
+        historyEpoch += 1;
+        if (historyRestoring) {
+            historyRestoreRevision += 1;
+            historyRestoring = false;
+            filmstripView?.detachPlayer();
+            setRunning(false);
+        }
+        wallHistory.clear();
+        historySnackbar.hidden = true;
+        historySnackbarAction.disabled = false;
+        delete historySnackbarAction.dataset.historyAction;
+    }
+
+    function recordWallHistory(entry: CompareWallHistoryEntry): void {
+        wallHistory.record(entry);
+        showHistorySnackbar(`${entry.label}.`, "undo");
+    }
+
+    function writeRunConfigControls(config: CompareRunConfig): void {
+        seedInput.value = config.seed;
+        seedPad.syncFromSeed();
+        if (selectHasValue(ruleSelect, config.rule)) {
+            ruleSelect.value = config.rule;
+        }
+        if (selectHasValue(traversalSelect, config.traversal)) {
+            traversalSelect.value = config.traversal;
+        }
+        wallGenerationsInput.value = String(config.frames);
+        gridInput.value = String(config.grid_size);
+        shapeSelect.value =
+            config.pattern && selectHasValue(shapeSelect, config.pattern) ? config.pattern : "";
+        syncShapeMode();
+    }
+
+    function replaceFocusInHash(geometry: string | null): void {
+        const next =
+            geometry === null
+                ? hashWithoutFocus(window.location.hash)
+                : hashWithFocus(window.location.hash, geometry);
+        const suffix = next === "" ? "" : next;
+        window.history.replaceState(
+            null,
+            "",
+            `${window.location.pathname}${window.location.search}${suffix}`,
+        );
+    }
+
+    async function restoreWallSnapshot(snapshot: CompareWallSnapshot): Promise<boolean> {
+        const revision = ++historyRestoreRevision;
+        historyRestoring = true;
+        historySnackbarAction.disabled = true;
+        workspaceScheduler.cancel(() => true);
+        operationCoordinator.invalidate();
+        filmstripView?.closeTilingPicker();
+        filmstripTransport.pause();
+        disposeAllForkedBoards();
+        clearFailedWallUpdate();
+        setRunning(true);
+        statusLine.textContent = "Restoring wall history…";
+
+        writeRunConfigControls(snapshot.configuration);
+        replaceSelection(new Set(snapshot.configuration.geometries));
+        workspaceStore.update((state) => ({
+            ...state,
+            configuration: snapshot.configuration,
+            orderedBoards: snapshot.orderedBoards,
+            selectedBoard: snapshot.selectedBoard,
+            focusedBoard: snapshot.focusedBoard,
+            results: {
+                filmstrip: snapshot.filmstrip,
+                filmstripKey: snapshot.resultKey,
+                analysis: null,
+                analysisKey: null,
+            },
+            playback: {
+                frameIndex: snapshot.frameIndex,
+                playing: snapshot.playing,
+            },
+            operation: {
+                kind: null,
+                status: "idle",
+                error: null,
+                executing: true,
+                wallUpdateFailed: false,
+            },
+        }));
+        replaceFocusInHash(snapshot.focusedBoard);
+        renderTilingChecklist();
+        refreshPreview();
+        showStageHero(false);
+
+        try {
+            await loadFilmstrip(snapshot.filmstrip, {
+                initialFrame: snapshot.frameIndex,
+                autoplay: snapshot.playing,
+            });
+            if (disposed || revision !== historyRestoreRevision) {
+                return false;
+            }
+            filmstripView?.setSelectedBoard(snapshot.selectedBoard);
+            filmstripView?.focus(snapshot.focusedBoard);
+            stageMain.classList.toggle("is-speaker", snapshot.focusedBoard !== null);
+            updateStageCaption(snapshot.configuration);
+            updateSummary();
+            statusLine.textContent = filmstripReadyStatus(snapshot.playing);
+            return true;
+        } finally {
+            if (revision === historyRestoreRevision) {
+                historyRestoring = false;
+                setRunning(false);
+                historySnackbarAction.disabled = false;
+            }
+        }
+    }
+
+    async function undoWallHistory(): Promise<void> {
+        if (historyRestoring) {
+            return;
+        }
+        const entry = wallHistory.undo();
+        if (!entry) {
+            return;
+        }
+        if (await restoreWallSnapshot(entry.before)) {
+            showHistorySnackbar(`Undid ${entry.label.toLowerCase()}.`, "redo");
+        } else {
+            wallHistory.redo();
+        }
+    }
+
+    async function redoWallHistory(): Promise<void> {
+        if (historyRestoring) {
+            return;
+        }
+        const entry = wallHistory.redo();
+        if (!entry) {
+            return;
+        }
+        if (await restoreWallSnapshot(entry.after)) {
+            showHistorySnackbar(`Redid ${entry.label.toLowerCase()}.`, "undo");
+        } else {
+            wallHistory.undo();
         }
     }
 
@@ -1422,6 +1714,7 @@ export function createComparePanelContent(
 
     // Switching seed source toggles the bit pad/preview and refreshes accordingly.
     shapeSelect.addEventListener("change", () => {
+        clearWallHistory();
         // Named-shape run configs legitimately carry an empty bit seed. When
         // the user returns to Bits, restore an editable seed before the next
         // request drops the pattern field; otherwise both seed sources are
@@ -1604,6 +1897,7 @@ export function createComparePanelContent(
     const root = el("div", { class: "compare-content" }, [
         workspaceLayout.element,
         analysisOverlay,
+        historySnackbar,
     ]);
 
     renderTilingChecklist();
@@ -1877,6 +2171,7 @@ export function createComparePanelContent(
                     title: disabledReason,
                 });
                 checkbox.addEventListener("change", () => {
+                    clearWallHistory();
                     if (!tilingCompatibleWithSelectedRule(option)) {
                         checkbox.checked = false;
                         selected.delete(option.geometry);
@@ -1959,6 +2254,7 @@ export function createComparePanelContent(
                 ],
             );
             chip.addEventListener("click", () => {
+                clearWallHistory();
                 selected.delete(option.geometry);
                 renderTilingChecklist();
                 refreshPreview();
@@ -1983,6 +2279,7 @@ export function createComparePanelContent(
     }
 
     function applyTilingPreset(preset: TilingPreset): void {
+        clearWallHistory();
         const omitted = replaceSelection(selectionForPreset(preset));
         renderTilingChecklist();
         refreshPreview();
@@ -2567,6 +2864,7 @@ export function createComparePanelContent(
             ruleSelect.value = "conway";
         }
         ruleSelect.addEventListener("change", () => {
+            clearWallHistory();
             pruneSelectionForSelectedRule({ selectAllIfEmpty: true });
             renderTilingChecklist();
             refreshPreview();
@@ -2634,6 +2932,7 @@ export function createComparePanelContent(
     }
 
     async function applyRunConfig(config: CompareRunConfig): Promise<void> {
+        clearWallHistory();
         // A loaded run replaces the entire wall. Older backend work may still
         // settle, but it no longer owns any visible or busy state.
         operationCoordinator.invalidate();
@@ -2643,21 +2942,9 @@ export function createComparePanelContent(
             return;
         }
 
-        seedInput.value = config.seed;
-        seedPad.syncFromSeed();
         const requestedRuleAvailable =
             rules.length === 0 || selectHasValue(ruleSelect, config.rule);
-        if (selectHasValue(ruleSelect, config.rule)) {
-            ruleSelect.value = config.rule;
-        }
-        if (selectHasValue(traversalSelect, config.traversal)) {
-            traversalSelect.value = config.traversal;
-        }
-        wallGenerationsInput.value = String(config.frames);
-        gridInput.value = String(config.grid_size);
-        shapeSelect.value =
-            config.pattern && selectHasValue(shapeSelect, config.pattern) ? config.pattern : "";
-        syncShapeMode();
+        writeRunConfigControls(config);
 
         const knownGeometries = new Set(allTilings.map((tiling) => tiling.geometry));
         const omitted = replaceSelection(
@@ -2927,6 +3214,17 @@ export function createComparePanelContent(
             statusLine.textContent = filmstripReadyStatus(
                 workspaceStore.getState().playback.playing,
             );
+            if (runOptions.historyIntent && runOptions.historyIntent.epoch === historyEpoch) {
+                const after = captureWallSnapshot();
+                if (after) {
+                    recordWallHistory({
+                        operation: runOptions.historyIntent.operation,
+                        label: runOptions.historyIntent.label,
+                        before: runOptions.historyIntent.before,
+                        after,
+                    });
+                }
+            }
             if (analysisOverlayOpen) {
                 scheduleAnalysis();
             }
@@ -3135,6 +3433,13 @@ export function createComparePanelContent(
     }
 
     runButton.addEventListener("click", () => void runComparison());
+    historySnackbarAction.addEventListener("click", () => {
+        if (historySnackbarAction.dataset.historyAction === "redo") {
+            void redoWallHistory();
+        } else {
+            void undoWallHistory();
+        }
+    });
     retryWallUpdateButton.addEventListener("click", () => void workspaceScheduler.retry());
     setupRunButton.addEventListener("click", () => {
         if (isFilmstripCurrent()) {
@@ -3225,6 +3530,40 @@ export function createComparePanelContent(
         exitFocusIfAny(): boolean {
             if (workspaceStore.getState().focusedBoard !== null && filmstripView) {
                 filmstripView.focus(null);
+                return true;
+            }
+            return false;
+        },
+        handleHistoryKey(event: KeyboardEvent): boolean {
+            if (
+                event.defaultPrevented ||
+                event.altKey ||
+                !(event.ctrlKey || event.metaKey) ||
+                isEditableShortcutTarget(event.target)
+            ) {
+                return false;
+            }
+            const key = event.key.toLowerCase();
+            const historyState = wallHistory.getState();
+            if (key === "z" && event.shiftKey) {
+                if (!historyState.canRedo || historyRestoring) {
+                    return false;
+                }
+                void redoWallHistory();
+                return true;
+            }
+            if (key === "z") {
+                if (!historyState.canUndo || historyRestoring) {
+                    return false;
+                }
+                void undoWallHistory();
+                return true;
+            }
+            if (key === "y") {
+                if (!historyState.canRedo || historyRestoring) {
+                    return false;
+                }
+                void redoWallHistory();
                 return true;
             }
             return false;
