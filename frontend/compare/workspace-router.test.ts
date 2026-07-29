@@ -221,6 +221,24 @@ describe("mountWorkspaceRouter", () => {
         expect(document.querySelector(".compare-watch-banner")).toBeNull();
     });
 
+    it("waits for the lazy panel before dispatching a Compare menu command", async () => {
+        const { mountWorkspaceRouter } = await import("./workspace-router.js");
+        const handle = mountWorkspaceRouter({
+            backend: fakeBackend(),
+            bootstrapData: bootstrapData(),
+        });
+        handles.push(handle);
+
+        await handle.executeCompareMenuCommand({ type: "open-config", tab: "saved" });
+
+        expect(document.querySelector(".compare-config-sheet")?.classList.contains("is-open")).toBe(
+            true,
+        );
+        expect(document.querySelector<HTMLElement>("#compare-config-panel-saved")?.hidden).toBe(
+            false,
+        );
+    });
+
     it("keeps the wall closed for a #/lab deep link", async () => {
         window.location.hash = "#/lab";
         await mount();

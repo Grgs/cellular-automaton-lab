@@ -2778,6 +2778,39 @@ describe("mountComparePanel", () => {
         handle.dispose();
     });
 
+    it("executes shell config commands without toggling the setup drawer", async () => {
+        const { mountComparePanel } = await import("./compare-panel.js");
+        const { backend } = fakeBackend();
+        const handle = mountComparePanel({
+            openOnMount: true,
+            backend,
+            bootstrapData: bootstrapData(),
+        });
+        const sheet = document.querySelector<HTMLElement>(".compare-config-sheet");
+        const panel = (tab: string) =>
+            document.querySelector<HTMLElement>(`#compare-config-panel-${tab}`);
+
+        handle.executeMenuCommand({ type: "open-config", tab: "tilings" });
+        expect(sheet?.classList.contains("is-open")).toBe(true);
+        expect(panel("tilings")?.hidden).toBe(false);
+
+        handle.executeMenuCommand({ type: "focus-rule" });
+        expect(sheet?.classList.contains("is-open")).toBe(true);
+        expect(panel("setup")?.hidden).toBe(false);
+        expect(document.activeElement).toBe(
+            document.querySelector<HTMLSelectElement>('[aria-label="Comparison rule"]'),
+        );
+
+        handle.executeMenuCommand({ type: "open-config", tab: "saved" });
+        expect(sheet?.classList.contains("is-open")).toBe(true);
+        expect(panel("saved")?.hidden).toBe(false);
+
+        handle.executeMenuCommand({ type: "open-config", tab: "help" });
+        expect(sheet?.classList.contains("is-open")).toBe(true);
+        expect(panel("help")?.hidden).toBe(false);
+        handle.dispose();
+    });
+
     it("lands with both drawers closed on desktop so the wall fills the stage", async () => {
         Object.defineProperty(window, "innerWidth", { configurable: true, value: 1024 });
         const { mountComparePanel } = await import("./compare-panel.js");

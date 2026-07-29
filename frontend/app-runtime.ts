@@ -64,10 +64,6 @@ export async function initApp(options: InitAppOptions = {}): Promise<void> {
         throw new Error("Missing grid canvas element.");
     }
     disposeApp();
-    disposeShellMenu = wireShellMenu({
-        wallTrigger: elements.wallViewBtn,
-        labTrigger: elements.openLabBtn,
-    });
     const backend = options.backend ?? createHttpSimulationBackend();
     const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
     const paneBaseSessionId = options.paneBaseSessionId ?? window.APP_SESSION_ID ?? null;
@@ -154,6 +150,11 @@ export async function initApp(options: InitAppOptions = {}): Promise<void> {
                 handleAppError(error);
             }
         },
+    });
+    disposeShellMenu = wireShellMenu({
+        wallTrigger: elements.wallViewBtn,
+        labTrigger: elements.openLabBtn,
+        executeCompareMenuCommand: (command) => workspaceRouter?.executeCompareMenuCommand(command),
     });
     await workspaceRouter.initialRouteSettled();
     window.__appReady = true;

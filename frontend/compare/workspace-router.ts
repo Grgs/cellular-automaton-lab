@@ -35,6 +35,7 @@ import {
 import { clearShareFragment } from "../share-link.js";
 import { isCompareDemoSeen, markCompareDemoSeen } from "./compare-storage.js";
 import type { FocusPaneServices } from "../pane/pane-core.js";
+import type { CompareMenuCommand } from "./compare-menu-command.js";
 
 const ROUTER_STYLE_ID = "workspace-router-styles";
 
@@ -87,6 +88,8 @@ export interface MountWorkspaceRouterOptions {
 export interface WorkspaceRouterHandle {
     /** Resolves once the landing route is displayed and interactive. */
     initialRouteSettled(): Promise<void>;
+    /** Ensure Compare is ready, then execute a semantic command in its workspace. */
+    executeCompareMenuCommand(command: CompareMenuCommand): Promise<void>;
     dispose(): void;
 }
 
@@ -113,7 +116,7 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
     document.body.append(loadingVeil);
 
     let panel: ComparePanelHandle | null = null;
-    let loading = false;
+    let panelLoadPromise: Promise<void> | null = null;
     let labReadyPromise: Promise<void> | null = null;
     let lastAppliedRunBody: string | null = null;
     let demoConsidered = false;
@@ -253,60 +256,62 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
         await panel.runFeaturedDemo(FEATURED_COMPARE_DEMO);
     }
 
-    async function loadAndOpen(): Promise<void> {
+    function loadAndOpen(): Promise<void> {
         if (disposed) {
-            return;
+            return Promise.resolve();
         }
         if (panel) {
             panel.open();
-            await applyRunFromHashIfPresent();
-            void maybeRunDefaultFilmstrip();
-            return;
-        }
-        if (loading) {
-            return;
-        }
-        loading = true;
-        loadingVeil.textContent = "Preparing the comparison wall…";
-        loadingVeil.hidden = false;
-        try {
-            const { mountComparePanel } = await import("./compare-panel.js");
-            if (disposed) {
-                return;
-            }
-            // The user may have navigated to the Lab while the chunk loaded;
-            // mount closed in that case so opening does not rewrite the route.
-            const stillOnWall = resolveShellRoute(window.location.hash) === "wall";
-            panel = mountComparePanel({
-                backend: options.backend,
-                bootstrapData: options.bootstrapData,
-                host: wallHost,
-                ...(options.onOpenPattern ? { onOpenPattern: options.onOpenPattern } : {}),
-                ...(options.focusPaneServices
-                    ? { focusPaneServices: options.focusPaneServices }
-                    : {}),
-                ...(options.getInitialRuleName
-                    ? { getInitialRuleName: options.getInitialRuleName }
-                    : {}),
-                openOnMount: stillOnWall,
-                onOpen: () => writeHash(hashWithoutLabRoute(window.location.hash)),
-                onClose: () => {
-                    navigateTo("lab");
-                    // Closing can strip slots via replaceState (no hashchange);
-                    // resolve the destination explicitly.
-                    void syncFromHash();
-                },
+            return applyRunFromHashIfPresent().then(() => {
+                void maybeRunDefaultFilmstrip();
             });
-            await applyRunFromHashIfPresent();
-            // The featured demo (or the paused default filmstrip) is real
-            // compute; the route counts as settled once the wall is on screen.
-            void maybeRunDefaultFilmstrip();
-        } finally {
-            loading = false;
-            if (resolveShellRoute(window.location.hash) === "wall") {
-                loadingVeil.hidden = true;
-            }
         }
+        if (panelLoadPromise) {
+            return panelLoadPromise;
+        }
+        panelLoadPromise = (async () => {
+            loadingVeil.textContent = "Preparing the comparison wall…";
+            loadingVeil.hidden = false;
+            try {
+                const { mountComparePanel } = await import("./compare-panel.js");
+                if (disposed) {
+                    return;
+                }
+                // The user may have navigated to the Lab while the chunk loaded;
+                // mount closed in that case so opening does not rewrite the route.
+                const stillOnWall = resolveShellRoute(window.location.hash) === "wall";
+                panel = mountComparePanel({
+                    backend: options.backend,
+                    bootstrapData: options.bootstrapData,
+                    host: wallHost,
+                    ...(options.onOpenPattern ? { onOpenPattern: options.onOpenPattern } : {}),
+                    ...(options.focusPaneServices
+                        ? { focusPaneServices: options.focusPaneServices }
+                        : {}),
+                    ...(options.getInitialRuleName
+                        ? { getInitialRuleName: options.getInitialRuleName }
+                        : {}),
+                    openOnMount: stillOnWall,
+                    onOpen: () => writeHash(hashWithoutLabRoute(window.location.hash)),
+                    onClose: () => {
+                        navigateTo("lab");
+                        // Closing can strip slots via replaceState (no hashchange);
+                        // resolve the destination explicitly.
+                        void syncFromHash();
+                    },
+                });
+                await applyRunFromHashIfPresent();
+                // The featured demo (or the paused default filmstrip) is real
+                // compute; the route counts as settled once the wall is on screen.
+                void maybeRunDefaultFilmstrip();
+            } finally {
+                panelLoadPromise = null;
+                if (resolveShellRoute(window.location.hash) === "wall") {
+                    loadingVeil.hidden = true;
+                }
+            }
+        })();
+        return panelLoadPromise;
     }
 
     /** Boot the Lab (once) behind the veil, then reveal it. */
@@ -359,6 +364,18 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
         void syncFromHash();
     }
 
+    async function executeCompareMenuCommand(command: CompareMenuCommand): Promise<void> {
+        if (disposed) {
+            return;
+        }
+        if (resolveShellRoute(window.location.hash) !== "wall") {
+            navigateTo("wall");
+            showRoute("wall");
+        }
+        await loadAndOpen();
+        panel?.executeMenuCommand(command);
+    }
+
     options.wallTrigger?.addEventListener("click", onWallTriggerClick);
     options.labTrigger?.addEventListener("click", onLabTriggerClick);
     window.addEventListener("hashchange", onHashChange);
@@ -367,6 +384,7 @@ export function mountWorkspaceRouter(options: MountWorkspaceRouterOptions): Work
 
     return {
         initialRouteSettled: () => initialSettled,
+        executeCompareMenuCommand,
         dispose(): void {
             disposed = true;
             window.removeEventListener("hashchange", onHashChange);

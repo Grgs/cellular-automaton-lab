@@ -103,7 +103,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.emulate_media(color_scheme="light")
         self._expect("html").to_have_attribute("data-theme", "light")
 
-    def test_shell_menu_navigates_and_opens_theme_preferences(self) -> None:
+    def test_shell_menu_navigates_and_exposes_workspace_actions(self) -> None:
         case = self._case()
         case.page.set_viewport_size({"width": 1280, "height": 800})
         case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [1280, 800])
@@ -127,8 +127,15 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         expect(menu_toggle).to_have_attribute("aria-expanded", "true")
         expect(menu).to_be_visible()
         expect(case.page.locator(".shell-menu-navigation")).not_to_be_visible()
+        expect(case.page.locator("#shell-menu-lab-actions")).to_be_visible()
+        expect(case.page.locator("#shell-menu-compare-actions")).not_to_be_visible()
         expect(case.page.get_by_role("button", name="Preferences", exact=True)).to_be_visible()
 
+        case.page.click("#shell-menu-lab-rule")
+        expect(case.page.locator("#control-drawer")).to_have_attribute("data-open", "true")
+        expect(menu).not_to_be_visible()
+
+        menu_toggle.click()
         menu_toggle.press("Escape")
         expect(menu).not_to_be_visible()
         case.assertEqual(
@@ -144,6 +151,8 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         menu_toggle.click()
         expect(menu).to_be_visible()
+        expect(case.page.locator("#shell-menu-compare-actions")).to_be_visible()
+        expect(case.page.locator("#shell-menu-lab-actions")).not_to_be_visible()
         desktop_menu_rect = case.page.locator("#shell-menu-panel").bounding_box()
         if desktop_menu_rect is None:
             raise AssertionError("desktop app menu rectangle was unavailable")
@@ -156,6 +165,19 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             int(case.page.evaluate("() => document.documentElement.scrollWidth")),
             1280,
         )
+
+        case.page.click("#shell-menu-compare-wall")
+        setup_sheet = case.page.locator(".compare-config-sheet")
+        expect(setup_sheet).to_have_class(re.compile(r"\bis-open\b"))
+        expect(case.page.locator("#compare-config-panel-tilings")).to_be_visible()
+
+        menu_toggle.click()
+        case.page.click("#shell-menu-compare-rule")
+        expect(setup_sheet).to_have_class(re.compile(r"\bis-open\b"))
+        expect(case.page.locator("#compare-config-panel-setup")).to_be_visible()
+        expect(case.page.get_by_label("Comparison rule")).to_be_focused()
+
+        menu_toggle.click()
         case.page.locator(".wall-brand").click()
         expect(menu).not_to_be_visible()
 
