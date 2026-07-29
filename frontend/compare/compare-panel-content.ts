@@ -82,6 +82,7 @@ import { createCompareWorkspaceLayout } from "./compare-workspace-layout.js";
 import { createCompareOperationCoordinator } from "./compare-operation-coordinator.js";
 import { createCompareResultView } from "./compare-result-view.js";
 import { createCompareFilmstripPresentation } from "./compare-filmstrip-presentation.js";
+import type { CompareConfigTab, CompareMenuCommand } from "./compare-menu-command.js";
 import {
     createCompareWallHistory,
     createCompareWallSnapshot,
@@ -188,6 +189,8 @@ export interface ComparePanelContentHandle {
     runDefaultFilmstrip(config: CompareRunConfig): Promise<void>;
     /** Show a run-link load problem in the status line (e.g. an unreadable link). */
     reportRunLinkError(message: string): void;
+    /** Execute an explicit command from shell chrome without toggling dock controls. */
+    executeMenuCommand(command: CompareMenuCommand): void;
     /** Let an open action menu consume Escape; returns true when it did. */
     handleEscape(): boolean;
     /** Close the configuration sheet if it is open; returns true when it did. */
@@ -202,7 +205,7 @@ export interface ComparePanelContentHandle {
 }
 
 type TilingPreset = "representative" | "regular" | "mixed" | "aperiodic" | "all" | "none";
-type ConfigTab = "setup" | "tilings" | "help" | "saved";
+type ConfigTab = CompareConfigTab;
 
 export function ensureComparePanelStyles(): void {
     if (document.getElementById(STYLE_ELEMENT_ID)) {
@@ -3380,6 +3383,39 @@ export function createComparePanelContent(
         window.requestAnimationFrame(focusTilingSearchIfOpen);
     }
 
+    function focusComparisonRuleIfOpen(): void {
+        if (
+            configSheet.classList.contains("is-open") &&
+            !configTabPanels.get("setup")?.hidden &&
+            !ruleSelect.disabled
+        ) {
+            ruleSelect.focus();
+        }
+    }
+
+    function focusComparisonRule(): void {
+        openConfigSheet("setup");
+        focusComparisonRuleIfOpen();
+        window.requestAnimationFrame(focusComparisonRuleIfOpen);
+    }
+
+    function executeMenuCommand(command: CompareMenuCommand): void {
+        switch (command.type) {
+            case "open-config":
+                if (command.tab === "tilings") {
+                    openTilingsSheet();
+                } else {
+                    openConfigSheet(command.tab);
+                }
+                return;
+            case "focus-rule":
+                focusComparisonRule();
+                return;
+            case "copy-run-link":
+                copyRunLink();
+        }
+    }
+
     function focusSeedEditorIfOpen(): void {
         if (
             configSheet.classList.contains("is-open") &&
@@ -3476,6 +3512,7 @@ export function createComparePanelContent(
         reportRunLinkError(message: string): void {
             statusLine.textContent = message;
         },
+        executeMenuCommand,
         handleEscape(): boolean {
             if (filmstripView?.closeTilingPicker()) {
                 return true;

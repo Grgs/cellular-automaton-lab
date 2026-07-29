@@ -14,6 +14,7 @@ import type { AppBootstrapData, PatternPayload } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
 import type { FocusPaneServices } from "../pane/pane-core.js";
 import type { CompareRunConfig } from "./compare-run-link.js";
+import type { CompareMenuCommand } from "./compare-menu-command.js";
 import {
     createComparePanelContent,
     ensureComparePanelStyles,
@@ -46,6 +47,7 @@ export interface ComparePanelHandle {
     runFeaturedDemo(config: CompareRunConfig): Promise<void>;
     runDefaultFilmstrip(config: CompareRunConfig): Promise<void>;
     reportRunLinkError(message: string): void;
+    executeMenuCommand(command: CompareMenuCommand): void;
     dispose(): void;
 }
 
@@ -164,6 +166,7 @@ export function mountComparePanel(options: MountComparePanelOptions): ComparePan
         runFeaturedDemo: (config) => content.runFeaturedDemo(config),
         runDefaultFilmstrip: (config) => content.runDefaultFilmstrip(config),
         reportRunLinkError: (message) => content.reportRunLinkError(message),
+        executeMenuCommand: (command) => content.executeMenuCommand(command),
         dispose(): void {
             document.removeEventListener("keydown", onKeydown);
             content.dispose();

@@ -411,6 +411,18 @@ h1.wall-brand {
     display: none;
 }
 
+.shell-menu-context {
+    display: grid;
+    gap: 3px;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--line);
+}
+
+.shell-menu-context[hidden] {
+    display: none;
+}
+
 .shell-menu-heading {
     padding: 3px 8px 2px;
     color: var(--muted);

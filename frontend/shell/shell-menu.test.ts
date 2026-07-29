@@ -28,12 +28,23 @@ function setup() {
             <div id="shell-menu-panel" hidden>
                 <button id="shell-menu-compare" type="button">Compare</button>
                 <button id="shell-menu-lab" type="button">Lab</button>
+                <div id="shell-menu-lab-actions">
+                    <button id="shell-menu-lab-export" type="button">Export Pattern</button>
+                </div>
+                <div id="shell-menu-compare-actions">
+                    <button id="shell-menu-compare-wall" type="button">Choose Tilings…</button>
+                    <button id="shell-menu-compare-rule" type="button">Change Rule…</button>
+                    <button id="shell-menu-compare-saved" type="button">Saved</button>
+                    <button id="shell-menu-compare-share" type="button">Copy Run Link</button>
+                    <button id="shell-menu-compare-help" type="button">Help</button>
+                </div>
                 <button id="shell-preferences-btn" type="button">Preferences</button>
             </div>
         </div>
         <button id="outside" type="button">Outside</button>
         <button id="wall-view-btn" type="button">Compare</button>
         <button id="open-lab-btn" type="button">Lab</button>
+        <button id="export-pattern-btn" type="button">Export</button>
         <dialog id="shell-preferences">
             <button id="shell-preferences-close" type="button">Close</button>
             <label><input name="shell-theme-preference" type="radio" value="light">Light</label>
@@ -48,14 +59,17 @@ function setup() {
     `;
     const root = document.createElement("html");
     root.dataset.theme = "light";
+    root.dataset.workspaceRoute = "lab";
     const stored = storage();
     const compareLayoutEventTarget = new EventTarget();
+    const executeCompareMenuCommand = vi.fn();
     const media = () => ({ matches: true }) as MediaQueryList;
     const dispose = wireShellMenu({
         root,
         storage: stored,
         media,
         compareLayoutEventTarget,
+        executeCompareMenuCommand,
     });
     return {
         dispose,
@@ -66,6 +80,12 @@ function setup() {
         menuPanel: document.querySelector<HTMLElement>("#shell-menu-panel")!,
         compare: document.querySelector<HTMLButtonElement>("#shell-menu-compare")!,
         lab: document.querySelector<HTMLButtonElement>("#shell-menu-lab")!,
+        labActions: document.querySelector<HTMLElement>("#shell-menu-lab-actions")!,
+        compareActions: document.querySelector<HTMLElement>("#shell-menu-compare-actions")!,
+        labExport: document.querySelector<HTMLButtonElement>("#shell-menu-lab-export")!,
+        exportTarget: document.querySelector<HTMLButtonElement>("#export-pattern-btn")!,
+        compareWall: document.querySelector<HTMLButtonElement>("#shell-menu-compare-wall")!,
+        executeCompareMenuCommand,
         preferences: document.querySelector<HTMLButtonElement>("#shell-preferences-btn")!,
         dialog: document.querySelector<HTMLDialogElement>("#shell-preferences")!,
         inputs: Array.from(
@@ -120,6 +140,62 @@ describe("shell menu", () => {
         document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
         expect(view.menuPanel.hidden).toBe(true);
         expect(document.activeElement).toBe(view.menuButton);
+        view.dispose();
+    });
+
+    it("shows contextual actions for only the active workspace", async () => {
+        const view = setup();
+        expect(view.labActions.hidden).toBe(false);
+        expect(view.compareActions.hidden).toBe(true);
+
+        view.root.dataset.workspaceRoute = "wall";
+        await Promise.resolve();
+        expect(view.labActions.hidden).toBe(true);
+        expect(view.compareActions.hidden).toBe(false);
+        view.dispose();
+    });
+
+    it("routes Lab commands through the existing controls", () => {
+        const view = setup();
+        const exportListener = vi.fn();
+        view.exportTarget.addEventListener("click", exportListener);
+        view.menuButton.click();
+        view.labExport.click();
+        expect(exportListener).toHaveBeenCalledTimes(1);
+        expect(view.menuPanel.hidden).toBe(true);
+        view.dispose();
+    });
+
+    it("dispatches semantic Compare commands and closes the menu", () => {
+        const view = setup();
+        view.root.dataset.workspaceRoute = "wall";
+        view.menuButton.click();
+        view.compareWall.click();
+        expect(view.executeCompareMenuCommand).toHaveBeenLastCalledWith({
+            type: "open-config",
+            tab: "tilings",
+        });
+        expect(view.menuPanel.hidden).toBe(true);
+
+        document.querySelector<HTMLButtonElement>("#shell-menu-compare-rule")?.click();
+        expect(view.executeCompareMenuCommand).toHaveBeenLastCalledWith({
+            type: "focus-rule",
+        });
+        document.querySelector<HTMLButtonElement>("#shell-menu-compare-saved")?.click();
+        expect(view.executeCompareMenuCommand).toHaveBeenLastCalledWith({
+            type: "open-config",
+            tab: "saved",
+        });
+        document.querySelector<HTMLButtonElement>("#shell-menu-compare-help")?.click();
+        expect(view.executeCompareMenuCommand).toHaveBeenLastCalledWith({
+            type: "open-config",
+            tab: "help",
+        });
+        document.querySelector<HTMLButtonElement>("#shell-menu-compare-share")?.click();
+        expect(view.executeCompareMenuCommand).toHaveBeenLastCalledWith({
+            type: "copy-run-link",
+        });
+        expect(view.executeCompareMenuCommand).toHaveBeenCalledTimes(5);
         view.dispose();
     });
 

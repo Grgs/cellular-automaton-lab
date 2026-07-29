@@ -5,6 +5,7 @@ import {
     type ThemePreference,
 } from "../theme.js";
 import { resetStoredCompareWorkspaceLayout } from "../compare/compare-workspace-layout.js";
+import type { CompareMenuCommand } from "../compare/compare-menu-command.js";
 
 interface ShellMenuOptions {
     menu?: HTMLElement | null;
@@ -14,6 +15,7 @@ interface ShellMenuOptions {
     labButton?: HTMLButtonElement | null;
     wallTrigger?: HTMLButtonElement | null;
     labTrigger?: HTMLButtonElement | null;
+    executeCompareMenuCommand?: (command: CompareMenuCommand) => void | Promise<void>;
     preferencesButton?: HTMLButtonElement | null;
     preferencesDialog?: HTMLDialogElement | null;
     preferencesThemeInputs?: readonly HTMLInputElement[];
@@ -37,6 +39,7 @@ export function wireShellMenu({
     labButton = document.getElementById("shell-menu-lab") as HTMLButtonElement | null,
     wallTrigger = document.getElementById("wall-view-btn") as HTMLButtonElement | null,
     labTrigger = document.getElementById("open-lab-btn") as HTMLButtonElement | null,
+    executeCompareMenuCommand,
     preferencesButton = document.getElementById(
         "shell-preferences-btn",
     ) as HTMLButtonElement | null,
@@ -61,6 +64,10 @@ export function wireShellMenu({
     media = typeof window !== "undefined" ? window.matchMedia?.bind(window) : undefined,
 }: ShellMenuOptions = {}): () => void {
     let menuOpen = false;
+    const shellButton = (id: string): HTMLButtonElement | null =>
+        documentNode.getElementById(id) as HTMLButtonElement | null;
+    const labActions = documentNode.getElementById("shell-menu-lab-actions");
+    const compareActions = documentNode.getElementById("shell-menu-compare-actions");
 
     const setMenuOpen = (open: boolean, { restoreFocus = false } = {}): void => {
         menuOpen = open;
@@ -102,6 +109,33 @@ export function wireShellMenu({
         setMenuOpen(false, { restoreFocus: true });
         trigger?.click();
     };
+    const perform = (action: () => void): (() => void) => {
+        return () => {
+            setMenuOpen(false);
+            action();
+        };
+    };
+    const performCompare = (command: CompareMenuCommand): (() => void) => {
+        return perform(() => {
+            void executeCompareMenuCommand?.(command);
+        });
+    };
+    const showLabSection = (sectionId: string): void => {
+        const drawer = documentNode.getElementById("control-drawer");
+        if (drawer && drawer.dataset.open !== "true") {
+            shellButton("drawer-toggle-btn")?.click();
+        }
+        documentNode.querySelector<HTMLAnchorElement>(`a[href="#${sectionId}"]`)?.click();
+    };
+    const syncContext = (): void => {
+        const route = root.dataset.workspaceRoute;
+        if (labActions) {
+            labActions.hidden = route !== "lab";
+        }
+        if (compareActions) {
+            compareActions.hidden = route !== "wall";
+        }
+    };
     const syncPreferences = (): void => {
         const preference = readThemePreference({ storage });
         for (const input of preferencesThemeInputs) {
@@ -118,6 +152,19 @@ export function wireShellMenu({
     const onMenuToggle = (): void => setMenuOpen(!menuOpen);
     const onCompare = (): void => navigate(wallTrigger);
     const onLab = (): void => navigate(labTrigger);
+    const onLabControls = perform(() => shellButton("drawer-toggle-btn")?.click());
+    const onLabRule = perform(() => showLabSection("sim-section"));
+    const onLabImport = perform(() => shellButton("import-pattern-btn")?.click());
+    const onLabExport = perform(() => shellButton("export-pattern-btn")?.click());
+    const onLabCopy = perform(() => shellButton("copy-pattern-btn")?.click());
+    const onLabPaste = perform(() => shellButton("paste-pattern-btn")?.click());
+    const onLabShare = perform(() => shellButton("share-link-btn")?.click());
+    const onLabPreset = perform(() => shellButton("preset-seed-btn")?.click());
+    const onCompareWall = performCompare({ type: "open-config", tab: "tilings" });
+    const onCompareRule = performCompare({ type: "focus-rule" });
+    const onCompareSaved = performCompare({ type: "open-config", tab: "saved" });
+    const onCompareShare = performCompare({ type: "copy-run-link" });
+    const onCompareHelp = performCompare({ type: "open-config", tab: "help" });
     const onPreferences = (): void => openPreferences();
     const onThemePreference = (event: Event): void => {
         const input = event.currentTarget;
@@ -154,6 +201,19 @@ export function wireShellMenu({
     menuButton?.addEventListener("click", onMenuToggle);
     compareButton?.addEventListener("click", onCompare);
     labButton?.addEventListener("click", onLab);
+    shellButton("shell-menu-lab-controls")?.addEventListener("click", onLabControls);
+    shellButton("shell-menu-lab-rule")?.addEventListener("click", onLabRule);
+    shellButton("shell-menu-lab-import")?.addEventListener("click", onLabImport);
+    shellButton("shell-menu-lab-export")?.addEventListener("click", onLabExport);
+    shellButton("shell-menu-lab-copy")?.addEventListener("click", onLabCopy);
+    shellButton("shell-menu-lab-paste")?.addEventListener("click", onLabPaste);
+    shellButton("shell-menu-lab-share")?.addEventListener("click", onLabShare);
+    shellButton("shell-menu-lab-preset")?.addEventListener("click", onLabPreset);
+    shellButton("shell-menu-compare-wall")?.addEventListener("click", onCompareWall);
+    shellButton("shell-menu-compare-rule")?.addEventListener("click", onCompareRule);
+    shellButton("shell-menu-compare-saved")?.addEventListener("click", onCompareSaved);
+    shellButton("shell-menu-compare-share")?.addEventListener("click", onCompareShare);
+    shellButton("shell-menu-compare-help")?.addEventListener("click", onCompareHelp);
     preferencesButton?.addEventListener("click", onPreferences);
     preferencesThemeInputs.forEach((input) => input.addEventListener("change", onThemePreference));
     preferencesResetCompareLayoutButton?.addEventListener("click", onResetCompareLayout);
@@ -162,8 +222,14 @@ export function wireShellMenu({
     documentNode.addEventListener("pointerdown", onDocumentPointerDown);
     documentNode.addEventListener("keydown", onDocumentKeyDown, true);
 
-    const observer = new MutationObserver(syncPreferences);
-    observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+    const observer = new MutationObserver(() => {
+        syncPreferences();
+        syncContext();
+    });
+    observer.observe(root, {
+        attributes: true,
+        attributeFilter: ["data-theme", "data-workspace-route"],
+    });
     const systemQuery = media?.("(prefers-color-scheme: dark)") ?? null;
     const onOsChange = (): void => {
         if (readThemePreference({ storage }) === "system") {
@@ -174,11 +240,25 @@ export function wireShellMenu({
     systemQuery?.addEventListener?.("change", onOsChange);
     setMenuOpen(false);
     syncPreferences();
+    syncContext();
 
     return () => {
         menuButton?.removeEventListener("click", onMenuToggle);
         compareButton?.removeEventListener("click", onCompare);
         labButton?.removeEventListener("click", onLab);
+        shellButton("shell-menu-lab-controls")?.removeEventListener("click", onLabControls);
+        shellButton("shell-menu-lab-rule")?.removeEventListener("click", onLabRule);
+        shellButton("shell-menu-lab-import")?.removeEventListener("click", onLabImport);
+        shellButton("shell-menu-lab-export")?.removeEventListener("click", onLabExport);
+        shellButton("shell-menu-lab-copy")?.removeEventListener("click", onLabCopy);
+        shellButton("shell-menu-lab-paste")?.removeEventListener("click", onLabPaste);
+        shellButton("shell-menu-lab-share")?.removeEventListener("click", onLabShare);
+        shellButton("shell-menu-lab-preset")?.removeEventListener("click", onLabPreset);
+        shellButton("shell-menu-compare-wall")?.removeEventListener("click", onCompareWall);
+        shellButton("shell-menu-compare-rule")?.removeEventListener("click", onCompareRule);
+        shellButton("shell-menu-compare-saved")?.removeEventListener("click", onCompareSaved);
+        shellButton("shell-menu-compare-share")?.removeEventListener("click", onCompareShare);
+        shellButton("shell-menu-compare-help")?.removeEventListener("click", onCompareHelp);
         preferencesButton?.removeEventListener("click", onPreferences);
         preferencesThemeInputs.forEach((input) =>
             input.removeEventListener("change", onThemePreference),
