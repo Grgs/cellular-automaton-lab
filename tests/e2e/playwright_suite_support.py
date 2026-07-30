@@ -32,6 +32,14 @@ PLAYWRIGHT_FEATURE_NAMES = (
     "standalone_runtime",
 )
 
+COMPARE_WORKBENCH_TEST_METHODS = (
+    "test_shell_menu_navigates_and_exposes_workspace_actions",
+    "test_compare_summary_toolbar_edits_canonical_configuration_at_both_widths",
+    "test_compare_resizable_layout_persists_resets_and_preserves_narrow_drawers",
+    "test_compare_tabs_and_selected_actions_preserve_order_focus_and_toolbelt",
+    "test_compare_wall_history_restores_membership_playback_and_shortcuts",
+)
+
 PLAYWRIGHT_LOCAL_CASES = (
     CellularAutomatonUITests,
     StandaloneCellularAutomatonUITests,
@@ -217,6 +225,17 @@ def _playwright_suite_definitions() -> OrderedDict[str, PlaywrightSuiteDefinitio
                 ),
             ),
             (
+                "compare_workbench",
+                PlaywrightSuiteDefinition(
+                    name="compare_workbench",
+                    label="Compare workbench regression gate",
+                    module="tests.e2e.test_playwright_compare_workbench",
+                    includes_standalone=True,
+                    requires_standalone_build=True,
+                    shardable=False,
+                ),
+            ),
+            (
                 "subset",
                 PlaywrightSuiteDefinition(
                     name="subset",
@@ -278,6 +297,18 @@ def build_playwright_suite() -> unittest.TestSuite:
 
 def build_server_playwright_suite() -> unittest.TestSuite:
     return build_named_playwright_suite(iter_server_playwright_test_names())
+
+
+def iter_compare_workbench_test_names() -> list[str]:
+    return [
+        _test_id(case_cls, method_name)
+        for case_cls in (CellularAutomatonUITests, StandaloneCellularAutomatonUITests)
+        for method_name in COMPARE_WORKBENCH_TEST_METHODS
+    ]
+
+
+def build_compare_workbench_playwright_suite() -> unittest.TestSuite:
+    return build_named_playwright_suite(iter_compare_workbench_test_names())
 
 
 def iter_playwright_feature_test_names(feature_name: str) -> list[str]:

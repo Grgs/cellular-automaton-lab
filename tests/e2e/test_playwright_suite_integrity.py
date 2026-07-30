@@ -4,10 +4,13 @@ from collections import Counter
 from backend.simulation.aperiodic_family_manifest import PENROSE_GEOMETRY
 from backend.simulation.topology_catalog import default_patch_depth_for_tiling_family
 from tests.e2e.playwright_suite_support import (
+    COMPARE_WORKBENCH_TEST_METHODS,
     DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
     PLAYWRIGHT_FEATURE_NAMES,
+    build_compare_workbench_playwright_suite,
     build_playwright_suite,
     build_server_playwright_suite,
+    iter_compare_workbench_test_names,
     iter_playwright_feature_test_names,
     iter_playwright_subset_test_names,
     iter_playwright_test_names,
@@ -42,6 +45,7 @@ class PlaywrightSuiteIntegrityTests(unittest.TestCase):
                 "all",
                 "server",
                 "standalone",
+                "compare_workbench",
                 "subset",
                 *PLAYWRIGHT_FEATURE_NAMES,
             ],
@@ -52,11 +56,28 @@ class PlaywrightSuiteIntegrityTests(unittest.TestCase):
 
         self.assertTrue(manifest["all"]["requires_standalone_build"])
         self.assertTrue(manifest["standalone"]["requires_standalone_build"])
+        self.assertTrue(manifest["compare_workbench"]["requires_standalone_build"])
         self.assertTrue(manifest["standalone_runtime"]["requires_standalone_build"])
         self.assertFalse(manifest["server"]["requires_standalone_build"])
         self.assertFalse(manifest["subset"]["requires_standalone_build"])
         self.assertFalse(manifest["rules_and_picker"]["requires_standalone_build"])
         self.assertFalse(manifest["topology_and_persistence"]["requires_standalone_build"])
+
+    def test_compare_workbench_gate_covers_each_journey_on_both_hosts(self) -> None:
+        expected = [
+            f"{case_name}.{method_name}"
+            for case_name in (
+                "CellularAutomatonUITests",
+                "StandaloneCellularAutomatonUITests",
+            )
+            for method_name in COMPARE_WORKBENCH_TEST_METHODS
+        ]
+
+        self.assertEqual(iter_compare_workbench_test_names(), expected)
+        self.assertEqual(
+            _iter_suite_test_names(build_compare_workbench_playwright_suite()),
+            expected,
+        )
 
     def test_default_playwright_loader_covers_every_master_browser_test(self) -> None:
         expected = iter_playwright_test_names()
