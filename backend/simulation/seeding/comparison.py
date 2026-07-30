@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from backend.public_errors import PublicApiError
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
 from backend.simulation.periodic_face_tilings import (
@@ -343,11 +344,11 @@ def compare_seed(
     aborting the sweep.
     """
     if traversal not in TRAVERSALS:
-        raise ValueError(
+        raise PublicApiError(
             f"Unknown traversal {traversal!r}. Available: {', '.join(sorted(TRAVERSALS))}."
         )
     if pattern is not None and pattern not in NAMED_PATTERNS:
-        raise ValueError(
+        raise PublicApiError(
             f"Unknown pattern {pattern!r}. Available: {', '.join(sorted(NAMED_PATTERNS))}."
         )
     bits = normalize_bits(seed)
@@ -355,7 +356,7 @@ def compare_seed(
     target_geometries = geometries if geometries is not None else SUPPORTED_GEOMETRIES
     unknown = [geometry for geometry in target_geometries if geometry not in SUPPORTED_GEOMETRIES]
     if unknown:
-        raise ValueError(f"Unknown geometry key(s): {', '.join(unknown)}.")
+        raise PublicApiError(f"Unknown geometry key(s): {', '.join(unknown)}.")
 
     comparison = SeedComparison(
         rule_name=rule.name,
@@ -552,20 +553,20 @@ def run_seed_filmstrip(
     than aborting the run.
     """
     if traversal not in TRAVERSALS:
-        raise ValueError(
+        raise PublicApiError(
             f"Unknown traversal {traversal!r}. Available: {', '.join(sorted(TRAVERSALS))}."
         )
     if pattern is not None and pattern not in NAMED_PATTERNS:
-        raise ValueError(
+        raise PublicApiError(
             f"Unknown pattern {pattern!r}. Available: {', '.join(sorted(NAMED_PATTERNS))}."
         )
     if not geometries:
-        raise ValueError("At least one geometry is required for a filmstrip.")
+        raise PublicApiError("At least one geometry is required for a filmstrip.")
     if len(geometries) > MAX_FILMSTRIP_TILINGS:
-        raise ValueError(f"At most {MAX_FILMSTRIP_TILINGS} tilings can run side by side.")
+        raise PublicApiError(f"At most {MAX_FILMSTRIP_TILINGS} tilings can run side by side.")
     unknown = [geometry for geometry in geometries if geometry not in SUPPORTED_GEOMETRIES]
     if unknown:
-        raise ValueError(f"Unknown geometry key(s): {', '.join(unknown)}.")
+        raise PublicApiError(f"Unknown geometry key(s): {', '.join(unknown)}.")
     resolved_frame_count = max(1, min(int(frame_count), MAX_FILMSTRIP_FRAMES))
 
     bits = normalize_bits(seed)

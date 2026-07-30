@@ -16,6 +16,9 @@ import {
 declare function importScripts(...urls: string[]): void;
 declare let loadPyodide: ((options: { indexURL: string }) => Promise<PyodideRuntime>) | undefined;
 
+const PYODIDE_BASE_URL = "../pyodide/";
+const PYODIDE_SCRIPT_URL = `${PYODIDE_BASE_URL}pyodide.js`;
+
 interface PyodideRuntime {
     globals: {
         set(key: string, value: unknown): void;
@@ -119,16 +122,16 @@ async function installPythonBundle(bundleUrl: string): Promise<void> {
     }
 }
 
-async function ensurePyodide(initMessage: StandaloneInitMessage): Promise<void> {
+async function ensurePyodide(pythonBundleUrl: string): Promise<void> {
     if (pyodideInstance) {
         return;
     }
-    importScripts(`${initMessage.pyodideBaseUrl.replace(/\/?$/, "/")}pyodide.js`);
+    importScripts(PYODIDE_SCRIPT_URL);
     if (typeof loadPyodide !== "function") {
         throw new Error("Pyodide loader did not become available inside the standalone worker.");
     }
-    pyodideInstance = await loadPyodide({ indexURL: initMessage.pyodideBaseUrl });
-    await installPythonBundle(initMessage.pythonBundleUrl);
+    pyodideInstance = await loadPyodide({ indexURL: PYODIDE_BASE_URL });
+    await installPythonBundle(pythonBundleUrl);
     await pyodideInstance.runPythonAsync(`
 import sys
 if "/app" not in sys.path:
@@ -144,7 +147,7 @@ function syncSnapshotState(snapshot: { running?: boolean; speed?: number } | und
 
 async function handleInit(initMessage: StandaloneInitMessage): Promise<void> {
     try {
-        await ensurePyodide(initMessage);
+        await ensurePyodide(initMessage.pythonBundleUrl);
         const persistedSnapshotJson = initMessage.persistedSnapshot
             ? JSON.stringify(initMessage.persistedSnapshot)
             : null;

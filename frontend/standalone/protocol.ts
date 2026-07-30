@@ -37,7 +37,6 @@ export interface StandaloneInitMessage {
     requestId: string;
     persistedSnapshot: PersistedSimulationSnapshotV5 | null;
     pythonBundleUrl: string;
-    pyodideBaseUrl: string;
 }
 
 export type StandaloneRequestPayload =

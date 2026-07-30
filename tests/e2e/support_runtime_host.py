@@ -35,6 +35,11 @@ _STANDALONE_REQUIRED_OUTPUTS = (
     "index.html",
     "standalone-bootstrap.json",
     "standalone-python-bundle.json",
+    "pyodide/pyodide.js",
+    "pyodide/pyodide.asm.js",
+    "pyodide/pyodide.asm.wasm",
+    "pyodide/pyodide-lock.json",
+    "pyodide/python_stdlib.zip",
 )
 _STANDALONE_BUILD_MANIFEST_NAME = "build-manifest.json"
 

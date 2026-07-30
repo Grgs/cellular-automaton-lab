@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from backend.payload_types import CellStatePayload
+from backend.public_errors import PublicApiError
 from backend.simulation.rule_frame_capabilities import (
     DIRECTIONAL_FRAME_CAPABILITIES,
     RuleFrameCapabilities,
@@ -34,7 +35,7 @@ class CellStateDefinition:
 RULE_PROTOCOL_UNIVERSAL_V1 = "universal-v1"
 
 
-class RuleTopologyCompatibilityError(ValueError):
+class RuleTopologyCompatibilityError(PublicApiError):
     """Raised when a rule is applied to a tiling family it does not support."""
 
 

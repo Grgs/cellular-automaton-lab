@@ -103,8 +103,15 @@ class RuntimeHostProvenanceTests(unittest.TestCase):
                 "index.html",
                 "standalone-bootstrap.json",
                 "standalone-python-bundle.json",
+                "pyodide/pyodide.js",
+                "pyodide/pyodide.asm.js",
+                "pyodide/pyodide.asm.wasm",
+                "pyodide/pyodide-lock.json",
+                "pyodide/python_stdlib.zip",
             ):
-                (output_dir / relative_path).write_text("{}\n", encoding="utf-8")
+                output_path = output_dir / relative_path
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                output_path.write_text("{}\n", encoding="utf-8")
             fingerprint, source_files = compute_source_fingerprint(root)
             (output_dir / "build-manifest.json").write_text(
                 json.dumps(

@@ -30,6 +30,14 @@ from tools.provenance import (
 OUTPUT_DIR = ROOT_DIR / "output" / "standalone"
 STANDALONE_BUILD_INPUT_DIR = ROOT_DIR / "output" / ".standalone-build-input"
 STANDALONE_HTML_INPUT_PATH = STANDALONE_BUILD_INPUT_DIR / "standalone.html"
+PYODIDE_PACKAGE_DIR = ROOT_DIR / "node_modules" / "pyodide"
+PYODIDE_RUNTIME_FILES = (
+    "pyodide.js",
+    "pyodide.asm.js",
+    "pyodide.asm.wasm",
+    "pyodide-lock.json",
+    "python_stdlib.zip",
+)
 
 
 def build_parser(root: Path = ROOT_DIR) -> argparse.ArgumentParser:
@@ -87,6 +95,18 @@ def copy_static_assets() -> None:
     (OUTPUT_DIR / ".nojekyll").write_text("", encoding="utf-8")
 
 
+def copy_pyodide_runtime() -> None:
+    destination = OUTPUT_DIR / "pyodide"
+    destination.mkdir(parents=True, exist_ok=True)
+    for filename in PYODIDE_RUNTIME_FILES:
+        source = PYODIDE_PACKAGE_DIR / filename
+        if not source.is_file():
+            raise FileNotFoundError(
+                f"Pyodide runtime file is missing: {source}. Run npm install before building."
+            )
+        shutil.copy2(source, destination / filename)
+
+
 def write_python_bundle() -> None:
     source_roots = (ROOT_DIR / "backend", ROOT_DIR / "config")
     files = sorted(
@@ -131,6 +151,7 @@ def build_standalone() -> int:
     try:
         build_standalone_frontend(standalone_html_entry)
         copy_static_assets()
+        copy_pyodide_runtime()
         export_bootstrap_data(OUTPUT_DIR / "standalone-bootstrap.json")
         write_python_bundle()
         write_build_manifest()

@@ -6,7 +6,7 @@ draw a tiling's begin/end board: every cell is returned with a polygon
 (``vertices``) so the frontend renders all families uniformly, including regular
 grids whose geometry is otherwise computed client-side.
 
-Validation failures raise ``ValueError`` for the host layer to turn into a 4xx
+Validation failures raise ``PublicApiError`` for the host layer to turn into a 4xx
 response.
 """
 
@@ -15,6 +15,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from backend.public_errors import PublicApiError
 from backend.simulation.rule_context_frames import topology_frame_for
 from backend.simulation.rule_context_geometry import cell_geometry
 from backend.simulation.seeding.comparison import board_size_for
@@ -41,9 +42,9 @@ def _bounded_int(value: Any, *, default: int, low: int, high: int, name: str) ->
     try:
         parsed = int(value)
     except (TypeError, ValueError) as error:
-        raise ValueError(f"'{name}' must be an integer.") from error
+        raise PublicApiError(f"'{name}' must be an integer.") from error
     if parsed < low or parsed > high:
-        raise ValueError(f"'{name}' must be between {low} and {high}.")
+        raise PublicApiError(f"'{name}' must be between {low} and {high}.")
     return parsed
 
 
@@ -51,7 +52,7 @@ def build_topology_preview(payload: Mapping[str, Any]) -> dict[str, Any]:
     """Validate ``payload`` and return ``{topology_revision, cells:[...]}``."""
     geometry = payload.get("geometry")
     if not isinstance(geometry, str) or geometry not in SUPPORTED_GEOMETRIES:
-        raise ValueError("'geometry' must be a supported geometry key.")
+        raise PublicApiError("'geometry' must be a supported geometry key.")
 
     grid_size_value = payload.get("grid_size")
     if grid_size_value not in (None, ""):
@@ -83,7 +84,7 @@ def build_topology_preview(payload: Mapping[str, Any]) -> dict[str, Any]:
 
     topology = build_topology(geometry, width, height, patch_depth)
     if topology.cell_count > _MAX_PREVIEW_CELLS:
-        raise ValueError(
+        raise PublicApiError(
             f"Topology has {topology.cell_count} cells; preview limit is {_MAX_PREVIEW_CELLS}."
         )
 
@@ -118,7 +119,7 @@ def build_topology_preview(payload: Mapping[str, Any]) -> dict[str, Any]:
     traversal = payload.get("traversal")
     if traversal is not None:
         if not isinstance(traversal, str) or traversal not in TRAVERSALS:
-            raise ValueError(f"'traversal' must be one of: {', '.join(sorted(TRAVERSALS))}.")
+            raise PublicApiError(f"'traversal' must be one of: {', '.join(sorted(TRAVERSALS))}.")
         frame = topology_frame_for(topology)
         result["order"] = list(TRAVERSALS[traversal](frame))
 
@@ -127,7 +128,7 @@ def build_topology_preview(payload: Mapping[str, Any]) -> dict[str, Any]:
     pattern = payload.get("pattern")
     if pattern not in (None, ""):
         if not isinstance(pattern, str) or pattern not in NAMED_PATTERNS:
-            raise ValueError(f"'pattern' must be one of: {', '.join(sorted(NAMED_PATTERNS))}.")
+            raise PublicApiError(f"'pattern' must be one of: {', '.join(sorted(NAMED_PATTERNS))}.")
         frame = topology_frame_for(topology)
         result["shape_cells"] = place_pattern(frame, NAMED_PATTERNS[pattern])
 

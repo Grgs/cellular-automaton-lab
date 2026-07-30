@@ -4,6 +4,7 @@ import os
 from collections.abc import Iterable
 from functools import lru_cache
 
+from backend.public_errors import PublicApiError
 from backend.simulation.topology_implementation_registry import get_topology_implementation
 from backend.simulation.topology_types import LatticeCell, LatticeTopology, topology_revision
 
@@ -19,7 +20,7 @@ def interactive_topology_cell_budget() -> int | None:
     return INTERACTIVE_TOPOLOGY_CELL_BUDGET
 
 
-class TopologyCellBudgetExceeded(ValueError):
+class TopologyCellBudgetExceeded(PublicApiError):
     """Raised before an oversized topology enters interactive runtime state."""
 
     code = "topology_cell_budget_exceeded"
