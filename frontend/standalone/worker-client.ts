@@ -14,8 +14,6 @@ import type {
     StandaloneWorkerOutgoingMessage,
 } from "./protocol.js";
 
-const DEFAULT_PYODIDE_BASE_URL = "https://cdn.jsdelivr.net/pyodide/v0.27.5/full/";
-
 export interface StandaloneEnvironmentOptions {
     persistState?: boolean;
 }
@@ -152,7 +150,6 @@ export async function createStandaloneEnvironment(
                 /* @vite-ignore */ "../standalone-python-bundle.json",
                 import.meta.url,
             ).toString(),
-            pyodideBaseUrl: DEFAULT_PYODIDE_BASE_URL,
         });
     } catch (error) {
         dispose();

@@ -4,6 +4,7 @@ import random
 import threading
 
 from backend.payload_types import TopologySpecInput, TopologySpecPatch
+from backend.public_errors import PublicApiError
 from backend.rules import RuleRegistry
 from backend.simulation.engine import SimulationEngine
 from backend.simulation.models import CellMutationDelta, SimulationSnapshot, SimulationStateData
@@ -29,7 +30,7 @@ from backend.simulation.service_transitions import (
 from backend.simulation.topology_builders import TopologyCellBudgetExceeded
 
 
-class SimulationOperationError(ValueError):
+class SimulationOperationError(PublicApiError):
     """Raised when a requested simulation operation is invalid for the current rule."""
 
 
@@ -131,8 +132,12 @@ class SimulationService:
                 self._state.state_revision += 1
             except TopologyCellBudgetExceeded:
                 raise
+            except PublicApiError as exc:
+                raise SimulationOperationError(exc.public_message) from exc
             except ValueError as exc:
-                raise SimulationOperationError(str(exc)) from exc
+                raise SimulationOperationError(
+                    "The requested simulation reset could not be completed."
+                ) from exc
 
     def update_config(
         self,
@@ -157,8 +162,12 @@ class SimulationService:
                     self._state.state_revision += 1
             except TopologyCellBudgetExceeded:
                 raise
+            except PublicApiError as exc:
+                raise SimulationOperationError(exc.public_message) from exc
             except ValueError as exc:
-                raise SimulationOperationError(str(exc)) from exc
+                raise SimulationOperationError(
+                    "The requested simulation configuration could not be applied."
+                ) from exc
 
     def _cell_mutation_delta(
         self, base_state_revision: int, updates: dict[str, int]
@@ -185,8 +194,12 @@ class SimulationService:
             base_state_revision = self._state.state_revision
             try:
                 validate_state_values(self._state.rule, [state])
+            except PublicApiError as exc:
+                raise SimulationOperationError(exc.public_message) from exc
             except ValueError as exc:
-                raise SimulationOperationError(str(exc)) from exc
+                raise SimulationOperationError(
+                    "The requested cell state could not be applied."
+                ) from exc
             updates = set_cells_by_id(self._state, [(cell_id, state)])
             if updates:
                 self._state.state_revision += 1
@@ -197,8 +210,12 @@ class SimulationService:
             base_state_revision = self._state.state_revision
             try:
                 validate_state_values(self._state.rule, [state for _, state in cells])
+            except PublicApiError as exc:
+                raise SimulationOperationError(exc.public_message) from exc
             except ValueError as exc:
-                raise SimulationOperationError(str(exc)) from exc
+                raise SimulationOperationError(
+                    "The requested cell states could not be applied."
+                ) from exc
             updates = set_cells_by_id(self._state, cells)
             if updates:
                 self._state.state_revision += 1

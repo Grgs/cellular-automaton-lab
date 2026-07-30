@@ -221,6 +221,7 @@ describe("standalone worker client", () => {
         await flushAsyncStartup();
         const initMessage = lastInitMessage(worker());
         expect(initMessage.pythonBundleUrl).toContain("standalone-python-bundle.json");
+        expect(initMessage).not.toHaveProperty("pyodideBaseUrl");
         worker().dispatchMessage({
             type: "ready",
             requestId: initMessage.requestId,

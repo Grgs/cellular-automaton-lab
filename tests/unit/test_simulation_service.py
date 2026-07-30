@@ -98,8 +98,13 @@ class SimulationServiceTests(unittest.TestCase):
         before = self.service.get_state()
 
         with patch("backend.simulation.service.transfer_board", side_effect=ValueError("failed")):
-            with self.assertRaisesRegex(SimulationOperationError, "failed"):
+            with self.assertRaisesRegex(
+                SimulationOperationError,
+                "requested simulation configuration could not be applied",
+            ) as raised:
                 self.service.update_config(topology_spec={"width": 12, "height": 9})
+        self.assertNotIn("failed", raised.exception.public_message)
+        self.assertEqual(str(raised.exception.__cause__), "failed")
 
         after = self.service.get_state()
         self.assertTrue(after.running)

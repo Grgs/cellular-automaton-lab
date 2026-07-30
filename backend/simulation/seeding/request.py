@@ -2,7 +2,7 @@
 
 Shared by the Flask route and the standalone browser runtime so both surfaces
 validate and bound the request identically. Validation failures raise
-``ValueError`` for the host layer to turn into a 4xx response.
+``PublicApiError`` for the host layer to turn into a 4xx response.
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from backend.public_errors import PublicApiError
 from backend.simulation.seeding.comparison import (
     DEFAULT_FILMSTRIP_FRAMES,
     DEFAULT_FILMSTRIP_GRID_SIZE,
@@ -49,9 +50,9 @@ def _bounded_int(value: Any, *, default: int, low: int, high: int, name: str) ->
     try:
         parsed = int(value)
     except (TypeError, ValueError) as error:
-        raise ValueError(f"'{name}' must be an integer.") from error
+        raise PublicApiError(f"'{name}' must be an integer.") from error
     if parsed < low or parsed > high:
-        raise ValueError(f"'{name}' must be between {low} and {high}.")
+        raise PublicApiError(f"'{name}' must be between {low} and {high}.")
     return parsed
 
 
@@ -59,7 +60,7 @@ def parse_compare_request(payload: Mapping[str, Any]) -> CompareRequest:
     pattern_value = payload.get("pattern")
     pattern = pattern_value if isinstance(pattern_value, str) and pattern_value else None
     if pattern is not None and pattern not in NAMED_PATTERNS:
-        raise ValueError(
+        raise PublicApiError(
             f"Unknown pattern {pattern!r}. Available: {', '.join(sorted(NAMED_PATTERNS))}."
         )
 
@@ -67,12 +68,12 @@ def parse_compare_request(payload: Mapping[str, Any]) -> CompareRequest:
     if pattern is None:
         # Bit-string mode requires a seed; in pattern mode the seed is ignored.
         if not isinstance(seed_value, str) or not seed_value.strip():
-            raise ValueError("'seed' must be a non-empty string.")
+            raise PublicApiError("'seed' must be a non-empty string.")
         seed = seed_value
     else:
         seed = seed_value if isinstance(seed_value, str) else ""
     if len(seed) > _MAX_SEED_LENGTH:
-        raise ValueError(f"'seed' must be at most {_MAX_SEED_LENGTH} characters.")
+        raise PublicApiError(f"'seed' must be at most {_MAX_SEED_LENGTH} characters.")
 
     rule_value = payload.get("rule")
     rule_name = rule_value if isinstance(rule_value, str) and rule_value else DEFAULT_RULE
@@ -84,7 +85,7 @@ def parse_compare_request(payload: Mapping[str, Any]) -> CompareRequest:
         else DEFAULT_TRAVERSAL
     )
     if traversal not in TRAVERSALS:
-        raise ValueError(
+        raise PublicApiError(
             f"Unknown traversal {traversal!r}. Available: {', '.join(sorted(TRAVERSALS))}."
         )
 
@@ -103,10 +104,10 @@ def parse_compare_request(payload: Mapping[str, Any]) -> CompareRequest:
     geometries: tuple[str, ...] | None = None
     if geometries_value is not None:
         if not isinstance(geometries_value, (list, tuple)):
-            raise ValueError("'geometries' must be a list of geometry keys.")
+            raise PublicApiError("'geometries' must be a list of geometry keys.")
         collected = tuple(item for item in geometries_value if isinstance(item, str) and item)
         if not collected:
-            raise ValueError("'geometries' must contain at least one geometry key.")
+            raise PublicApiError("'geometries' must contain at least one geometry key.")
         geometries = collected
 
     return CompareRequest(
@@ -155,9 +156,9 @@ def parse_filmstrip_request(payload: Mapping[str, Any]) -> FilmstripRequest:
     # so geometries are required (not an optional "all tilings" sweep) and
     # capped to keep per-frame compute and payload bounded.
     if base.geometries is None:
-        raise ValueError("'geometries' must list the tilings to run side by side.")
+        raise PublicApiError("'geometries' must list the tilings to run side by side.")
     if len(base.geometries) > MAX_FILMSTRIP_TILINGS:
-        raise ValueError(
+        raise PublicApiError(
             f"'geometries' must list at most {MAX_FILMSTRIP_TILINGS} tilings for side-by-side play."
         )
 

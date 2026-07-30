@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from backend.contract_validation import (
-    ContractValidationError,
     normalize_config_topology_patch,
     normalize_reset_topology_spec,
     parse_cell_id,
@@ -17,12 +16,12 @@ from backend.contract_validation import (
     validate_persisted_snapshot_payload,
 )
 from backend.payload_types import PersistedSimulationSnapshotInput
+from backend.public_errors import PublicApiError
 from backend.rules import RuleRegistry
 from backend.simulation.persistence import SimulationStateStore
 from backend.simulation.seeding import run_compare_request, run_filmstrip_request
-from backend.simulation.service import SimulationOperationError, SimulationService
+from backend.simulation.service import SimulationService
 from backend.simulation.state_restore import SimulationStateRestorer
-from backend.simulation.topology_builders import TopologyCellBudgetExceeded
 from backend.simulation.topology_preview import build_topology_preview
 
 
@@ -52,10 +51,9 @@ def _response_payload(
     return json.dumps(payload)
 
 
-def _error_payload(error: str | TopologyCellBudgetExceeded) -> str:
-    if isinstance(error, TopologyCellBudgetExceeded):
-        return json.dumps({"ok": False, **error.to_payload()})
-    return json.dumps({"ok": False, "error": error})
+def _error_payload(error: str | PublicApiError) -> str:
+    payload = error.to_payload() if isinstance(error, PublicApiError) else {"error": error}
+    return json.dumps({"ok": False, **payload})
 
 
 @dataclass
@@ -152,9 +150,9 @@ class BrowserSimulationRuntime:
                 )
                 return json.dumps({"ok": True, **delta.to_dict()})
             else:
-                raise ValueError(f"Unknown command '{path}'.")
-        except (ContractValidationError, SimulationOperationError, ValueError) as exc:
-            return _error_payload(exc if isinstance(exc, TopologyCellBudgetExceeded) else str(exc))
+                raise PublicApiError(f"Unknown command '{path}'.")
+        except PublicApiError as exc:
+            return _error_payload(exc)
 
         snapshot = self.service.get_state()
         return _response_payload(

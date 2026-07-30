@@ -5,6 +5,7 @@ import threading
 from collections import OrderedDict
 from pathlib import Path
 
+from backend.public_errors import PublicApiError
 from backend.rules import RuleRegistry
 from backend.simulation.coordinator import SimulationCoordinator
 from backend.simulation.persistence import SimulationStateStore
@@ -14,7 +15,7 @@ SESSION_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{1,80}$")
 DEFAULT_MAX_SESSIONS = 64
 
 
-class SimulationSessionError(ValueError):
+class SimulationSessionError(PublicApiError):
     """Raised when a simulation session id is malformed."""
 
 

@@ -4,6 +4,7 @@ import random
 from collections.abc import Callable, Sequence
 
 from backend.defaults import DEFAULT_GEOMETRY
+from backend.public_errors import PublicApiError
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
 from backend.rules.constraints import normalize_rule_dimensions
@@ -49,7 +50,7 @@ def random_service_board(
     choice_fn: Callable[..., Sequence[int]] = random.choices,
 ) -> SimulationBoard:
     if not rule.supports_randomize or not rule.randomize_weights:
-        raise ValueError(f"Rule '{rule.name}' does not support random reset.")
+        raise PublicApiError(f"Rule '{rule.name}' does not support random reset.")
     state_values = list(rule.randomize_weights.keys())
     state_weights = list(rule.randomize_weights.values())
     board = empty_service_board(geometry, width, height, patch_depth=patch_depth)

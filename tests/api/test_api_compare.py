@@ -1,6 +1,7 @@
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 try:
     from tests.api.support import ApiTestCase
@@ -47,6 +48,16 @@ class ApiCompareTests(ApiTestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertIn("error", response.get_json())
+
+    def test_compare_does_not_expose_unexpected_exception_messages(self) -> None:
+        private_detail = "private detail: /srv/internal/comparison.py"
+        with patch(
+            "backend.web.routes.run_compare_request", side_effect=ValueError(private_detail)
+        ):
+            response = self.client.post("/api/compare", json={"seed": "111"})
+
+        self.assertEqual(response.status_code, 500)
+        self.assertNotIn(private_detail, response.get_data(as_text=True))
 
     def test_compare_include_states_returns_board_payloads(self) -> None:
         response = self.client.post(

@@ -6,26 +6,15 @@ from markupsafe import Markup
 from backend.app_shell import render_server_app_shell
 from backend.bootstrap_data import build_bootstrap_payload
 from backend.frontend_assets import FrontendAssetManifest
-from backend.payload_types import (
-    ApiErrorPayload,
-    RulesResponsePayload,
-)
+from backend.payload_types import RulesResponsePayload
+from backend.public_errors import PublicApiError
 from backend.rules import RuleRegistry
-from backend.rules.base import RuleTopologyCompatibilityError
 from backend.simulation.coordinator import SimulationCoordinator
 from backend.simulation.seeding import run_compare_request, run_filmstrip_request
-from backend.simulation.service import SimulationOperationError
-from backend.simulation.sessions import (
-    DEFAULT_SESSION_ID,
-    SimulationSessionError,
-    SimulationSessionRegistry,
-)
+from backend.simulation.sessions import DEFAULT_SESSION_ID, SimulationSessionRegistry
 from backend.simulation.topology_builders import TopologyCellBudgetExceeded
 from backend.simulation.topology_preview import build_topology_preview
-from backend.web.requests import (
-    RequestValidationError,
-    get_payload,
-)
+from backend.web.requests import get_payload
 from backend.web.state_actions import StateActionService
 
 page_bp = Blueprint("pages", __name__)
@@ -62,11 +51,6 @@ def state_actions(session_id: str = DEFAULT_SESSION_ID) -> StateActionService:
     return StateActionService(simulation_coordinator(session_id), rule_registry())
 
 
-def json_error(message: str, status_code: int = 400) -> tuple[Response, int]:
-    payload: ApiErrorPayload = {"error": message}
-    return jsonify(payload), status_code
-
-
 @api_bp.app_errorhandler(TopologyCellBudgetExceeded)
 def handle_topology_cell_budget_error(
     exc: TopologyCellBudgetExceeded,
@@ -76,14 +60,11 @@ def handle_topology_cell_budget_error(
 
 # Invalid session ids, request-contract violations, and rejected simulation
 # operations are all client errors reported as a 400 with a JSON body. One
-# app-wide handler per type lets every route resolve a coordinator and apply
-# its action directly, instead of repeating the same try/except in each one.
-@api_bp.app_errorhandler(SimulationSessionError)
-@api_bp.app_errorhandler(RequestValidationError)
-@api_bp.app_errorhandler(SimulationOperationError)
-@api_bp.app_errorhandler(RuleTopologyCompatibilityError)
-def handle_api_request_error(exc: ValueError) -> tuple[Response, int]:
-    return json_error(str(exc))
+# app-wide handler for their shared public-error base lets every route resolve
+# a coordinator and apply its action directly without repeating try/except.
+@api_bp.app_errorhandler(PublicApiError)
+def handle_api_request_error(exc: PublicApiError) -> tuple[Response, int]:
+    return jsonify(exc.to_payload()), 400
 
 
 def state_response(session_id: str = DEFAULT_SESSION_ID) -> Response:
@@ -149,8 +130,8 @@ def compare(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
     payload = get_payload(request)
     try:
         comparison = run_compare_request(payload)
-    except (RequestValidationError, ValueError) as exc:
-        return json_error(str(exc))
+    except PublicApiError as exc:
+        return jsonify(exc.to_payload()), 400
     return jsonify({"comparison": comparison})
 
 
@@ -160,8 +141,8 @@ def compare_filmstrip(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
     payload = get_payload(request)
     try:
         filmstrip = run_filmstrip_request(payload)
-    except (RequestValidationError, ValueError) as exc:
-        return json_error(str(exc))
+    except PublicApiError as exc:
+        return jsonify(exc.to_payload()), 400
     return jsonify({"filmstrip": filmstrip})
 
 
@@ -171,8 +152,8 @@ def topology_preview(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
     payload = get_payload(request)
     try:
         topology = build_topology_preview(payload)
-    except (RequestValidationError, ValueError) as exc:
-        return json_error(str(exc))
+    except PublicApiError as exc:
+        return jsonify(exc.to_payload()), 400
     return jsonify({"topology_preview": topology})
 
 

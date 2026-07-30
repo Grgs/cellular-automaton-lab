@@ -11,6 +11,7 @@ from backend.payload_types import (
     TopologySpecPatch,
     TopologySpecRequestPayload,
 )
+from backend.public_errors import PublicApiError
 from backend.rules import RuleRegistry
 from backend.rules.base import AutomatonRule
 from backend.simulation.models import TopologySpec
@@ -24,7 +25,7 @@ from backend.simulation.topology_catalog import (
 SNAPSHOT_VERSION: Literal[5] = 5
 
 
-class ContractValidationError(ValueError):
+class ContractValidationError(PublicApiError):
     """Raised when a command or persisted payload is malformed."""
 
 
