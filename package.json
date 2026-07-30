@@ -20,6 +20,7 @@
         "typecheck:python": "node ./tools/internal/python_exec.mjs -m mypy --config-file pyproject.toml",
         "test:frontend": "vitest run",
         "test:e2e:playwright": "node ./tools/internal/python_tools_entry.mjs test e2e --suite all",
+        "test:e2e:playwright:compare-workbench": "npm run build:frontend && node ./tools/internal/python_tools_entry.mjs test e2e --suite compare_workbench",
         "test:e2e:playwright:server": "node ./tools/internal/python_tools_entry.mjs test e2e --suite server",
         "test:e2e:playwright:subset": "node ./tools/internal/python_tools_entry.mjs test e2e --suite subset",
         "test:e2e:playwright:standalone": "node ./tools/internal/python_tools_entry.mjs test e2e --suite standalone",

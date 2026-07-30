@@ -27,6 +27,7 @@ class PlaywrightRunnerToolTests(unittest.TestCase):
                 "all",
                 "server",
                 "standalone",
+                "compare_workbench",
                 "subset",
                 "rules_and_picker",
                 "overlays_and_editor",
@@ -48,6 +49,7 @@ class PlaywrightRunnerToolTests(unittest.TestCase):
 
         self.assertTrue(payload["all"]["requires_standalone_build"])
         self.assertTrue(payload["standalone"]["requires_standalone_build"])
+        self.assertTrue(payload["compare_workbench"]["requires_standalone_build"])
         self.assertTrue(payload["standalone_runtime"]["requires_standalone_build"])
         self.assertFalse(payload["server"]["requires_standalone_build"])
         self.assertFalse(payload["subset"]["requires_standalone_build"])

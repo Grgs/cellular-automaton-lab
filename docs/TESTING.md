@@ -305,6 +305,7 @@ Useful entrypoints include:
 
 ```powershell
 npm run test:e2e:playwright
+npm run test:e2e:playwright:compare-workbench
 npm run test:e2e:playwright:server
 npm run test:e2e:playwright:standalone
 npm run test:e2e:playwright:subset
@@ -314,6 +315,14 @@ python -m tools test playwright-suites
 ```
 
 These npm scripts are the preferred local entrypoints because they forward into the unified Python tools CLI, which owns Playwright suite selection, Linux browser-runtime repair, and standalone-build setup when a suite needs it. The suite list comes from the Python Playwright manifest in `tests/e2e/playwright_suite_support.py`.
+
+`npm run test:e2e:playwright:compare-workbench` is the focused regression gate
+for the Compare workbench redesign tracked by issues #261 and #267. It runs the
+same five accessibility-first journeys against both the local server and the
+fresh standalone build. The gate covers shell navigation and preferences,
+theme changes, editable run configuration, resizable desktop and narrow
+panels, tabs and selected-tiling actions, removal with undo/redo, Compare-to-Lab
+handoffs, viewport overflow, and console/page errors.
 
 The runner now reuses `output/standalone/` when the existing build manifest matches the current checkout fingerprint. It only rebuilds the standalone bundle when required outputs are missing, the manifest is missing, or the build fingerprint no longer matches the current source tree.
 
