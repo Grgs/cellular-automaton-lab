@@ -145,20 +145,13 @@ log/diff. Do not rediscover or reimplement completed phases.
 | 3 — Resizable panels     | #264      | `feat/compare-resizable-panels`     | #271 (merged) | `d717b45876e728e5c820473d4ce7e82936c5c98e` | 584 frontend tests and 144 Playwright journeys; frontend/Python typing, lint, formatting, server/standalone builds, bundle budgets, catalog checks, focused desktop/narrow splitter, persistence, reset, overlay, theme, overflow, Compare↔Lab, and console checks; practical screenshot review                                                                                                                                                                                                                                                                                                           | Phase 4 started fresh from the merged `origin/main`                                |
 | 4 — Action scope         | #265      | `feat/compare-action-scope`         | #272 (merged) | `c14d220441c7fa108c05fbb7c372867395e7758e` | Full CI and Supply Chain Audit passed; 586 frontend tests plus focused server/standalone selected-action journeys passed                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Phase 5 started fresh from the merged `origin/main`                                |
 | 5 — Wall history         | #266      | `feat/compare-wall-history`         | #279 (merged) | `5492ac1c5d3fb59c894374445ad8a32fd2906d8d` | The single change-aware gate passed privacy, Python lint/format/typecheck, frontend lint/typecheck/build, all 600 frontend tests, the standalone build and bundle budgets, and full tiling validation/verification. Focused history/controller/panel coverage includes async capture, failure/cancellation/staleness, exact order/selection/focus/frame/play restoration, 20-entry eviction, clearing, route retention, snackbar actions, shortcut yielding, and superseded preview loads. The focused wall-history journey passes in server and freshly built standalone Chromium at 1280×800 and 390×800, and the server-only pending-request cancellation journey passes with clean console/page-error checks. | Phase 6 started fresh from the merged `origin/main` |
-| 6 — Regression gate      | #267/#261 | `agent/compare-browser-regressions` | #280 (draft)  | —                                          | The named `compare_workbench` gate passed all 10 server/standalone journeys, covering shell navigation/preferences and themes, editable summary/Rule behavior, resizable desktop and narrow panels, tabs and selected actions, removal with undo/redo, Compare-to-Lab handoffs, overflow, and console/page errors. The full local PR gate also passed privacy/secret checks, Python/frontend lint and typecheck, 605 frontend tests, builds and bundle budgets, tiling validation/reference verification, and all 149 Playwright tests. Documentation links passed separately. | Close #267 and #261 after merge                                                     |
+| 6 — Regression gate      | #267/#261 | `agent/compare-browser-regressions` | #280 (merged) | `93e8e53b6a700b14edf70bb3b7d83d3fb50abf16` | The named `compare_workbench` gate passed all 10 server/standalone journeys, covering shell navigation/preferences and themes, editable summary/Rule behavior, resizable desktop and narrow panels, tabs and selected actions, removal with undo/redo, Compare-to-Lab handoffs, overflow, and console/page errors. The full local PR gate also passed privacy/secret checks, Python/frontend lint and typecheck, 605 frontend tests, builds and bundle budgets, tiling validation/reference verification, and all 149 Playwright tests. Documentation links passed separately. | Program complete; close #261                                                       |
 
-### Exact Phase 6 completion checkpoint
+### Program completion checkpoint
 
-Continue only issue #267 on `agent/compare-browser-regressions`. Issue #63
-remains out of scope.
+All six Compare workbench phases have merged and child issues #262–#267 are
+closed. The final regression gate merged in PR #280 as
+`93e8e53b6a700b14edf70bb3b7d83d3fb50abf16` after the focused 10-journey gate,
+the 605-test frontend suite, and the full 149-test Playwright matrix passed.
 
-1. Preserve the completed Phase 1–5 journeys in
-   `tests/e2e/playwright_case_suite.py`; the regression gate selects them
-   without duplicating their implementations.
-2. Keep `compare_workbench` in the public Playwright manifest and run it against
-   both server and standalone hosts.
-3. Keep the suite integrity test aligned with the manifest and its exact
-   two-host journey list.
-4. Run the focused gate plus change-aware repository checks, then open one
-   draft PR targeting `main` with `Closes #267`.
-5. After the PR merges, close umbrella issue #261 with the merged PR and SHA.
+Issue #261 can be closed as completed. Issue #63 remains out of scope.
