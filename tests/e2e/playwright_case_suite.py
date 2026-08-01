@@ -1473,7 +1473,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#drawer-toggle-btn")
         self._expect("#control-drawer").to_have_attribute("data-open", "true")
 
-    def test_canvas_refits_after_lab_chrome_changes_without_accidental_drag(self) -> None:
+    def test_canvas_stays_fixed_when_lab_overlays_change(self) -> None:
         case = self._case()
 
         def canvas_metrics() -> dict[str, Any]:
@@ -1521,25 +1521,66 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             case.assertLessEqual(metrics["scrollHeight"], metrics["viewportHeight"] + 1)
             return metrics
 
-        initial_board = canvas_metrics()["board"]
-        open_cell_sizes: list[float] = []
-        for _ in range(2):
-            self._expect("#control-drawer").to_have_attribute("data-open", "true")
-            open_cell_sizes.append(float(wait_for_fitted_canvas()["renderCellSize"]))
-            case.page.click("#drawer-toggle-btn")
-            self._expect("#control-drawer").to_have_attribute("data-open", "false")
-            wait_for_fitted_canvas()
-            case.page.click("#drawer-toggle-btn")
+        def settled_canvas_metrics() -> dict[str, Any]:
+            # The old resize path was debounced behind a ResizeObserver and the
+            # drawer transition. Wait past both before comparing geometry.
+            case.page.wait_for_timeout(250)
+            return wait_for_fitted_canvas()
+
+        def assert_canvas_geometry_unchanged(
+            expected: dict[str, Any], actual: dict[str, Any], transition: str
+        ) -> None:
+            case.assertEqual(
+                actual["viewportWidth"], expected["viewportWidth"], f"{transition} changed width"
+            )
+            case.assertEqual(
+                actual["viewportHeight"],
+                expected["viewportHeight"],
+                f"{transition} changed height",
+            )
+            for key in (
+                "canvasLeft",
+                "canvasTop",
+                "canvasWidth",
+                "canvasHeight",
+                "renderCellSize",
+            ):
+                case.assertLessEqual(
+                    abs(float(actual[key]) - float(expected[key])),
+                    0.1,
+                    f"{transition} changed {key}",
+                )
+
+        self._ensure_drawer_open()
+        initial = settled_canvas_metrics()
+        initial_board = initial["board"]
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "false")
+        assert_canvas_geometry_unchanged(
+            initial, settled_canvas_metrics(), "closing the control drawer"
+        )
+        case.page.click("#drawer-toggle-btn")
         self._expect("#control-drawer").to_have_attribute("data-open", "true")
-        open_cell_sizes.append(float(wait_for_fitted_canvas()["renderCellSize"]))
-        case.assertLessEqual(max(open_cell_sizes) - min(open_cell_sizes), 0.05)
+        assert_canvas_geometry_unchanged(
+            initial, settled_canvas_metrics(), "opening the control drawer"
+        )
         case.assertEqual(canvas_metrics()["board"], initial_board)
 
         case.page.click("#reset-btn")
         self._wait_for_exported_pattern_payload(expected_rule="conway", expected_cells_by_id={})
         arm_button = case.page.locator("#canvas-toolbar-arm-btn")
-        if arm_button.get_attribute("aria-pressed") != "true":
-            arm_button.click()
+        idle = settled_canvas_metrics()
+        arm_button.click()
+        self._expect("#canvas-toolbar-controls").to_be_visible()
+        assert_canvas_geometry_unchanged(idle, settled_canvas_metrics(), "arming the canvas editor")
+
+        case.page.click("#canvas-toolbar-dismiss-btn")
+        self._expect("#canvas-toolbar-arm-btn").to_be_visible()
+        assert_canvas_geometry_unchanged(
+            idle, settled_canvas_metrics(), "leaving the canvas editor"
+        )
+
+        arm_button.click()
         self._expect("#canvas-toolbar-controls").to_be_visible()
         brush_button = case.page.locator('[data-editor-tool="brush"]')
         if brush_button.get_attribute("aria-pressed") != "true":
@@ -1551,63 +1592,61 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         if state_button.get_attribute("aria-pressed") != "true":
             state_button.click()
         self._ensure_drawer_open()
-        before_pointer = wait_for_fitted_canvas()
-        canvas_box = case.page.locator("#grid").bounding_box()
-        if canvas_box is None:
-            raise AssertionError("grid canvas bounding box was unavailable")
-        pointer_x = canvas_box["x"] + (canvas_box["width"] / 2)
-        pointer_y = canvas_box["y"] + (canvas_box["height"] / 2)
-
-        case.page.mouse.move(pointer_x, pointer_y)
-        case.page.mouse.down()
-        case.page.wait_for_timeout(100)
-        during_pointer = canvas_metrics()
-        self._expect("#control-drawer").to_have_attribute("data-open", "true")
-        # CSS canvas dimensions can settle differently across device-pixel
-        # ratios and persisted board shapes. Bound edge movement to one cell,
-        # then verify the gesture still commits exactly one cell below. The
-        # original regression moved the board by many cells and produced a drag
-        # path.
-        edge_tolerance = max(0.5, float(before_pointer["renderCellSize"]))
-        size_tolerance = edge_tolerance * 2
-        case.assertLessEqual(
-            abs(during_pointer["canvasLeft"] - before_pointer["canvasLeft"]),
-            edge_tolerance,
-        )
-        case.assertLessEqual(
-            abs(during_pointer["canvasTop"] - before_pointer["canvasTop"]),
-            edge_tolerance,
-        )
-        case.assertLessEqual(
-            abs(during_pointer["canvasWidth"] - before_pointer["canvasWidth"]),
-            size_tolerance,
-        )
-        case.assertLessEqual(
-            abs(during_pointer["canvasHeight"] - before_pointer["canvasHeight"]),
-            size_tolerance,
-        )
-        case.page.mouse.up()
+        before_pointer = settled_canvas_metrics()
+        self._click_canvas_center()
         self._expect("#canvas-toolbar-undo-btn").to_be_enabled()
+        assert_canvas_geometry_unchanged(
+            before_pointer, settled_canvas_metrics(), "clicking outside the canvas editor controls"
+        )
         painted_payload = self._export_pattern_payload()
         painted_cells = painted_payload.get("cells_by_id")
         if not isinstance(painted_cells, dict):
             raise AssertionError(f"painted cells payload was invalid: {painted_cells!r}")
         case.assertEqual(len(painted_cells), 1)
 
+        case.page.click("#run-toggle-btn")
+        self._expect("#status-text").to_have_text("Running")
+        self._expect("#canvas-toolbar").to_be_hidden()
+        assert_canvas_geometry_unchanged(
+            before_pointer, settled_canvas_metrics(), "hiding the canvas editor while running"
+        )
+        case.page.click("#run-toggle-btn")
+        self._expect("#status-text").to_have_text("Paused")
+        self._expect("#canvas-toolbar-arm-btn").to_be_visible()
+        assert_canvas_geometry_unchanged(
+            before_pointer, settled_canvas_metrics(), "restoring the canvas editor after running"
+        )
+
         case.page.set_viewport_size({"width": 820, "height": 900})
         case.page.wait_for_function("() => window.innerWidth === 820 && window.innerHeight === 900")
         self._ensure_drawer_open()
-        narrow_open = wait_for_fitted_canvas()
+        narrow_open = settled_canvas_metrics()
         case.assertEqual(narrow_open["innerWidth"], 820)
         case.assertEqual(narrow_open["innerHeight"], 900)
         case.page.click("#drawer-toggle-btn")
         self._expect("#control-drawer").to_have_attribute("data-open", "false")
-        narrow_closed = wait_for_fitted_canvas()
+        assert_canvas_geometry_unchanged(
+            narrow_open, settled_canvas_metrics(), "closing the narrow control drawer"
+        )
         case.page.click("#drawer-toggle-btn")
         self._expect("#control-drawer").to_have_attribute("data-open", "true")
-        narrow_reopened = wait_for_fitted_canvas()
-        case.assertLessEqual(
-            abs(narrow_closed["renderCellSize"] - narrow_reopened["renderCellSize"]), 0.05
+        assert_canvas_geometry_unchanged(
+            narrow_open, settled_canvas_metrics(), "opening the narrow control drawer"
+        )
+        case.page.click("#drawer-toggle-btn")
+        self._expect("#control-drawer").to_have_attribute("data-open", "false")
+        assert_canvas_geometry_unchanged(
+            narrow_open, settled_canvas_metrics(), "closing the narrow control drawer again"
+        )
+        arm_button.click()
+        self._expect("#canvas-toolbar-controls").to_be_visible()
+        assert_canvas_geometry_unchanged(
+            narrow_open, settled_canvas_metrics(), "arming the narrow canvas editor"
+        )
+        case.page.click("#canvas-toolbar-dismiss-btn")
+        self._expect("#canvas-toolbar-arm-btn").to_be_visible()
+        assert_canvas_geometry_unchanged(
+            narrow_open, settled_canvas_metrics(), "leaving the narrow canvas editor"
         )
 
     def test_canvas_editor_click_updates_exported_pattern(self) -> None:
