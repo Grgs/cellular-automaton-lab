@@ -95,6 +95,7 @@ Browser UI
   -> frontend/standalone/worker-client.ts
   -> frontend/standalone-worker.ts
   -> backend/browser_runtime.py
+  -> backend/application_commands/dispatcher.py
   -> backend/simulation/service.py
   -> backend/simulation/engine.py + backend/rules/*
   -> worker response
@@ -371,6 +372,10 @@ A self-contained overlay that runs one seed under one rule across many tilings a
   Reusable substitution-recipe helper for recursive affine expansion, structured substitution nodes, metadata propagation, and deterministic leaf flattening.
 - [backend/simulation/aperiodic_registry.py](../backend/simulation/aperiodic_registry.py)
   Registry-backed dispatch for family-specific aperiodic builders and recipe styles.
+- [backend/simulation/aperiodic_family_manifest.py](../backend/simulation/aperiodic_family_manifest.py)
+  Canonical aperiodic family metadata, picker status, public kinds, implementation status, and promotion blockers.
+- [backend/simulation/aperiodic_contracts.py](../backend/simulation/aperiodic_contracts.py)
+  Query helpers over the aperiodic implementation contracts.
 - [backend/simulation/literature_reference_specs.py](../backend/simulation/literature_reference_specs.py)
   Source-backed reference specs for literature-faithfulness verification of the full topology catalog.
 - [backend/simulation/literature_reference_verification.py](../backend/simulation/literature_reference_verification.py)
@@ -387,7 +392,12 @@ A self-contained overlay that runs one seed under one rule across many tilings a
 - [backend/simulation/aperiodic_dodecagonal_square_triangle.py](../backend/simulation/aperiodic_dodecagonal_square_triangle.py)
 - [backend/simulation/aperiodic_shield.py](../backend/simulation/aperiodic_shield.py)
 - [backend/simulation/aperiodic_pinwheel.py](../backend/simulation/aperiodic_pinwheel.py)
-  Family-specific aperiodic patch builders, including Spectre, the Taylor-Socolar half-hex factor, Sphinx, Hat, Tuebingen Triangle, Schlottmann Square-Triangle, Shield, and Pinwheel. Pinwheel uses the exact-record helper path in `aperiodic_support.patches` (via the new `ExactSimilaritySubstitution` shared helper); the other rebuilt families still emit the standard polygon patch format.
+  Representative family-specific aperiodic patch builders. Additional builders
+  follow the same `aperiodic_<family>.py` naming convention, including Chair,
+  Turtle, L-Tetromino, P-Pentomino, Robinson Triangles, the multigrid families,
+  Pinwheel 2:1, and both Socolar presentations. Exact-record helpers are used
+  where float edge coincidence is not authoritative; other families emit the
+  standard polygon patch format.
 
 ### Rules
 
@@ -476,36 +486,13 @@ A self-contained overlay that runs one seed under one rule across many tilings a
 - [vite.config.ts](../vite.config.ts)
   Frontend build configuration.
 
-## Current Refactor Targets
+## Structural Guidance
 
-Use this list to decide where cleanup work should start. These are the files with the most structural pressure today, not necessarily the files with the most defects.
-
-- Frontend gesture orchestration:
-  [surface-bindings.ts](../frontend/interactions/surface-bindings.ts),
-  [paint-drag.ts](../frontend/interactions/paint-drag.ts),
-  [editor-session.ts](../frontend/interactions/editor-session.ts),
-  [command-dispatch.ts](../frontend/interactions/command-dispatch.ts)
-- Canvas transient overlays:
-  [canvas-view.ts](../frontend/canvas-view.ts),
-  [render-layers.ts](../frontend/canvas/render-layers.ts),
-  [render-style.ts](../frontend/canvas/render-style.ts)
-- Drawer metadata and inspector modeling:
-  [drawer.ts](../frontend/controls-model/drawer.ts),
-  [view-sections.ts](../frontend/controls/view-sections.ts),
-  [app-view.ts](../frontend/app-view.ts)
-- Aperiodic implementation quality:
-  [aperiodic_registry.py](../backend/simulation/aperiodic_registry.py),
-  [aperiodic_substitution.py](../backend/simulation/aperiodic_substitution.py),
-  [aperiodic_support/](../backend/simulation/aperiodic_support/),
-  [aperiodic_shield.py](../backend/simulation/aperiodic_shield.py)
-- Literature verification size and ownership:
-  [literature_reference_specs.py](../backend/simulation/literature_reference_specs.py),
-  [literature_reference_verification.py](../backend/simulation/literature_reference_verification.py)
-- Frontend/backend contract drift:
-  [types/domain.d.ts](../frontend/types/domain.d.ts),
-  [types/controller-api.d.ts](../frontend/types/controller-api.d.ts),
-  [payload_types.py](../backend/payload_types.py),
-  [contract_validation.py](../backend/contract_validation.py)
+This file maps the implementation; it does not own a second refactor backlog.
+Use [DESIGN.md](DESIGN.md) for durable boundaries and
+[CODE_QUALITY_ROADMAP.md](CODE_QUALITY_ROADMAP.md) for current structural
+priorities. When a refactor moves files or call paths, update this map in the
+same change.
 
 ## If You Want To Change...
 

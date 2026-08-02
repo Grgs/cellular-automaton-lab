@@ -116,7 +116,7 @@ Useful commands:
 
 ```powershell
 npm run test:frontend -- frontend/presets.test.ts frontend/pattern-io.test.ts frontend/actions/pattern-import-runtime.test.ts
-py -3 -m unittest -q tests.e2e.test_playwright_pattern_and_showcase
+python -m tools test e2e --suite pattern_and_showcase
 ```
 
 ## Common Pitfalls

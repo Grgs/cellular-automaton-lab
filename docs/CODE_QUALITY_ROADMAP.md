@@ -44,12 +44,15 @@ Next action:
 - Split any new large drawer section into its own `frontend/controls-model/drawer-*.ts` builder instead of growing `drawer.ts`.
 - Keep section tests local to the section model when possible.
 
-### 2. Aperiodic Implementation Status
+### 2. Experimental Aperiodic Promotion
 
-The repo now exposes per-family implementation contracts. `dodecagonal-square-triangle` (catalog label "Schlottmann Square-Triangle") now runs the canonical Schlottmann marked-prototile substitution and was promoted to the main `Aperiodic` group on July 2, 2026, so no family status remains provisional.
+The repo exposes per-family implementation contracts. `socolar-hexagonal`
+currently remains in the `Experimental` picker group pending independent manual
+visual review of its cut-and-project implementation.
 
 Next action:
 
+- Complete and record that review before changing its picker group.
 - Keep product status, verification status, and known-deviation docs aligned in the same change.
 
 ### 3. Verification Report Consumption
@@ -60,15 +63,6 @@ Next action:
 
 - Publish the report as a CI artifact only when there is a reviewer, release, or dashboard workflow that uses it.
 - Until then, keep it as an on-demand maintainer diagnostic.
-
-### 4. Standalone Runtime Packaging
-
-The standalone demo still loads Pyodide from a CDN. That is acceptable for the preview, but it remains a public limitation.
-
-Next action:
-
-- Keep the CDN dependency documented in README, release notes, and known limitations.
-- Revisit offline bundling only if standalone offline use becomes a product goal.
 
 ## Completed Cleanup
 
@@ -82,6 +76,10 @@ The following roadmap items are considered done and should not be reopened witho
 - shared polygon adapter common path
 - backend/frontend payload contract guard
 - centralized Playwright suite manifest and npm runner path
+- same-origin standalone packaging for the pinned Pyodide runtime
+- transport-neutral application commands shared by Flask and Pyodide
+- explicit live-fork and persistence capabilities in frontend runtime environments
+- structured public-error parity across HTTP and worker adapters
 - full Python lint/format coverage for `app.py`, `backend/`, `tests/`, and `tools/`
 - full frontend ESLint/Prettier coverage for authored frontend sources and frontend build scripts
 
