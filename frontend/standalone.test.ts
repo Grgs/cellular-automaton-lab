@@ -139,6 +139,7 @@ describe("standalone startup", () => {
         const environmentDeferred = deferred<{
             backend: object;
             bootstrapData: typeof bootstrapData;
+            runtimeEnvironment: object;
         }>();
         const initDeferred = deferred<void>();
         const initApp = vi.fn(() => initDeferred.promise);
@@ -177,14 +178,25 @@ describe("standalone startup", () => {
             "Loading Pyodide, bundled Python sources, and the first board.",
         );
 
-        environmentDeferred.resolve({ backend: {}, bootstrapData });
+        const runtimeEnvironment = {
+            liveForks: {
+                kind: "supported",
+                baseSessionId: "standalone",
+                backendFactory: vi.fn(),
+                maxConcurrent: 2,
+            },
+            persistence: {
+                scope: "browser-device",
+                guarantee: "best-effort-local",
+            },
+        };
+        environmentDeferred.resolve({ backend: {}, bootstrapData, runtimeEnvironment });
         await flushAsyncStartup();
         expect(initApp).toHaveBeenCalledWith(
             expect.objectContaining({
                 backend: {},
                 bootstrapData,
-                paneBaseSessionId: "standalone",
-                paneBackendFactory: expect.any(Function),
+                runtimeEnvironment,
             }),
         );
         expect(startupMessage().textContent).toBe("Starting Python runtime");

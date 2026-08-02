@@ -30,7 +30,7 @@ The public release line is a preview series: tagged GitHub source release plus t
 - `frontend/standalone-worker.ts` loads Pyodide, installs a bundled Python payload into Pyodide's virtual filesystem, imports `backend.browser_runtime`, and proxies frontend commands into the Python simulation runtime.
 - The worker owns the standalone run loop with JS timers. The frontend continues to use the existing polling/reconciliation flow while the worker advances the simulation in the background.
 - Browser-local persistence uses IndexedDB first and falls back to `localStorage` if IndexedDB is unavailable.
-- The standalone worker now uses the same shared command parsing and persisted snapshot acceptance helpers as the Flask route layer.
+- The standalone worker and Flask use the same semantic command registry, request decoding, domain dispatcher, and public-error contract from `backend/application_commands/`. Host lifecycle and transport envelopes remain separate.
 
 ## Lifecycle Cleanup
 
@@ -112,6 +112,8 @@ The `path` values intentionally match the existing HTTP command surface:
 
 The worker command paths intentionally stay aligned with the existing `/api/...` HTTP surface so the frontend controller does not branch on host after environment creation. Cell commands carry the same revisioned delta fields as HTTP. The main-thread snapshot cache validates those fields, forces a full worker `/api/state` request on mismatch, and serializes the reconciled full snapshot for browser-local persistence.
 
+The frontend bootstraps also provide a discriminated runtime environment. Features check the `liveForks` and `persistence` capabilities they consume rather than testing a `server` or `standalone` host name. A supported live-fork capability must include its backend factory; an unavailable capability carries the explicit `open-in-lab` fallback.
+
 ## Browser Test Architecture
 
 - The Playwright harness is now host-aware through `tests/e2e/support_runtime_host.py`.
@@ -121,6 +123,7 @@ The worker command paths intentionally stay aligned with the existing `/api/...`
 - Server-only coverage keeps backend restart persistence assertions.
 - Standalone-only coverage adds:
   - static-host startup
+  - a measured 30-second cold-start budget exposed as `window.__standaloneStartupMs`
   - browser storage restore on reload
   - visible startup error messaging when Pyodide initialization fails
 - The shard machinery in `tests/e2e/playwright_suite_support.py` now targets server-host tests only. Standalone tests are intentionally excluded from those shards and run through their dedicated suite entrypoint.
@@ -131,6 +134,8 @@ The preferred local standalone suite entrypoint is:
 ```powershell
 npm run test:e2e:playwright:standalone
 ```
+
+Cold start is guarded by the standalone Playwright suite. Artifact size is guarded separately by `tools/standalone_bundle_budget.json` through `npm run check:bundle-size:fresh`; a Pyodide replacement should be considered only when measured startup or bundle budgets fail persistently.
 
 Direct Python debugging is still supported, but it now expects prebuilt `output/standalone/` artifacts:
 

@@ -52,7 +52,8 @@ class ApiCompareTests(ApiTestCase):
     def test_compare_does_not_expose_unexpected_exception_messages(self) -> None:
         private_detail = "private detail: /srv/internal/comparison.py"
         with patch(
-            "backend.web.routes.run_compare_request", side_effect=ValueError(private_detail)
+            "backend.application_commands.dispatcher.run_compare_request",
+            side_effect=ValueError(private_detail),
         ):
             response = self.client.post("/api/compare", json={"seed": "111"})
 

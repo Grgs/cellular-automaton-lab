@@ -112,6 +112,18 @@ PAYLOAD_FIELD_CONTRACTS: tuple[PayloadFieldContract, ...] = (
     PayloadFieldContract("CellStatePayload", "CellStateDefinition"),
     PayloadFieldContract("RuleDefinitionPayload", "ApiRuleDefinition"),
     PayloadFieldContract("RulesResponsePayload", "RulesResponse"),
+    PayloadFieldContract(
+        "ApiErrorPayload", "PublicApiErrorPayload", frontend_path=CONTROLLER_API_FRONTEND_PATH
+    ),
+    PayloadFieldContract("CompareRequestPayload", "CompareRequest"),
+    PayloadFieldContract("TopologyComparisonResultPayload", "TopologyComparisonResultPayload"),
+    PayloadFieldContract("SeedComparisonResultPayload", "SeedComparisonResult"),
+    PayloadFieldContract("FilmstripRequestPayload", "FilmstripRequest"),
+    PayloadFieldContract("TopologyFilmstripPayload", "TopologyFilmstrip"),
+    PayloadFieldContract("SeedFilmstripResultPayload", "SeedFilmstripResult"),
+    PayloadFieldContract("TopologyPreviewRequestPayload", "TopologyPreviewRequest"),
+    PayloadFieldContract("TopologyPreviewCellPayload", "TopologyPreviewCell"),
+    PayloadFieldContract("TopologyPreviewPayload", "TopologyPreview"),
     PayloadFieldContract("SimulationStatePayload", "ApiSimulationSnapshot"),
     PayloadFieldContract("CellMutationDeltaPayload", "CellMutationDelta"),
     PayloadFieldContract("PersistedSimulationSnapshotV5", "PersistedSimulationSnapshotV5"),

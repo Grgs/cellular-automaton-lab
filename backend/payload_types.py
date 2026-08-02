@@ -204,6 +204,108 @@ class ApiErrorPayload(TypedDict):
     actual_cells: NotRequired[int]
 
 
+class CompareRequestPayload(TypedDict, total=False):
+    seed: Required[str]
+    rule: str
+    traversal: str
+    steps: int
+    grid_size: int
+    geometries: list[str]
+    include_states: bool
+    pattern: str
+
+
+class TopologyComparisonResultPayload(TypedDict, total=False):
+    geometry: Required[str]
+    tiling_family: Required[str]
+    family: Required[str]
+    cell_count: Required[int]
+    seed_bits: Required[int]
+    seed_cells: Required[int]
+    initial_population: Required[int]
+    final_population: Required[int]
+    normalized_population: Required[float]
+    classification: Required[str]
+    period: Required[int | None]
+    steps_run: Required[int]
+    extinction_step: Required[int | None]
+    note: Required[str | None]
+    population: Required[list[int]]
+    change_rate: Required[list[float]]
+    topology_spec: TopologySpecPayload
+    initial_cells_by_id: SparseCellsByIdPayload
+    final_cells_by_id: SparseCellsByIdPayload
+
+
+class SeedComparisonResultPayload(TypedDict):
+    rule_name: str
+    seed: str
+    seed_bits: int
+    traversal: str
+    steps: int
+    grid_size: int
+    degenerate: bool
+    results: list[TopologyComparisonResultPayload]
+
+
+class FilmstripRequestPayload(TypedDict, total=False):
+    seed: Required[str]
+    rule: str
+    traversal: str
+    frames: int
+    grid_size: int
+    geometries: Required[list[str]]
+    pattern: str
+
+
+class TopologyFilmstripPayload(TypedDict, total=False):
+    geometry: Required[str]
+    tiling_family: Required[str]
+    family: Required[str]
+    label: str
+    cell_count: Required[int]
+    topology_spec: Required[TopologySpecPayload]
+    frames: Required[list[SparseCellsByIdPayload]]
+    extinction_step: Required[int | None]
+    period: Required[int | None]
+    note: Required[str | None]
+    seed_order: list[str]
+
+
+class SeedFilmstripResultPayload(TypedDict):
+    rule_name: str
+    seed: str
+    traversal: str
+    frame_count: int
+    grid_size: int
+    tilings: list[TopologyFilmstripPayload]
+
+
+class TopologyPreviewRequestPayload(TypedDict, total=False):
+    geometry: Required[str]
+    width: int
+    height: int
+    patch_depth: int
+    grid_size: int
+    traversal: str
+    pattern: str
+
+
+class TopologyPreviewCellPayload(TypedDict):
+    id: str
+    kind: str
+    center: PointPayload
+    vertices: list[PointPayload]
+
+
+class TopologyPreviewPayload(TypedDict, total=False):
+    topology_revision: Required[str]
+    topology_spec: Required[TopologySpecPayload]
+    cells: Required[list[TopologyPreviewCellPayload]]
+    order: list[str]
+    shape_cells: SparseCellsByIdPayload
+
+
 class PeriodicFaceTilingDescriptorPayload(TypedDict):
     geometry: str
     label: str

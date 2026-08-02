@@ -231,6 +231,14 @@ describe("standalone worker client", () => {
 
         const environment = await environmentPromise;
         expect(persistence.save).toHaveBeenCalledWith(persistedSnapshot);
+        expect(environment.runtimeEnvironment).toMatchObject({
+            liveForks: {
+                kind: "supported",
+                baseSessionId: "standalone",
+                maxConcurrent: 2,
+            },
+            persistence: { scope: "browser-device", guarantee: "best-effort-local" },
+        });
 
         const statePromise = environment.backend.getState();
         const requestMessage = lastRequestMessage(worker());
@@ -278,10 +286,15 @@ describe("standalone worker client", () => {
             persistedSnapshot,
         });
 
-        await expect(environmentPromise).resolves.toEqual({
-            backend: expect.objectContaining({ getState: expect.any(Function) }),
-            bootstrapData,
-        });
+        await expect(environmentPromise).resolves.toEqual(
+            expect.objectContaining({
+                backend: expect.objectContaining({ getState: expect.any(Function) }),
+                bootstrapData,
+                runtimeEnvironment: expect.objectContaining({
+                    persistence: { scope: "none", guarantee: "ephemeral" },
+                }),
+            }),
+        );
         expect(persistence.save).not.toHaveBeenCalled();
     });
 

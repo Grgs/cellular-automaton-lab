@@ -168,7 +168,7 @@ export interface ComparePanelContentOptions {
     onOpenPattern?: (pattern: PatternPayload) => void | Promise<void>;
     /** The content asks its host to dismiss it (e.g. after loading in place). */
     onRequestClose?: () => void;
-    /** Server-only seams for the live focus pane; absent/null baseSessionId = fork to the Lab. */
+    /** Host capability for a live focus pane or an explicit Lab fallback. */
     focusPaneServices?: FocusPaneServices;
     /** The Lab rule active when the wall is opened; used for the default wall setup. */
     getInitialRuleName?: () => string | null | undefined;
@@ -713,11 +713,9 @@ export function createComparePanelContent(
             forkedBoards: [...forkedBoards.keys()],
         }));
     }
-    // Live in-place forking needs an independent server session; standalone
-    // (no baseSessionId) forks into the Lab instead. A host may also cap
-    // concurrent forks (undefined means unlimited) -- see the check in
-    // forkFocusedBoardLive below.
-    const focusLiveEnabled = Boolean(options.focusPaneServices?.baseSessionId);
+    // Features ask for the capability they need; they do not infer it from a
+    // server/standalone host name or a nullable service.
+    const focusLiveEnabled = options.focusPaneServices?.liveForks.kind === "supported";
 
     // The focused board is mirrored into the hash (`&focus=<geometry>`) so speaker
     // view is shareable and the browser back button returns to the gallery.
@@ -1445,9 +1443,8 @@ export function createComparePanelContent(
             return;
         }
         const services = options.focusPaneServices;
-        // Standalone (no server session): fork into the Lab instead of in
-        // place, folding the paint into the pattern so it isn't dropped.
-        if (!services?.baseSessionId) {
+        const liveForks = services?.liveForks;
+        if (!liveForks || liveForks.kind === "fallback") {
             void openResultPattern(
                 initialPaint
                     ? {
@@ -1461,14 +1458,14 @@ export function createComparePanelContent(
             );
             return;
         }
-        if (services.forkCapacity !== undefined && forkedBoards.size >= services.forkCapacity) {
-            statusLine.textContent = `Only ${services.forkCapacity} live forks at a time here — discard one first.`;
+        if (liveForks.maxConcurrent !== undefined && forkedBoards.size >= liveForks.maxConcurrent) {
+            statusLine.textContent = `Only ${liveForks.maxConcurrent} live forks at a time here — discard one first.`;
             return;
         }
         let backend: SimulationBackend | null = null;
         try {
-            backend = services.backendFactory(
-                paneSessionId(services.baseSessionId, `focus-${geometry}`),
+            backend = liveForks.backendFactory(
+                paneSessionId(liveForks.baseSessionId, `focus-${geometry}`),
             );
             const { mountFocusPane } = await import("./compare-focus-pane.js");
 

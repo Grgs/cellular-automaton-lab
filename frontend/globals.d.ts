@@ -53,6 +53,8 @@ declare global {
         APP_APERIODIC_FAMILIES: ReadonlyArray<BootstrappedAperiodicFamilyDefinition>;
         APP_SESSION_ID?: string;
         __appReady?: boolean;
+        __standaloneStartupMs?: number;
+        __standaloneStartupBudgetMs?: number;
         __reviewApi?: ReviewApi | null;
     }
 }

@@ -14,6 +14,7 @@ import { getGeometryAdapter } from "./geometry/registry.js";
 import { installReviewApi } from "./review-api.js";
 import { wireShellMenu } from "./shell/shell-menu.js";
 import type { AppController, InitAppOptions } from "./types/controller-app.js";
+import type { AppRuntimeEnvironment } from "./types/controller-api.js";
 
 interface FitRenderCellSizeAdapter {
     fitViewport?: (options: {
@@ -37,6 +38,29 @@ let activeController: AppController | null = null;
 let disposeReviewApi: (() => void) | null = null;
 let disposeShellMenu: (() => void) | null = null;
 let workspaceRouter: WorkspaceRouterHandle | null = null;
+
+function defaultRuntimeEnvironment(): AppRuntimeEnvironment {
+    const sessionId = window.APP_SESSION_ID ?? null;
+    if (sessionId) {
+        return {
+            liveForks: {
+                kind: "supported",
+                baseSessionId: sessionId,
+                backendFactory: (childSessionId) =>
+                    createHttpSimulationBackend({ sessionId: childSessionId }),
+            },
+            persistence: { scope: "server-session", guarantee: "debounced-durable" },
+        };
+    }
+    return {
+        liveForks: {
+            kind: "fallback",
+            behavior: "open-in-lab",
+            explanation: "This host opens the selected board in the Lab.",
+        },
+        persistence: { scope: "none", guarantee: "ephemeral" },
+    };
+}
 
 export function disposeApp(): void {
     workspaceRouter?.dispose();
@@ -66,7 +90,8 @@ export async function initApp(options: InitAppOptions = {}): Promise<void> {
     disposeApp();
     const backend = options.backend ?? createHttpSimulationBackend();
     const bootstrapData = options.bootstrapData ?? bootstrapDataFromWindow();
-    const paneBaseSessionId = options.paneBaseSessionId ?? window.APP_SESSION_ID ?? null;
+    const runtimeEnvironment: AppRuntimeEnvironment =
+        options.runtimeEnvironment ?? defaultRuntimeEnvironment();
 
     let controllerPromise: Promise<AppController> | null = null;
     function ensureController(): Promise<AppController> {
@@ -90,9 +115,6 @@ export async function initApp(options: InitAppOptions = {}): Promise<void> {
 
     // Seams for the wall's live focus pane: an independent backend session, a
     // canvas grid view, and the editor geometry helpers.
-    const paneBackendFactory =
-        options.paneBackendFactory ??
-        ((sessionId: string) => createHttpSimulationBackend({ sessionId }));
     const createPaneGridView = (canvas: HTMLCanvasElement) => createCanvasGridView({ canvas });
     const resolvePaneViewportDimensions = (paneOptions: PaneViewportDimensionsOptions) => {
         const adapter = getGeometryAdapter(paneOptions.geometry) as FitRenderCellSizeAdapter;
@@ -113,15 +135,11 @@ export async function initApp(options: InitAppOptions = {}): Promise<void> {
     };
 
     const focusPaneServices: FocusPaneServices = {
-        baseSessionId: paneBaseSessionId,
-        backendFactory: paneBackendFactory,
+        liveForks: runtimeEnvironment.liveForks,
         createGridView: createPaneGridView,
         buildEditorToolCells,
         resolveCellSize: resolvePaneCellSize,
         resolveViewportDimensions: resolvePaneViewportDimensions,
-        ...(options.paneForkCapacity === undefined
-            ? {}
-            : { forkCapacity: options.paneForkCapacity }),
     };
 
     workspaceRouter = mountWorkspaceRouter({

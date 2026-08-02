@@ -1,13 +1,9 @@
 import { fetchBootstrapData, installBootstrapData } from "./bootstrap-data.js";
 import { createStandaloneEnvironment } from "./standalone/worker-client.js";
-import type { SimulationBackend } from "./types/controller-api.js";
-import type { AppBootstrapData } from "./types/domain.js";
 
 let disposeStandaloneApp = (): void => {};
-
-// Each standalone fork boots its own persist-free Pyodide runtime from
-// scratch; two concurrent forks is already a meaningful memory/CPU cost.
-const STANDALONE_FORK_CAPACITY = 2;
+const standaloneStartupStartedAt = performance.now();
+const STANDALONE_COLD_START_BUDGET_MS = 30_000;
 
 interface StartupStage {
     message: string;
@@ -106,73 +102,6 @@ function installPageLifecycleDisposal(): void {
     );
 }
 
-function createStandalonePaneBackendFactory(
-    bootstrapData: AppBootstrapData,
-): (sessionId: string) => SimulationBackend {
-    return () => {
-        let backend: SimulationBackend | null = null;
-        let environmentPromise: Promise<SimulationBackend> | null = null;
-        let disposed = false;
-
-        async function resolveBackend(): Promise<SimulationBackend> {
-            if (disposed) {
-                throw new Error("Standalone pane runtime was disposed.");
-            }
-            if (!environmentPromise) {
-                environmentPromise = createStandaloneEnvironment(bootstrapData, {
-                    persistState: false,
-                }).then((environment) => {
-                    if (disposed) {
-                        void environment.backend.dispose();
-                        throw new Error("Standalone pane runtime was disposed.");
-                    }
-                    backend = environment.backend;
-                    return environment.backend;
-                });
-            }
-            return environmentPromise;
-        }
-
-        const postControl = (async (path: string, body?: unknown) => {
-            const resolvedBackend = await resolveBackend();
-            const delegate = resolvedBackend.postControl as (
-                nextPath: string,
-                nextBody?: unknown,
-            ) => ReturnType<SimulationBackend["getState"]>;
-            return body === undefined ? delegate(path) : delegate(path, body);
-        }) as SimulationBackend["postControl"];
-
-        const proxyBackend: SimulationBackend = {
-            getState: async () => (await resolveBackend()).getState(),
-            getRules: async () => (await resolveBackend()).getRules(),
-            dispose: () => {
-                disposed = true;
-                if (backend) {
-                    void backend.dispose();
-                    return;
-                }
-                // The environment can still be booting when a wall replacement
-                // or route change disposes its fork. `resolveBackend` rejects
-                // that obsolete boot deliberately; consume the disposal chain
-                // so the expected cancellation is not surfaced as an uncaught
-                // page error. Active pane callers still receive the rejection.
-                void environmentPromise
-                    ?.then((resolvedBackend) => resolvedBackend.dispose())
-                    .catch(() => undefined);
-            },
-            postControl,
-            toggleCell: async (cell) => (await resolveBackend()).toggleCell(cell),
-            setCell: async (cell, state) => (await resolveBackend()).setCell(cell, state),
-            setCells: async (cells) => (await resolveBackend()).setCells(cells),
-            compareSeed: async (request) => (await resolveBackend()).compareSeed(request),
-            requestFilmstrip: async (request) => (await resolveBackend()).requestFilmstrip(request),
-            previewTopology: async (request) => (await resolveBackend()).previewTopology(request),
-        };
-
-        return proxyBackend;
-    };
-}
-
 export async function startStandaloneApp(): Promise<void> {
     showStartupOverlay(STARTUP_STAGE_LOADING_DATA);
     const bootstrapData = installBootstrapData(
@@ -187,13 +116,10 @@ export async function startStandaloneApp(): Promise<void> {
     await initApp({
         backend: environment.backend,
         bootstrapData: environment.bootstrapData,
-        // The wall's live focus pane forks into its own persist-free Pyodide
-        // environment; there are no server sessions in the standalone build.
-        // Each fork boots a full Pyodide runtime, so concurrent forks are capped.
-        paneBaseSessionId: "standalone",
-        paneBackendFactory: createStandalonePaneBackendFactory(environment.bootstrapData),
-        paneForkCapacity: STANDALONE_FORK_CAPACITY,
+        runtimeEnvironment: environment.runtimeEnvironment,
     });
+    window.__standaloneStartupMs = performance.now() - standaloneStartupStartedAt;
+    window.__standaloneStartupBudgetMs = STANDALONE_COLD_START_BUDGET_MS;
     hideStartupOverlay();
     installPageLifecycleDisposal();
 }

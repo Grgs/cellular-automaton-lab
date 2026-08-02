@@ -1,5 +1,10 @@
 import type { AppBootstrapData, RulesResponse, SimulationSnapshot } from "../types/domain.js";
-import type { ConfigSyncBody, ResetControlBody, SimulationBackend } from "../types/controller.js";
+import type {
+    AppRuntimeEnvironment,
+    ConfigSyncBody,
+    ResetControlBody,
+    SimulationBackend,
+} from "../types/controller.js";
 import { createSimulationStatePersistence } from "./persistence.js";
 import { persistedSnapshotFrom, SimulationSnapshotCache } from "../simulation-snapshot-cache.js";
 import type {
@@ -13,10 +18,15 @@ import type {
     StandaloneWorkerIncomingMessage,
     StandaloneWorkerOutgoingMessage,
 } from "./protocol.js";
+import { BackendRequestError } from "../backend-request-error.js";
 
 export interface StandaloneEnvironmentOptions {
     persistState?: boolean;
 }
+
+// Each live fork boots a persist-free Pyodide runtime. Two concurrent forks
+// is the explicit standalone memory/CPU budget.
+const STANDALONE_FORK_CAPACITY = 2;
 
 interface PendingRequest {
     resolve: (
@@ -27,22 +37,6 @@ interface PendingRequest {
             | StandaloneErrorResponse,
     ) => void;
     reject: (error: Error) => void;
-}
-
-export class StandaloneRequestError extends Error {
-    readonly code: string | undefined;
-    readonly limit: number | undefined;
-    readonly estimatedCells: number | undefined;
-    readonly actualCells: number | undefined;
-
-    constructor(response: StandaloneErrorResponse) {
-        super(response.error);
-        this.name = "StandaloneRequestError";
-        this.code = response.code;
-        this.limit = response.limit;
-        this.estimatedCells = response.estimated_cells;
-        this.actualCells = response.actual_cells;
-    }
 }
 
 function createRequestId(): string {
@@ -56,12 +50,91 @@ function requireSnapshot(snapshot: SimulationSnapshot | undefined): SimulationSn
     return snapshot;
 }
 
+function createStandalonePaneBackendFactory(
+    bootstrapData: AppBootstrapData,
+): (sessionId: string) => SimulationBackend {
+    return () => {
+        let backend: SimulationBackend | null = null;
+        let environmentPromise: Promise<SimulationBackend> | null = null;
+        let disposed = false;
+
+        async function resolveBackend(): Promise<SimulationBackend> {
+            if (disposed) {
+                throw new Error("Standalone pane runtime was disposed.");
+            }
+            if (!environmentPromise) {
+                environmentPromise = createStandaloneEnvironment(bootstrapData, {
+                    persistState: false,
+                }).then((environment) => {
+                    if (disposed) {
+                        void environment.backend.dispose();
+                        throw new Error("Standalone pane runtime was disposed.");
+                    }
+                    backend = environment.backend;
+                    return environment.backend;
+                });
+            }
+            return environmentPromise;
+        }
+
+        const postControl = (async (path: string, body?: unknown) => {
+            const resolvedBackend = await resolveBackend();
+            const delegate = resolvedBackend.postControl as (
+                nextPath: string,
+                nextBody?: unknown,
+            ) => ReturnType<SimulationBackend["getState"]>;
+            return body === undefined ? delegate(path) : delegate(path, body);
+        }) as SimulationBackend["postControl"];
+
+        return {
+            getState: async () => (await resolveBackend()).getState(),
+            getRules: async () => (await resolveBackend()).getRules(),
+            dispose: () => {
+                disposed = true;
+                if (backend) {
+                    void backend.dispose();
+                    return;
+                }
+                // A replaced wall can dispose a fork while it is still booting.
+                void environmentPromise
+                    ?.then((resolvedBackend) => resolvedBackend.dispose())
+                    .catch(() => undefined);
+            },
+            postControl,
+            toggleCell: async (cell) => (await resolveBackend()).toggleCell(cell),
+            setCell: async (cell, state) => (await resolveBackend()).setCell(cell, state),
+            setCells: async (cells) => (await resolveBackend()).setCells(cells),
+            compareSeed: async (request) => (await resolveBackend()).compareSeed(request),
+            requestFilmstrip: async (request) => (await resolveBackend()).requestFilmstrip(request),
+            previewTopology: async (request) => (await resolveBackend()).previewTopology(request),
+        };
+    };
+}
+
+function standaloneRuntimeEnvironment(
+    bootstrapData: AppBootstrapData,
+    persistState: boolean,
+): AppRuntimeEnvironment {
+    return {
+        liveForks: {
+            kind: "supported",
+            baseSessionId: "standalone",
+            backendFactory: createStandalonePaneBackendFactory(bootstrapData),
+            maxConcurrent: STANDALONE_FORK_CAPACITY,
+        },
+        persistence: persistState
+            ? { scope: "browser-device", guarantee: "best-effort-local" }
+            : { scope: "none", guarantee: "ephemeral" },
+    };
+}
+
 export async function createStandaloneEnvironment(
     bootstrapData: AppBootstrapData,
     { persistState = true }: StandaloneEnvironmentOptions = {},
 ): Promise<{
     backend: SimulationBackend;
     bootstrapData: AppBootstrapData;
+    runtimeEnvironment: AppRuntimeEnvironment;
 }> {
     const persistence = persistState ? await createSimulationStatePersistence() : null;
     const worker = new Worker(new URL("../standalone-worker.ts", import.meta.url), {
@@ -183,7 +256,16 @@ export async function createStandaloneEnvironment(
             throw new Error("Standalone runtime returned an unexpected response.");
         }
         if (!response.ok) {
-            throw new StandaloneRequestError(response);
+            throw new BackendRequestError(response.error, {
+                ...(response.code === undefined ? {} : { code: response.code }),
+                ...(response.limit === undefined ? {} : { limit: response.limit }),
+                ...(response.estimated_cells === undefined
+                    ? {}
+                    : { estimatedCells: response.estimated_cells }),
+                ...(response.actual_cells === undefined
+                    ? {}
+                    : { actualCells: response.actual_cells }),
+            });
         }
         return response;
     }
@@ -289,5 +371,6 @@ export async function createStandaloneEnvironment(
     return {
         backend,
         bootstrapData,
+        runtimeEnvironment: standaloneRuntimeEnvironment(bootstrapData, persistState),
     };
 }

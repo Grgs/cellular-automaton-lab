@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createHttpSimulationBackend, request } from "./api.js";
+import { BackendRequestError } from "./backend-request-error.js";
 import type { CompareRequest, FilmstripRequest, SimulationSnapshot } from "./types/domain.js";
 
 function stubFetch(response: Response): void {
@@ -82,6 +83,30 @@ describe("request", () => {
         stubFetch(new Response("<html>boom</html>", { status: 502 }));
 
         await expect(request("/api/state")).rejects.toThrow("Request failed: 502");
+    });
+
+    it("preserves structured public error fields", async () => {
+        stubFetch(
+            new Response(
+                JSON.stringify({
+                    error: "Topology is too large.",
+                    code: "topology_cell_budget_exceeded",
+                    limit: 20_000,
+                    estimated_cells: 20_100,
+                }),
+                { status: 400 },
+            ),
+        );
+
+        const error = await request("/api/control/reset").catch((reason: unknown) => reason);
+
+        expect(error).toBeInstanceOf(BackendRequestError);
+        expect(error).toMatchObject({
+            status: 400,
+            code: "topology_cell_budget_exceeded",
+            limit: 20_000,
+            estimatedCells: 20_100,
+        });
     });
 });
 

@@ -5,24 +5,20 @@ import threading
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from backend.contract_validation import (
-    normalize_config_topology_patch,
-    normalize_reset_topology_spec,
-    parse_cell_id,
-    parse_cell_updates,
-    parse_optional_float,
-    parse_rule_name,
-    parse_state_value,
-    validate_persisted_snapshot_payload,
+from backend.application_commands import (
+    COMMAND_BY_PATH,
+    ApplicationCommandDispatcher,
+    CommandResult,
+    CommandResultKind,
+    ServiceCommandTarget,
 )
+from backend.contract_validation import validate_persisted_snapshot_payload
 from backend.payload_types import PersistedSimulationSnapshotInput
 from backend.public_errors import PublicApiError
 from backend.rules import RuleRegistry
 from backend.simulation.persistence import SimulationStateStore
-from backend.simulation.seeding import run_compare_request, run_filmstrip_request
 from backend.simulation.service import SimulationService
 from backend.simulation.state_restore import SimulationStateRestorer
-from backend.simulation.topology_preview import build_topology_preview
 
 
 class NoopLock:
@@ -76,13 +72,27 @@ class BrowserSimulationRuntime:
         self.service.replace_state(next_state)
 
     def get_state_response(self) -> str:
-        snapshot = self.service.get_state()
-        return _response_payload(
-            snapshot.to_dict(), SimulationStateStore.serialize_snapshot(snapshot)
-        )
+        result = self.command_dispatcher.dispatch(COMMAND_BY_PATH["/api/state"])
+        return self._command_response(result)
 
     def get_rules_response(self) -> str:
-        return _response_payload(None, rules=self.rule_registry.describe_rules())
+        result = self.command_dispatcher.dispatch(COMMAND_BY_PATH["/api/rules"])
+        return self._command_response(result)
+
+    @property
+    def command_dispatcher(self) -> ApplicationCommandDispatcher:
+        return ApplicationCommandDispatcher(ServiceCommandTarget(self.service, self.rule_registry))
+
+    def _command_response(self, result: CommandResult) -> str:
+        if result.kind is CommandResultKind.SNAPSHOT:
+            snapshot = self.service.get_state()
+            return _response_payload(
+                result.payload,
+                SimulationStateStore.serialize_snapshot(snapshot),
+            )
+        if result.kind is CommandResultKind.RULES:
+            return _response_payload(None, rules=result.payload["rules"])
+        return json.dumps({"ok": True, **result.payload})
 
     def tick_running(self) -> str:
         if not self.service.step_if_running():
@@ -100,64 +110,13 @@ class BrowserSimulationRuntime:
     def handle_command(self, path: str, payload: object | None = None) -> str:
         request_payload = payload if isinstance(payload, dict) else {}
         try:
-            if path == "/api/state":
-                return self.get_state_response()
-            if path == "/api/rules":
-                return self.get_rules_response()
-            if path == "/api/compare":
-                return json.dumps({"ok": True, "comparison": run_compare_request(request_payload)})
-            if path == "/api/compare/filmstrip":
-                return json.dumps({"ok": True, "filmstrip": run_filmstrip_request(request_payload)})
-            if path == "/api/topology/preview":
-                return json.dumps(
-                    {"ok": True, "topology_preview": build_topology_preview(request_payload)}
-                )
-            if path == "/api/control/start":
-                self.service.start()
-            elif path == "/api/control/pause":
-                self.service.pause()
-            elif path == "/api/control/resume":
-                self.service.resume()
-            elif path == "/api/control/step":
-                self.service.step()
-            elif path == "/api/control/reset":
-                self.service.reset(
-                    topology_spec=normalize_reset_topology_spec(request_payload),
-                    rule_name=parse_rule_name(request_payload, self.rule_registry),
-                    speed=parse_optional_float(request_payload, "speed"),
-                    randomize=bool(request_payload.get("randomize", False)),
-                )
-            elif path == "/api/config":
-                self.service.update_config(
-                    topology_spec=normalize_config_topology_patch(request_payload),
-                    speed=parse_optional_float(request_payload, "speed"),
-                    rule_name=parse_rule_name(request_payload, self.rule_registry),
-                )
-            elif path == "/api/cells/toggle":
-                delta = self.service.toggle_cell_by_id(parse_cell_id(request_payload))
-                return json.dumps({"ok": True, **delta.to_dict()})
-            elif path == "/api/cells/set":
-                current_rule = self.service.state.rule
-                delta = self.service.set_cell_state_by_id(
-                    parse_cell_id(request_payload),
-                    parse_state_value(request_payload, current_rule),
-                )
-                return json.dumps({"ok": True, **delta.to_dict()})
-            elif path == "/api/cells/set-many":
-                cells = parse_cell_updates(request_payload, self.service.state.rule)
-                delta = self.service.set_cells_by_id(
-                    [(cell["id"], cell["state"]) for cell in cells]
-                )
-                return json.dumps({"ok": True, **delta.to_dict()})
-            else:
+            command = COMMAND_BY_PATH.get(path)
+            if command is None:
                 raise PublicApiError(f"Unknown command '{path}'.")
+            result = self.command_dispatcher.dispatch(command, request_payload)
+            return self._command_response(result)
         except PublicApiError as exc:
             return _error_payload(exc)
-
-        snapshot = self.service.get_state()
-        return _response_payload(
-            snapshot.to_dict(), SimulationStateStore.serialize_snapshot(snapshot)
-        )
 
 
 _RUNTIME: BrowserSimulationRuntime | None = None

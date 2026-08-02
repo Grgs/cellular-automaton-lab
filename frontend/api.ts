@@ -18,6 +18,7 @@ import type {
 } from "./types/controller.js";
 import { SimulationSnapshotCache } from "./simulation-snapshot-cache.js";
 import { decodeCellMutationDelta } from "./standalone/runtime-decoders.js";
+import { BackendRequestError } from "./backend-request-error.js";
 
 interface CellMutation extends CellIdentifier {
     state: number;
@@ -44,19 +45,34 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
         // Surface the server's error detail (e.g. "preview limit is 10000") so
         // callers can classify failures instead of seeing only a status code.
         let detail = "";
+        let code: string | undefined;
+        let limit: number | undefined;
+        let estimatedCells: number | undefined;
+        let actualCells: number | undefined;
         try {
             const body: unknown = await response.json();
             if (body && typeof body === "object" && "error" in body) {
-                detail = String((body as { error: unknown }).error);
+                const errorBody = body as Record<string, unknown>;
+                detail = String(errorBody.error);
+                code = typeof errorBody.code === "string" ? errorBody.code : undefined;
+                limit = typeof errorBody.limit === "number" ? errorBody.limit : undefined;
+                estimatedCells =
+                    typeof errorBody.estimated_cells === "number"
+                        ? errorBody.estimated_cells
+                        : undefined;
+                actualCells =
+                    typeof errorBody.actual_cells === "number" ? errorBody.actual_cells : undefined;
             }
         } catch {
             // Non-JSON error body; the status code alone will have to do.
         }
-        throw new Error(
-            detail
-                ? `Request failed: ${response.status} — ${detail}`
-                : `Request failed: ${response.status}`,
-        );
+        throw new BackendRequestError(detail, {
+            status: response.status,
+            ...(code === undefined ? {} : { code }),
+            ...(limit === undefined ? {} : { limit }),
+            ...(estimatedCells === undefined ? {} : { estimatedCells }),
+            ...(actualCells === undefined ? {} : { actualCells }),
+        });
     }
 
     return response.json();

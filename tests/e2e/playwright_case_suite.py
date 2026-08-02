@@ -3212,6 +3212,21 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         super().setUp()
         self.initialize_shared_ui_flow()
 
+    def test_cold_start_stays_within_the_explicit_budget(self) -> None:
+        measurement = self.page.evaluate(
+            """() => ({
+                elapsed: window.__standaloneStartupMs,
+                budget: window.__standaloneStartupBudgetMs,
+            })"""
+        )
+        if not isinstance(measurement, dict):
+            raise AssertionError(f"invalid standalone startup measurement: {measurement!r}")
+        elapsed = measurement.get("elapsed")
+        budget = measurement.get("budget")
+        if not isinstance(elapsed, (int, float)) or not isinstance(budget, (int, float)):
+            raise AssertionError(f"invalid standalone startup measurement: {measurement!r}")
+        self.assertLessEqual(elapsed, budget)
+
     def test_reload_restores_browser_persisted_state(self) -> None:
         self.page.select_option("#rule-select", "highlife")
         self._expect("#rule-select").to_have_value("highlife")

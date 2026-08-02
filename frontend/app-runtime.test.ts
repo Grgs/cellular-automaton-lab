@@ -201,14 +201,21 @@ describe("app runtime", () => {
         await initApp({
             backend,
             bootstrapData,
-            paneBaseSessionId: "s-runtime",
+            runtimeEnvironment: {
+                liveForks: {
+                    kind: "supported",
+                    baseSessionId: "s-runtime",
+                    backendFactory: vi.fn(),
+                },
+                persistence: { scope: "server-session", guarantee: "debounced-durable" },
+            },
         });
 
         expect(mountWorkspaceRouter).toHaveBeenCalledOnce();
         const firstCall = mountWorkspaceRouter.mock.calls[0];
         expect(firstCall).toBeDefined();
         const routerOptions = firstCall![0] as {
-            focusPaneServices?: { baseSessionId?: string | null };
+            focusPaneServices?: { liveForks?: { baseSessionId?: string } };
             getInitialRuleName?: () => string | null | undefined;
             wallTrigger?: HTMLButtonElement | null;
             labTrigger?: HTMLButtonElement | null;
@@ -216,7 +223,7 @@ describe("app runtime", () => {
             wallHost?: HTMLElement | null;
             ensureLabReady?: () => Promise<void>;
         };
-        expect(routerOptions.focusPaneServices?.baseSessionId).toBe("s-runtime");
+        expect(routerOptions.focusPaneServices?.liveForks?.baseSessionId).toBe("s-runtime");
         expect(routerOptions.wallTrigger).toBe(document.getElementById("wall-view-btn"));
         expect(routerOptions.labTrigger).toBe(document.getElementById("open-lab-btn"));
         expect(routerOptions.labRoot).toBe(document.getElementById("lab-root"));

@@ -2628,8 +2628,7 @@ describe("mountComparePanel", () => {
         };
         const backendFactory = vi.fn(() => focusBackend);
         const focusPaneServices: FocusPaneServices = {
-            baseSessionId: "sess",
-            backendFactory,
+            liveForks: { kind: "supported", baseSessionId: "sess", backendFactory },
             createGridView: () => fakeGridView(),
             buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
                 { ...startCell, state: paintState },
@@ -4348,8 +4347,7 @@ describe("mountComparePanel", () => {
         };
         const backendFactory = vi.fn(() => focusBackend);
         const focusPaneServices: FocusPaneServices = {
-            baseSessionId: "sess",
-            backendFactory,
+            liveForks: { kind: "supported", baseSessionId: "sess", backendFactory },
             createGridView: () => fakeGridView(),
             buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
                 { ...startCell, state: paintState },
@@ -4408,8 +4406,11 @@ describe("mountComparePanel", () => {
             dispose: vi.fn(),
         };
         const focusPaneServices: FocusPaneServices = {
-            baseSessionId: "sess",
-            backendFactory: () => focusBackend,
+            liveForks: {
+                kind: "supported",
+                baseSessionId: "sess",
+                backendFactory: () => focusBackend,
+            },
             createGridView: () => fakeGridView(),
             buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
                 { ...startCell, state: paintState },
@@ -4474,8 +4475,11 @@ describe("mountComparePanel", () => {
             dispose: vi.fn(),
         };
         const focusPaneServices: FocusPaneServices = {
-            baseSessionId: "sess",
-            backendFactory: () => focusBackend,
+            liveForks: {
+                kind: "supported",
+                baseSessionId: "sess",
+                backendFactory: () => focusBackend,
+            },
             createGridView: () => fakeGridView(),
             buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
                 { ...startCell, state: paintState },
@@ -4540,8 +4544,7 @@ describe("mountComparePanel", () => {
         });
         const backendFactory = vi.fn(focusBackendFor);
         const focusPaneServices: FocusPaneServices = {
-            baseSessionId: "sess",
-            backendFactory,
+            liveForks: { kind: "supported", baseSessionId: "sess", backendFactory },
             createGridView: () => fakeGridView(),
             buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
                 { ...startCell, state: paintState },
@@ -4611,13 +4614,16 @@ describe("mountComparePanel", () => {
             dispose: vi.fn(),
         };
         const focusPaneServices: FocusPaneServices = {
-            baseSessionId: "standalone",
-            backendFactory: () => focusBackend,
+            liveForks: {
+                kind: "supported",
+                baseSessionId: "standalone",
+                backendFactory: () => focusBackend,
+                maxConcurrent: 1,
+            },
             createGridView: () => fakeGridView(),
             buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
                 { ...startCell, state: paintState },
             ],
-            forkCapacity: 1,
         };
         const handle = mountComparePanel({
             backend: filmstripBackend,
@@ -4666,8 +4672,11 @@ describe("mountComparePanel", () => {
             dispose: focusDispose,
         };
         const focusPaneServices: FocusPaneServices = {
-            baseSessionId: "sess",
-            backendFactory: () => focusBackend,
+            liveForks: {
+                kind: "supported",
+                baseSessionId: "sess",
+                backendFactory: () => focusBackend,
+            },
             createGridView: () => fakeGridView(),
             buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
                 { ...startCell, state: paintState },
@@ -4724,8 +4733,11 @@ describe("mountComparePanel", () => {
             dispose: focusDispose,
         };
         const focusPaneServices: FocusPaneServices = {
-            baseSessionId: "sess",
-            backendFactory: () => focusBackend,
+            liveForks: {
+                kind: "supported",
+                baseSessionId: "sess",
+                backendFactory: () => focusBackend,
+            },
             createGridView: () => fakeGridView(),
             buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
                 { ...startCell, state: paintState },
@@ -4772,10 +4784,22 @@ describe("mountComparePanel", () => {
             requestFilmstrip: async () => twoBoardFilmstrip(),
         };
         const onOpenPattern = vi.fn();
+        const focusPaneServices: FocusPaneServices = {
+            liveForks: {
+                kind: "fallback",
+                behavior: "open-in-lab",
+                explanation: "Live forks are unavailable in this host.",
+            },
+            createGridView: () => fakeGridView(),
+            buildEditorToolCells: (_state, _tool, startCell, _endCell, paintState) => [
+                { ...startCell, state: paintState },
+            ],
+        };
         const handle = mountComparePanel({
             backend: filmstripBackend,
             bootstrapData: bootstrapData(),
             onOpenPattern,
+            focusPaneServices,
         });
         handle.open();
         [...document.querySelectorAll<HTMLButtonElement>(".compare-run")]

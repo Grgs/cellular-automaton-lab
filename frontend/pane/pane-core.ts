@@ -12,7 +12,7 @@ import {
     type EditorTool,
 } from "../editor-tools.js";
 import { indexTopology } from "../topology-index.js";
-import type { SimulationBackend } from "../types/controller-api.js";
+import type { LiveForkCapability, SimulationBackend } from "../types/controller-api.js";
 import type { GridView, ViewportDimensions } from "../types/controller-view.js";
 import type {
     AppBootstrapData,
@@ -162,14 +162,11 @@ export function paneEditorState(
 }
 
 export interface FocusPaneServices {
-    baseSessionId: string | null;
-    backendFactory: (sessionId: string) => SimulationBackend;
+    liveForks: LiveForkCapability;
     createGridView: (canvas: HTMLCanvasElement) => GridView;
     buildEditorToolCells: PaneEditorCellsBuilder;
     resolveCellSize?: (options: PaneCellSizeOptions) => number;
     resolveViewportDimensions?: (options: PaneViewportDimensionsOptions) => ViewportDimensions;
-    /** Maximum concurrent live forks; undefined means unlimited. */
-    forkCapacity?: number;
 }
 
 export interface EditablePaneOptions {

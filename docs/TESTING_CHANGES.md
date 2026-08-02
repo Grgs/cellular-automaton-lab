@@ -137,7 +137,7 @@ Suggested commands:
 
 ```powershell
 python -m mypy --config-file pyproject.toml
-python -m pytest -q tests/unit/test_request_models.py tests/unit/test_requests.py
+python -m pytest -q tests/api/test_command_parity.py tests/unit/test_requests.py
 python -m pytest -q -rs tests/api
 npm run test:e2e:playwright:server
 ```

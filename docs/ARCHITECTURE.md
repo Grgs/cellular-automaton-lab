@@ -11,8 +11,11 @@ flowchart LR
     Browser["Browser"] --> Frontend["TypeScript app"]
     Frontend --> Routes["Flask routes"]
     Routes --> Sessions["SimulationSessionRegistry"]
-    Routes --> StateActions["StateActionService"]
-    StateActions --> Coordinator["SimulationCoordinator"]
+    Routes --> Commands["ApplicationCommandDispatcher"]
+    Worker["Pyodide browser runtime"] --> Commands
+    Commands --> Targets["Coordinator / service target adapters"]
+    Targets --> Coordinator["SimulationCoordinator"]
+    Targets --> Service
     Sessions --> Coordinator
     Coordinator --> Runtime["SimulationRuntime"]
     Coordinator --> Persist["Coordinator persistence + restore"]
@@ -58,7 +61,7 @@ The short version:
 - Drawer sections should be independently owned. The right-click metadata inspector should move out of the broad drawer model into a section-specific model.
 - Aperiodic tilings need per-family implementation contracts so true substitutions, exact-affine paths, canonical reference patches, and known deviations are not treated as equivalent.
 - Literature verification should be split into smaller modules before more families or fixture modes are added.
-- Frontend/backend payload drift needs stronger mechanical protection as the API, standalone worker protocol, and topology metadata grow.
+- Keep the application-command and payload-contract checks current whenever the API or standalone worker protocol grows.
 
 ## Backend
 
@@ -69,9 +72,9 @@ The short version:
 - Flask route wiring
 - extension lookup
 - response helpers
-- request validation handoff
+- application-command selection and response encoding
 
-Typed mutation application lives in [backend/web/state_actions.py](../backend/web/state_actions.py), not in the route handlers themselves.
+Request decoding and domain dispatch live in [backend/application_commands](../backend/application_commands). The same dispatcher is used by Flask through a coordinator-backed target and by Pyodide through a service-backed target. HTTP paths and worker paths are transport mappings; semantic identities such as `simulation.reset` and `cells.set_many` are the application contract. The executable inventory and its host-only exclusions are documented in [COMMAND_CONTRACTS.md](./COMMAND_CONTRACTS.md).
 
 Server-mode simulation endpoints are exposed under `/api/sessions/<session_id>/...`. The unscoped `/api/...` simulation endpoints remain as a default-session compatibility shim for local tools and older tests.
 

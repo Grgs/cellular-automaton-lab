@@ -4,18 +4,19 @@ from flask import Blueprint, Response, current_app, jsonify, render_template, re
 from markupsafe import Markup
 
 from backend.app_shell import render_server_app_shell
+from backend.application_commands import (
+    ApplicationCommand,
+    ApplicationCommandDispatcher,
+    CoordinatorCommandTarget,
+)
 from backend.bootstrap_data import build_bootstrap_payload
 from backend.frontend_assets import FrontendAssetManifest
-from backend.payload_types import RulesResponsePayload
 from backend.public_errors import PublicApiError
 from backend.rules import RuleRegistry
 from backend.simulation.coordinator import SimulationCoordinator
-from backend.simulation.seeding import run_compare_request, run_filmstrip_request
 from backend.simulation.sessions import DEFAULT_SESSION_ID, SimulationSessionRegistry
 from backend.simulation.topology_builders import TopologyCellBudgetExceeded
-from backend.simulation.topology_preview import build_topology_preview
 from backend.web.requests import get_payload
-from backend.web.state_actions import StateActionService
 
 page_bp = Blueprint("pages", __name__)
 api_bp = Blueprint("api", __name__, url_prefix="/api")
@@ -47,8 +48,19 @@ def frontend_assets() -> FrontendAssetManifest:
     return _require_extension("frontend_assets", FrontendAssetManifest)
 
 
-def state_actions(session_id: str = DEFAULT_SESSION_ID) -> StateActionService:
-    return StateActionService(simulation_coordinator(session_id), rule_registry())
+def command_dispatcher(session_id: str = DEFAULT_SESSION_ID) -> ApplicationCommandDispatcher:
+    return ApplicationCommandDispatcher(
+        CoordinatorCommandTarget(simulation_coordinator(session_id), rule_registry())
+    )
+
+
+def dispatch_command(
+    command: ApplicationCommand,
+    session_id: str = DEFAULT_SESSION_ID,
+    *,
+    payload: dict[str, object] | None = None,
+) -> dict[str, object]:
+    return dict(command_dispatcher(session_id).dispatch(command, payload).payload)
 
 
 @api_bp.app_errorhandler(TopologyCellBudgetExceeded)
@@ -68,7 +80,7 @@ def handle_api_request_error(exc: PublicApiError) -> tuple[Response, int]:
 
 
 def state_response(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    return jsonify(simulation_coordinator(session_id).get_state().to_dict())
+    return jsonify(dispatch_command(ApplicationCommand.STATE_GET, session_id))
 
 
 def topology_response(session_id: str = DEFAULT_SESSION_ID) -> Response:
@@ -104,8 +116,7 @@ def get_state(session_id: str = DEFAULT_SESSION_ID) -> Response:
 @api_bp.get("/rules")
 @session_api_bp.get("/rules")
 def get_rules(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    payload: RulesResponsePayload = {"rules": rule_registry().describe_rules()}
-    return jsonify(payload)
+    return jsonify(dispatch_command(ApplicationCommand.RULES_LIST, session_id))
 
 
 @api_bp.get("/topology")
@@ -127,94 +138,118 @@ def get_bootstrap() -> Response:
 @api_bp.post("/compare")
 @session_api_bp.post("/compare")
 def compare(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    payload = get_payload(request)
-    try:
-        comparison = run_compare_request(payload)
-    except PublicApiError as exc:
-        return jsonify(exc.to_payload()), 400
-    return jsonify({"comparison": comparison})
+    return jsonify(
+        dispatch_command(
+            ApplicationCommand.COMPARE_RUN,
+            session_id,
+            payload=get_payload(request),
+        )
+    )
 
 
 @api_bp.post("/compare/filmstrip")
 @session_api_bp.post("/compare/filmstrip")
 def compare_filmstrip(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    payload = get_payload(request)
-    try:
-        filmstrip = run_filmstrip_request(payload)
-    except PublicApiError as exc:
-        return jsonify(exc.to_payload()), 400
-    return jsonify({"filmstrip": filmstrip})
+    return jsonify(
+        dispatch_command(
+            ApplicationCommand.FILMSTRIP_RUN,
+            session_id,
+            payload=get_payload(request),
+        )
+    )
 
 
 @api_bp.post("/topology/preview")
 @session_api_bp.post("/topology/preview")
 def topology_preview(session_id: str = DEFAULT_SESSION_ID) -> JsonRouteResult:
-    payload = get_payload(request)
-    try:
-        topology = build_topology_preview(payload)
-    except PublicApiError as exc:
-        return jsonify(exc.to_payload()), 400
-    return jsonify({"topology_preview": topology})
+    return jsonify(
+        dispatch_command(
+            ApplicationCommand.TOPOLOGY_PREVIEW,
+            session_id,
+            payload=get_payload(request),
+        )
+    )
 
 
 @api_bp.post("/control/start")
 @session_api_bp.post("/control/start")
 def start(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    snapshot = simulation_coordinator(session_id).start()
-    return jsonify(snapshot.to_dict())
+    return jsonify(dispatch_command(ApplicationCommand.SIMULATION_START, session_id))
 
 
 @api_bp.post("/control/pause")
 @session_api_bp.post("/control/pause")
 def pause(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    simulation_coordinator(session_id).pause()
-    return state_response(session_id)
+    return jsonify(dispatch_command(ApplicationCommand.SIMULATION_PAUSE, session_id))
 
 
 @api_bp.post("/control/resume")
 @session_api_bp.post("/control/resume")
 def resume(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    snapshot = simulation_coordinator(session_id).resume()
-    return jsonify(snapshot.to_dict())
+    return jsonify(dispatch_command(ApplicationCommand.SIMULATION_RESUME, session_id))
 
 
 @api_bp.post("/control/step")
 @session_api_bp.post("/control/step")
 def step(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    simulation_coordinator(session_id).step()
-    return state_response(session_id)
+    return jsonify(dispatch_command(ApplicationCommand.SIMULATION_STEP, session_id))
 
 
 @api_bp.post("/control/reset")
 @session_api_bp.post("/control/reset")
 def reset(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    state_actions(session_id).apply_reset_payload(get_payload(request))
-    return state_response(session_id)
+    return jsonify(
+        dispatch_command(
+            ApplicationCommand.SIMULATION_RESET,
+            session_id,
+            payload=get_payload(request),
+        )
+    )
 
 
 @api_bp.post("/config")
 @session_api_bp.post("/config")
 def update_config(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    state_actions(session_id).apply_config_payload(get_payload(request))
-    return state_response(session_id)
+    return jsonify(
+        dispatch_command(
+            ApplicationCommand.SIMULATION_CONFIGURE,
+            session_id,
+            payload=get_payload(request),
+        )
+    )
 
 
 @api_bp.post("/cells/toggle")
 @session_api_bp.post("/cells/toggle")
 def toggle_cell(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    delta = state_actions(session_id).apply_toggle_cell_payload(get_payload(request))
-    return jsonify(delta.to_dict())
+    return jsonify(
+        dispatch_command(
+            ApplicationCommand.CELL_TOGGLE,
+            session_id,
+            payload=get_payload(request),
+        )
+    )
 
 
 @api_bp.post("/cells/set")
 @session_api_bp.post("/cells/set")
 def set_cell(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    delta = state_actions(session_id).apply_set_cell_payload(get_payload(request))
-    return jsonify(delta.to_dict())
+    return jsonify(
+        dispatch_command(
+            ApplicationCommand.CELL_SET,
+            session_id,
+            payload=get_payload(request),
+        )
+    )
 
 
 @api_bp.post("/cells/set-many")
 @session_api_bp.post("/cells/set-many")
 def set_cells(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    delta = state_actions(session_id).apply_set_cells_payload(get_payload(request))
-    return jsonify(delta.to_dict())
+    return jsonify(
+        dispatch_command(
+            ApplicationCommand.CELLS_SET_MANY,
+            session_id,
+            payload=get_payload(request),
+        )
+    )

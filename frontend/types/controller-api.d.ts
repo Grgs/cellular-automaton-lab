@@ -70,6 +70,14 @@ export interface BackendRequestOptions {
     signal?: AbortSignal;
 }
 
+export interface PublicApiErrorPayload {
+    error: string;
+    code?: string;
+    limit?: number;
+    estimated_cells?: number;
+    actual_cells?: number;
+}
+
 export interface SimulationBackend {
     getState(): Promise<SimulationSnapshot>;
     getRules(): Promise<RulesResponse>;
@@ -94,6 +102,31 @@ export interface SimulationBackend {
 export interface SimulationStatePersistence {
     load(): Promise<PersistedSimulationSnapshotV5 | null>;
     save(snapshot: PersistedSimulationSnapshotV5): Promise<void>;
+}
+
+export type LiveForkCapability =
+    | {
+          kind: "supported";
+          baseSessionId: string;
+          backendFactory: (sessionId: string) => SimulationBackend;
+          /** Maximum concurrent live forks; omitted means unlimited. */
+          maxConcurrent?: number;
+      }
+    | {
+          kind: "fallback";
+          behavior: "open-in-lab";
+          explanation: string;
+      };
+
+export type PersistenceCapability =
+    | { scope: "server-session"; guarantee: "debounced-durable" }
+    | { scope: "browser-device"; guarantee: "best-effort-local" }
+    | { scope: "none"; guarantee: "ephemeral" };
+
+/** Host services and guarantees consumed by features without host-name checks. */
+export interface AppRuntimeEnvironment {
+    liveForks: LiveForkCapability;
+    persistence: PersistenceCapability;
 }
 
 export interface PostControlFunction {
@@ -121,10 +154,5 @@ export interface SetCellsRequestFunction {
 export interface InitAppOptions {
     backend?: SimulationBackend;
     bootstrapData?: AppBootstrapData | null;
-    /** Base session id the wall's live focus pane derives its child session from. */
-    paneBaseSessionId?: string | null;
-    /** Factory for the focus pane's independent backend session. */
-    paneBackendFactory?: (sessionId: string) => SimulationBackend;
-    /** Maximum concurrent live forks; undefined means unlimited. */
-    paneForkCapacity?: number;
+    runtimeEnvironment?: AppRuntimeEnvironment;
 }

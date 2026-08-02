@@ -13,7 +13,11 @@ function installPageLifecycleDisposal(): void {
     );
 }
 
-initApp({ backend: environment.backend, bootstrapData: environment.bootstrapData })
+initApp({
+    backend: environment.backend,
+    bootstrapData: environment.bootstrapData,
+    runtimeEnvironment: environment.runtimeEnvironment,
+})
     .then(() => {
         installPageLifecycleDisposal();
     })

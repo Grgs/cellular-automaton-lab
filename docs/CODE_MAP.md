@@ -21,8 +21,8 @@ For maintenance workflows and repo-owned guardrails, see [MAINTENANCE.md](./MAIN
    `register_simulation(app)` creates and stores the rule registry and session registry.
 4. [backend/web/routes.py](../backend/web/routes.py)
    HTTP entrypoints for state fetches and mutations. Server-mode simulation calls use `/api/sessions/<session_id>/...` and resolve the session coordinator lazily.
-5. [backend/web/state_actions.py](../backend/web/state_actions.py)
-   Bridges validated request payloads to simulation mutations.
+5. [backend/application_commands](../backend/application_commands)
+   Defines semantic commands and shares request decoding and domain dispatch between Flask and Pyodide.
 6. [backend/simulation/sessions.py](../backend/simulation/sessions.py)
    Owns session-id validation and per-session coordinator lifecycle/persistence paths.
 7. [backend/simulation/coordinator.py](../backend/simulation/coordinator.py)
@@ -79,7 +79,7 @@ Browser UI
   -> frontend/api.ts
   -> backend/web/routes.py (/api/sessions/<session_id>/...)
   -> backend/simulation/sessions.py
-  -> backend/web/state_actions.py
+  -> backend/application_commands/dispatcher.py
   -> backend/simulation/coordinator.py
   -> backend/simulation/service.py
   -> backend/simulation/engine.py + backend/rules/*
@@ -277,8 +277,8 @@ A self-contained overlay that runs one seed under one rule across many tilings a
 - [backend/web/routes.py](../backend/web/routes.py)
   Thin Flask routes and JSON response helpers.
   Main endpoints: `get_state()`, `get_rules()`, `get_bootstrap()`, `start()`, `pause()`, `resume()`, `step()`, `reset()`, `update_config()`, `toggle_cell()`, `set_cell()`, `set_cells()`, `compare()` (`POST /api/compare`, runs a seed sweep without mutating simulation state), `topology_preview()` (`POST /api/topology/preview`, builds one tiling with per-cell geometry for thumbnails)
-- [backend/web/state_actions.py](../backend/web/state_actions.py)
-  `StateActionService`
+- [backend/application_commands/dispatcher.py](../backend/application_commands/dispatcher.py)
+  `ApplicationCommandDispatcher`
 - [backend/web/requests.py](../backend/web/requests.py)
   `get_payload(request)`
 - [backend/contract_validation.py](../backend/contract_validation.py)
@@ -510,7 +510,7 @@ Use this list to decide where cleanup work should start. These are the files wit
 ## If You Want To Change...
 
 - HTTP endpoint behavior:
-  Start with [backend/web/routes.py](../backend/web/routes.py) and [backend/web/state_actions.py](../backend/web/state_actions.py)
+  Start with [backend/web/routes.py](../backend/web/routes.py) and [backend/application_commands](../backend/application_commands)
 - Simulation transitions or board mutation:
   Start with [backend/simulation/service.py](../backend/simulation/service.py) and [backend/simulation/service_transitions.py](../backend/simulation/service_transitions.py)
 - Rule logic:
