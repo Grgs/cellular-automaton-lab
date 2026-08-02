@@ -1,53 +1,136 @@
-# Design
+# Design: One Engine, Many Neighborhoods, Two Hosts
 
-Status: current design baseline for the development branch. Last audited against
-the implementation on August 2, 2026.
+Status: current design narrative for the development branch. Last audited
+against the implementation on August 2, 2026.
 
-This document explains why Cellular Automaton Lab is shaped the way it is. For
-current subsystem structure, read [ARCHITECTURE.md](ARCHITECTURE.md). For file
-and call-path navigation, read [CODE_MAP.md](CODE_MAP.md).
+This document explains how the product problem leads to the current design. It
+is a reasoning journey, not a claim about the chronological history of the
+repository. For current subsystem structure, read
+[ARCHITECTURE.md](ARCHITECTURE.md). For file and call-path navigation, read
+[CODE_MAP.md](CODE_MAP.md).
 
-## Product Problem
+## The Grid Is The First Limitation
 
-Cellular automata are often implemented as algorithms tied to one regular grid.
-That makes it difficult to compare the same rule or seed across square,
-periodic mixed, and aperiodic neighborhoods. This app instead treats topology
-as data: a board supplies stable cells and neighbor relationships, while a rule
-evaluates a cell through a shared neighbor context.
+A conventional cellular automaton often lets its storage representation define
+its world. A cell is an array position; its neighbors are calculated from row
+and column offsets; the rule is written with that grid in mind. This is simple
+and efficient, but it makes the square grid part of the meaning of the
+simulation.
 
-The application also needs two useful delivery modes:
+Cellular Automaton Lab starts from a different product question: what happens
+when the same rule or seed is placed on regular, periodic mixed, and aperiodic
+neighborhoods?
 
-- a local server mode with durable Python-owned sessions and an HTTP API
-- a static-site mode that can be published to GitHub Pages and used without a
-  separately running Python server
+That question rules out an engine built around one privileged array shape. In
+this application, a topology defines the cells and their neighbor
+relationships. Simulation state assigns values to those cells, and a rule
+evaluates a cell through a shared `RuleContext`. Stable cell IDs and adjacency
+are therefore model contracts, not rendering details.
 
-The static mode does not remove Python from the system. It runs the same Python
-simulation code inside the browser through Pyodide.
+This topology-first model gives the application its defining capability:
+topology construction can vary without rewriting the simulation loop. It also
+creates new obligations. Mixed tilings may attach meaning to cell kinds, and
+aperiodic families may need specialized construction and verification. A rule
+that depends on those properties must declare its compatibility rather than
+quietly assuming a square neighborhood.
 
-## Goals
+## One Meaning Of A Simulation
 
-- Apply one rule protocol across regular, periodic, and aperiodic topologies.
-- Keep simulation semantics in one Python implementation across both hosts.
-- Let the same TypeScript UI run against either an HTTP backend or a browser
-  worker.
-- Make topology and rule metadata canonical, inspectable, and testable.
-- Support a public static demo without maintaining a second simulation engine.
-- Keep mathematical faithfulness, internal geometric validity, and visible
-  rendering quality as separate claims with separate evidence.
-- Keep the repository usable as a plain Python codebase without Flask or a
-  browser when callers only need topology, rules, or simulation services.
+Making topology explicit solves the grid problem, but raises a more important
+one. The topology builders are now part of the meaning of the simulation. Some
+encode mathematical constructions; rules, transitions, snapshot validation,
+and comparison calculations all depend on them.
 
-## Non-Goals
+If the server and browser had separate implementations of that behavior, a
+named rule or tiling could gradually mean different things in each environment.
+Every feature would become a parity exercise, and correctness fixes would have
+to land twice.
 
-- A stable public Python, npm, or plugin API during the preview release line.
-- Multi-user server collaboration or cloud-synchronized browser preferences.
-- Arbitrary untrusted Python execution in the browser.
-- Treating every aperiodic family as the same kind of construction.
-- Making the generated standalone directory work when opened directly with a
-  `file://` URL. Workers, module loading, and fetched assets require an HTTP
-  origin, even when that origin is a local static server.
+The design therefore keeps simulation semantics in Python. Python owns topology
+construction, rule evaluation, transitions, snapshot validation, and comparison
+calculations. The repository can also use this core without Flask or a browser
+when a test, script, or caller needs only topology, rules, or simulation
+services.
 
-## Architecture At A Glance
+This is the first major bargain in the design: one correctness-sensitive engine
+is worth more than the smallest possible browser bundle. That bargain becomes
+challenging as soon as the application needs more than one way to run.
+
+## The Need To Run In Two Places
+
+A local Python application has a natural delivery model. Flask can expose the
+Python services over HTTP, serve the built frontend, and coordinate durable
+server-owned sessions. Kept thin, it is a useful adapter without becoming the
+domain model. Route wiring, request extraction, response wrappers, and server
+startup belong to Flask; simulation behavior does not.
+
+But a public laboratory should also be easy to publish and explore. Requiring
+every visitor to install Python or depend on a continuously operated application
+server would make the experiment harder to share. A static artifact suitable
+for GitHub Pages offers a second, valuable delivery mode.
+
+Static hosting appears to conflict with a Python-owned engine. There are three
+obvious responses:
+
+1. rewrite the simulation in TypeScript
+2. attempt to run the Flask application in the browser
+3. run the framework-neutral Python core in the browser
+
+The first creates two simulation engines. The second carries server-side HTTP
+and WSGI concepts into an environment where they add no value. The design takes
+the third path: the standalone build packages the Python sources and a pinned
+Pyodide runtime, then runs them inside a Web Worker.
+
+The worker is important. Python startup and simulation work do not take over the
+UI thread, and worker messages create an explicit boundary around runtime state.
+The result is a static application with no separately running Python backend
+process, although Python still executes locally in the user's browser.
+
+The standalone artifact includes its Python sources, Python standard library
+archive, Pyodide runtime, bootstrap metadata, and frontend assets. It has no CDN
+runtime dependency. Like most worker- and module-based applications, it must be
+served from an HTTP origin rather than opened with `file://`; a basic local
+static server is sufficient.
+
+At this point the system has one engine, but two hosts:
+
+| Concern | Server host | Standalone host |
+|---|---|---|
+| Python execution | CPython process | Pyodide in a Web Worker |
+| Transport | Flask HTTP routes | Worker messages using API-shaped paths |
+| Simulation authority | Session coordinator | Worker-local runtime |
+| Run loop | Backend coordinator thread | Worker timers |
+| Simulation persistence | Backend session store | IndexedDB, with `localStorage` fallback |
+| Deployment | Python process plus built assets | Static HTTP hosting |
+
+Flask enables the server-hosted application. Pyodide enables the standalone
+application. Neither is the application core.
+
+## Preventing Two Hosts From Becoming Two Products
+
+Solving execution creates the next problem. Two transports and two lifecycle
+models can easily grow into two user interfaces, two payload conventions, and
+two sets of defaults.
+
+The frontend therefore depends on a `SimulationBackend` contract rather than on
+`fetch`, Flask, or Pyodide directly. The HTTP adapter speaks to Flask. The worker
+adapter sends API-shaped commands to the browser runtime. Host selection happens
+when the frontend environment is created; the controller stack follows the same
+path afterward.
+
+Authored sources follow the same rule. `frontend/` is the only authored
+frontend tree. Server and standalone wrappers consume the same shell body.
+Canonical defaults and topology metadata come from backend-owned sources, with
+Flask injecting server bootstrap data and the standalone build emitting JSON.
+`static/dist/` and `output/standalone/` are generated products, not alternative
+places to edit the application.
+
+This boundary is intentionally constraining. A new operation normally needs
+both host adapters, payload drift must be caught at the Python/TypeScript
+boundary, and host-specific behavior still needs focused tests. In exchange,
+the two delivery modes remain one product rather than similar-looking forks.
+
+The architecture that follows from the journey is:
 
 ```mermaid
 flowchart LR
@@ -64,255 +147,192 @@ flowchart LR
 ```
 
 The important boundary is not “Python versus browser.” It is the host adapter
-around a shared simulation contract. Flask is one adapter. The Pyodide worker
-is another.
+around shared simulation behavior.
 
-## Runtime Hosts
+## Deciding Who Owns The Truth
 
-| Concern | Server host | Standalone host |
-|---|---|---|
-| Python execution | CPython process | Pyodide in a Web Worker |
-| Transport | Flask HTTP routes | Worker messages using API-shaped paths |
-| Simulation authority | Session coordinator | Worker-local runtime |
-| Run loop | Backend coordinator thread | Worker timers |
-| Simulation persistence | Backend session store | IndexedDB, with `localStorage` fallback |
-| UI preferences and saved wall runs | Browser storage | Browser storage |
-| Frontend | Shared shell and controller stack | Shared shell and controller stack |
-| Deployment | Python process plus built assets | Static HTTP hosting |
+A shared interface does not by itself answer who owns state. If the frontend
+evolves cells optimistically while Python also evolves them, there are two
+simulation authorities. If every small edit transfers a complete board, the
+authority is clear but the protocol is wasteful.
 
-The standalone artifact includes the pinned Pyodide runtime, Python standard
-library archive, application Python sources, bootstrap metadata, and frontend
-assets. It does not need a CDN or other runtime download. It still needs to be
-served over HTTP; `python -m http.server` is sufficient for a local artifact.
-
-## Design Decisions
-
-### 1. Make topology a first-class model
-
-Decision: boards store cells aligned to an explicit topology, and rules query a
-`RuleContext` instead of indexing a particular grid shape.
-
-Why: the product's defining behavior is comparing one simulation idea across
-different neighborhoods. A square-grid-specific engine with special cases for
-other tilings would make the catalog increasingly fragile.
-
-Consequences:
-
-- stable cell IDs and adjacency are part of the model contract
-- topology construction can be tested independently of simulation and UI
-- some topology families need specialized generation and verification paths
-- rules that depend on cell kinds must declare compatibility explicitly
-
-### 2. Keep simulation semantics in Python
-
-Decision: Python owns topology construction, rule evaluation, transitions,
-snapshot validation, and comparison calculations in both runtime hosts.
-
-Why: the topology implementations and their mathematical verification already
-live naturally in Python. Reimplementing them in TypeScript for a static demo
-would create two sources of truth and invite host-specific behavior.
-
-Consequences:
-
-- server mode uses normal CPython and can expose a conventional HTTP boundary
-- standalone mode pays Pyodide startup and bundle-size costs
-- browser-facing Python must avoid dependencies unavailable in the packaged
-  Pyodide runtime
-- shared payload contracts matter more than framework-specific request objects
-
-### 3. Use Flask as a thin server adapter
-
-Decision: Flask owns route wiring, request/response concerns, app startup, and
-server-host asset delivery. Simulation behavior belongs below the Flask layer.
-
-Why: Flask provides a small, direct local HTTP host without forcing the domain
-model into a larger web framework. Keeping its routes thin also lets the same
-services run in tests, scripts, and Pyodide.
-
-Consequences:
-
-- Flask enables the server-hosted app, not the static standalone app
-- request extraction and response wrappers are server-only concerns
-- payload normalization and simulation validation must stay framework-neutral
-- the plain Python examples can use the simulation stack without constructing a
-  Flask application
-
-### 4. Use Pyodide and a Web Worker for static hosting
-
-Decision: the standalone build packages Python sources and a pinned Pyodide
-runtime, then runs the simulation in a classic Web Worker.
-
-Why: this preserves one simulation implementation while making the app
-deployable as static files. A worker prevents simulation and Python startup
-from owning the UI thread.
-
-Consequences:
-
-- there is no separately running Python backend process
-- Python still executes locally in the user's browser
-- worker startup is heavier than a JavaScript-only application
-- worker messages must be serializable and explicitly decoded
-- browser-local persistence replaces server session persistence
-- operations are serialized within the worker to protect runtime state
-
-### 5. Keep the frontend host-neutral
-
-Decision: frontend controllers depend on `SimulationBackend`, not on `fetch`,
-Flask, or Pyodide directly. The worker command paths mirror the HTTP API where
-the operations are equivalent.
-
-Why: the UI should not fork into server and standalone implementations. Host
-selection happens when the environment is constructed; the controller stack
-then follows the same path.
-
-Consequences:
-
-- UI behavior can be exercised against both hosts with shared browser journeys
-- HTTP-only behavior, such as server restart persistence, remains host-specific
-- payload drift between Python and TypeScript needs contract fixtures and strict
-  runtime decoding
-- new operations normally require both adapters even when the UI change is
-  shared
-
-### 6. Make state ownership and reconciliation explicit
-
-Decision: the active runtime is authoritative for simulation state. The
+The active Python runtime is therefore authoritative for simulation state. The
 frontend caches snapshots for rendering and applies only validated, revisioned
-deltas.
+deltas. Control mutations return canonical snapshots. Cell mutations may return
+deltas carrying `base_state_revision`, `state_revision`, and `state_epoch`. A
+revision mismatch triggers a full-state resynchronization instead of a guessed
+merge. Revisions are runtime-local and intentionally not persisted.
 
-Why: optimistic local evolution would create competing simulation authorities.
-Full snapshots for every cell edit, however, are unnecessarily expensive.
+Persistence follows ownership rather than being made artificially identical:
 
-Consequences:
-
-- control mutations return canonical snapshots
-- cell mutations may return deltas carrying `base_state_revision`,
-  `state_revision`, and `state_epoch`
-- a mismatch causes a full-state resynchronization rather than a guessed merge
-- revisions are runtime-local and intentionally not persisted
-
-### 7. Share authored shell and bootstrap sources
-
-Decision: `frontend/` is the only authored frontend source tree. Server and
-standalone wrappers consume the same shell body, and canonical defaults and
-topology metadata are exported from backend-owned sources.
-
-Why: copying HTML, defaults, or catalog metadata between hosts would make
-apparently small changes host-dependent.
-
-Consequences:
-
-- `static/dist/` and `output/standalone/` are generated outputs
-- Flask injects server bootstrap data, while the standalone build emits JSON
-- generated-data freshness is a CI and maintenance concern
-- the frontend may have a fallback for startup safety, but it is not an
-  independent product configuration
-
-### 8. Separate persistence by ownership
-
-Decision: simulation snapshots are persisted by the active runtime host.
-Interface preferences, saved comparison runs, and saved tiling sets are stored
-by the browser.
-
-Why: server simulation recovery and user-interface preferences have different
-lifetimes and portability expectations. Treating browser storage as a server
-database would obscure those boundaries.
-
-Consequences:
-
-- server simulation sessions can survive process restarts through backend
-  persistence
-- standalone simulation state survives reload through browser storage
-- saved UI data remains local to one browser and device
+- the server host persists simulation snapshots through its backend session
+  store
+- the standalone host persists simulation snapshots in browser storage
+- the browser owns interface preferences, saved comparison runs, and saved
+  tiling sets in both modes
 - portable run links are the cross-device sharing format
 
-### 9. Distinguish validation from faithfulness
+The two hosts consequently offer different guarantees. Server sessions can
+survive process restarts through backend persistence. Standalone state survives
+reload on one browser and device. Static hosting does not imply server session
+isolation, cloud synchronization, or an account system.
 
-Decision: geometric validation, source-backed literature verification, and
-browser-visible review are separate layers.
+## Expanding The Meaning Of Correct
 
-Why: a topology can be internally consistent but represent the wrong published
-construction, and a mathematically sound patch can still render poorly.
+Unusual topology introduces one final design pressure: “the program did not
+crash” is a very weak definition of correctness.
 
-Consequences:
+A topology can have internally consistent polygons and adjacency while still
+representing the wrong published construction. A mathematically sound finite
+patch can still render badly, expose misleading metadata, or behave poorly in
+the picker. The project therefore treats three claims separately:
 
-- topology validation answers whether emitted geometry and adjacency are sane
-- reference specs state falsifiable family-specific expectations
-- known deviations are documented instead of hidden behind a generic pass
-- visual promotion of experimental families requires independent review, not
-  only fixtures generated from the implementation itself
+1. **Geometric validity:** emitted geometry, IDs, and adjacency are internally
+   sane.
+2. **Literature faithfulness:** the construction satisfies falsifiable,
+   source-backed expectations for its family.
+3. **Visible quality:** the topology renders and interacts acceptably in the
+   actual application.
 
-### 10. Prefer layered tests over browser-only confidence
+The testing strategy mirrors those claims. Pure logic belongs in unit tests;
+payload boundaries in API and contract tests; topology claims in validators and
+reference checks; real DOM, canvas, storage, and host behavior in Playwright.
+Server and standalone modes share user-flow coverage where their behavior
+should match, while host-specific guarantees receive focused coverage.
 
-Decision: pure logic is proven with unit tests, payload boundaries with API and
-contract tests, topology claims with validators and reference checks, and real
-DOM/canvas/storage behavior with Playwright.
+This layered approach is not merely an optimization for test speed. It keeps a
+green browser journey from being mistaken for mathematical evidence, and keeps
+implementation-generated fixtures from being the only judge of the
+implementation that generated them.
 
-Why: failures should be caught at the cheapest layer that can explain them.
-Browser tests are valuable for integration but expensive and imprecise for pure
-logic.
+## The Current Bargain
 
-Consequences:
+The current design makes a deliberate set of trades:
 
-- server and standalone share user-flow coverage where behavior should match
-- host-specific behavior has focused coverage
-- generated standalone freshness is checked before relying on browser results
-- a green browser test does not replace mathematical or payload verification
+- It accepts Pyodide artifact size and cold-start latency to keep one Python
+  simulation engine.
+- It accepts two host adapters to make both a durable local server and a static
+  public application possible.
+- It accepts explicit IDs, sparse state, and specialized builders rather than
+  forcing mixed and aperiodic neighborhoods into dense rectangular arrays.
+- It accepts host-specific persistence guarantees instead of pretending local
+  browser storage is a server database.
+- It accepts that topology families have different proof strengths. Exact
+  substitutions, exact-affine constructions, canonical finite patches, and
+  documented deviations must not be presented as equivalent claims.
+- During the preview release line, it accepts repository source and generated
+  artifacts as the integration surface rather than promising a stable Python,
+  npm, or plugin API.
 
-## Alternatives Not Chosen
+These are costs of the product the project has chosen to build, not incidental
+implementation details. They should be reconsidered if the product problem
+changes.
 
-### Rewrite the standalone simulation in TypeScript
+## Where The Design Is Heading
 
-This would reduce startup and bundle weight, but it would duplicate the largest
-and most correctness-sensitive part of the codebase. Host parity would become a
-continuous comparison problem. The current design accepts Pyodide's cost to
-preserve one simulation model.
+The following items are design direction, not descriptions of completed work or
+compatibility promises. They express how the current boundaries should become
+clearer without changing the central one-engine, two-host model.
 
-### Run Flask inside the browser
+### Intended direction
 
-Flask depends on server-side HTTP and WSGI concepts that do not provide value
-inside a worker. The standalone runtime bypasses Flask request and response
-objects while reusing framework-neutral payload and simulation contracts.
+1. **Converge application commands below the transports.** Flask routes and
+   worker messages should increasingly decode, dispatch to the same
+   framework-neutral command handlers, and encode the result. This reduces
+   orchestration drift without pretending the transports have identical
+   lifecycles.
+2. **Make host capabilities explicit.** Features should ask whether the active
+   host offers a capability—such as durable sessions or a particular
+   persistence guarantee—instead of accumulating scattered server-versus-worker
+   conditionals.
+3. **Strengthen the payload contract.** Python and TypeScript should move toward
+   a more canonical, mechanically checked schema for shared commands,
+   snapshots, deltas, and errors. Generated types are an option, not yet a
+   settled implementation choice.
 
-### Maintain separate server and standalone UIs
+These directions should enter the active roadmap only when scoped for delivery.
+Until then, current behavior documented in [ARCHITECTURE.md](ARCHITECTURE.md)
+remains authoritative.
 
-This would make each host easier to customize locally but would double product
-work and allow visible behavior to diverge. A host-neutral controller boundary
-is more constrained but keeps the two delivery modes comparable.
+### Open questions
 
-### Store boards as dense rectangular arrays
+- At what point would Pyodide startup or artifact size outweigh the value of a
+  single simulation implementation?
+- Which persistence guarantees, if any, should become portable across hosts and
+  devices?
+- Would a third host validate the adapter boundary, or reveal that the contract
+  is too closely shaped around HTTP?
+- Can more topology verification be derived from independent source data
+  without mistaking generated fixtures for independent evidence?
 
-Dense arrays are simple for square grids but do not naturally represent mixed
-faces or finite aperiodic patches. Stable topology cell IDs and sparse state
-maps are more general, at the cost of explicit indexing and migration rules.
+An open question is deliberately not a promise. It records a pressure future
+maintainers are likely to encounter and the assumptions that should be tested
+before changing the design.
 
-## Current Constraints And Tradeoffs
+## Boundaries And Non-Goals
 
-- Pyodide increases standalone artifact size and cold-start latency.
-- Static mode cannot provide server session isolation or backend restart
-  semantics; each worker environment is local to the page.
-- Browser storage is not a cross-device account system.
-- Some topology families are exact substitutions, some exact-affine
-  constructions, some canonical finite patches, and some documented
-  deviations. The UI and docs must not imply equal proof strength.
-- The preview release line treats repository source and generated artifacts as
-  the public integration surface. Compatibility may change before stable
-  packaging exists.
+The current design does not attempt to provide:
+
+- a stable public Python, npm, or plugin API during the preview release line
+- multi-user server collaboration
+- cloud-synchronized browser preferences or an account-backed state store
+- arbitrary untrusted Python execution in the browser
+- one generic construction or proof technique for every aperiodic family
+- a standalone directory that works when opened directly with `file://`
+
+These are boundaries, not declarations that the features can never exist. Each
+would introduce a new product problem and should earn its own design journey.
+
+## Decision Index
+
+This index is the short reference view of the design. The narrative above is
+the rationale.
+
+| # | Durable decision | Practical implication |
+|---|---|---|
+| 1 | Topology is a first-class model. | Boards use stable cells and explicit adjacency; rules query `RuleContext`. |
+| 2 | Python owns simulation semantics in both hosts. | Topology, rules, transitions, validation, and comparisons have one implementation. |
+| 3 | Flask is a thin server adapter. | HTTP concerns stay at the edge; domain behavior remains framework-neutral. |
+| 4 | Pyodide runs Python in a Web Worker for static hosting. | Standalone needs no Python server, but pays startup and bundle-size costs. |
+| 5 | The frontend is host-neutral. | Controllers depend on `SimulationBackend`; HTTP and worker details live in adapters. |
+| 6 | The active runtime owns simulation truth. | The UI applies revisioned results and resynchronizes instead of guessing after conflicts. |
+| 7 | Authored shell, defaults, and metadata have canonical sources. | Server and standalone outputs are generated from shared source rather than edited separately. |
+| 8 | Persistence follows state ownership. | Runtime state and browser-owned preferences have different stores and guarantees. |
+| 9 | Geometric validity, literature faithfulness, and visible quality are separate claims. | Each claim requires appropriate, independent evidence. |
+| 10 | Tests are layered by the kind of confidence they provide. | Unit, contract, topology, and browser tests complement rather than replace one another. |
+
+## Alternatives Rejected By The Current Design
+
+**Rewrite the standalone simulation in TypeScript.** This would reduce startup
+and bundle weight, but duplicate the most correctness-sensitive part of the
+codebase and turn host parity into permanent work.
+
+**Run Flask inside the browser.** Flask's server-side HTTP and WSGI concepts do
+not add value inside a worker. The standalone runtime reuses behavior below
+Flask rather than emulating a server around it.
+
+**Maintain separate server and standalone interfaces.** This would make local
+host customization easier but double product work and allow visible behavior to
+diverge.
+
+**Store every board as a dense rectangular array.** Dense arrays are convenient
+for square grids but do not naturally represent mixed faces or finite aperiodic
+patches. Stable topology IDs and sparse state are more general, at the cost of
+explicit indexing and migration rules.
 
 ## Keeping This Document Current
 
-Update this document when a change alters a product-level constraint, runtime
-host, source-of-truth boundary, state owner, persistence owner, or deliberately
-chosen tradeoff. Implementation-only movement belongs in
+Update this document when a change alters the product problem, a runtime host,
+a source-of-truth boundary, state or persistence ownership, a durable tradeoff,
+or an intended design direction. Do not rewrite the narrative for
+implementation-only movement; that belongs in
 [ARCHITECTURE.md](ARCHITECTURE.md) or [CODE_MAP.md](CODE_MAP.md).
 
-For a new durable decision, add or revise a numbered decision above with:
+When adding a future direction, label it as intended or open rather than
+describing it as current. When a direction is implemented, move its concrete
+behavior into the narrative and decision index. If it is abandoned, remove it
+or record the reason when future maintainers might otherwise propose it again.
 
-1. the decision
-2. the reason it exists
-3. its important consequences
-4. any alternative that future maintainers are likely to reconsider
-
-Record completed work in [CHANGELOG.md](../CHANGELOG.md), active follow-up in
-[TODO.md](../TODO.md), and structural cleanup priorities in
+Record completed work in [CHANGELOG.md](../CHANGELOG.md), active delivery work
+in [TODO.md](../TODO.md), and structural cleanup priorities in
 [CODE_QUALITY_ROADMAP.md](CODE_QUALITY_ROADMAP.md).
