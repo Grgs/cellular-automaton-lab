@@ -10,6 +10,13 @@ need without grepping for filenames.
 | [ONBOARDING.md](ONBOARDING.md) | First-time decision tree: *"I want to do X — read Y, run Z"* |
 | [../examples/README.md](../examples/README.md) | Five short runnable Python scripts (build a patch, run a sim, render SVG, ...) |
 
+## Using the app
+
+| Doc | What it is |
+|---|---|
+| [COMPARISON_WALL.md](COMPARISON_WALL.md) | Configure, play, edit, fork, analyze, save, and share comparison-wall runs |
+| [standalone-browser-runtime.md](standalone-browser-runtime.md) | How the Pyodide-in-browser path works |
+
 ## Architecture
 
 | Doc | What it is |
@@ -17,7 +24,6 @@ need without grepping for filenames.
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Runtime boundaries: backend / frontend / standalone; request flow |
 | [CODE_MAP.md](CODE_MAP.md) | File-level navigation; "if you want to change X, look at Y" |
 | [TILING_ARCHITECTURE_NOTES.md](TILING_ARCHITECTURE_NOTES.md) | How the tiling family system is layered (registry, builder, reference spec) |
-| [standalone-browser-runtime.md](standalone-browser-runtime.md) | How the Pyodide-in-browser path works |
 
 ## Add new content
 

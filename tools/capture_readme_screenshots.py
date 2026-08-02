@@ -23,7 +23,7 @@ from tools.render_review.browser_support.render_review import (
 )
 
 DEFAULT_OUTPUT_DIR = ROOT_DIR / "docs" / "images"
-VIEWPORT: ViewportSize = {"width": 1440, "height": 980}
+VIEWPORT: ViewportSize = {"width": 1440, "height": 810}
 TIMEOUT_MS = 60_000
 
 
@@ -80,26 +80,13 @@ def _capture_compare_results(page: Page, output_dir: Path) -> None:
     page.locator(".wall-page").wait_for(state="visible", timeout=TIMEOUT_MS)
     # Configuration lives in a bottom sheet the dock gear slides up.
     page.locator('.compare-dock-icon[aria-label="Configure the run"]').click(timeout=TIMEOUT_MS)
-    setup_panel = page.locator("#compare-config-panel-setup")
-    selects = setup_panel.locator("select.compare-field")
-    selects.nth(1).select_option("acorn", timeout=TIMEOUT_MS)
-    setup_panel.locator("input.compare-field").evaluate_all(
-        """(inputs) => {
-            const numberInputs = inputs.filter((input) => input instanceof HTMLInputElement && input.type === "number");
-            const steps = numberInputs[0];
-            const gridSize = numberInputs[1];
-            if (steps) {
-                steps.value = "120";
-                steps.dispatchEvent(new Event("input", { bubbles: true }));
-                steps.dispatchEvent(new Event("change", { bubbles: true }));
-            }
-            if (gridSize) {
-                gridSize.value = "18";
-                gridSize.dispatchEvent(new Event("input", { bubbles: true }));
-                gridSize.dispatchEvent(new Event("change", { bubbles: true }));
-            }
-        }"""
+    page.get_by_label("Comparison seed", exact=True).select_option(
+        "r-pentomino", timeout=TIMEOUT_MS
     )
+    for label, value in (("Analysis steps", "10"), ("Grid size", "22")):
+        field = page.get_by_label(label)
+        field.fill(value, timeout=TIMEOUT_MS)
+        field.dispatch_event("change")
     page.locator('.compare-dock-icon[aria-label="Analyze the tilings"]').click(timeout=TIMEOUT_MS)
     analysis_overlay = page.locator(".compare-analysis-overlay")
     analysis_overlay.wait_for(state="visible", timeout=TIMEOUT_MS)
@@ -107,44 +94,36 @@ def _capture_compare_results(page: Page, output_dir: Path) -> None:
         timeout=TIMEOUT_MS
     )
     page.locator(".compare-grid tbody tr").nth(0).wait_for(state="visible", timeout=TIMEOUT_MS)
-    # Flatten the modal overlay into a static full-width panel of just the
-    # portrait and table for the README hero.
+    # Tighten the real analysis panel for a legible README capture. The thicker
+    # traces compensate for GitHub scaling the 1000px panel down on narrow pages.
     page.add_style_tag(
         content="""
-            .compare-analysis-overlay {
-                position: static !important;
-                padding: 0 !important;
-            }
-            .compare-analysis-backdrop {
-                display: none !important;
-            }
             .compare-analysis-panel {
-                width: 100% !important;
+                width: min(1080px, calc(100% - 48px)) !important;
                 max-height: none !important;
-                box-shadow: none !important;
+                background: #fbf8f1 !important;
             }
             .compare-analysis-body {
                 overflow: visible !important;
                 max-height: none !important;
             }
-            .wall-screen,
-            .compare-analysis-header,
             .compare-intro,
             .compare-run-secondary {
                 display: none !important;
             }
-            html,
-            body,
-            .compare-content {
-                overflow: visible !important;
-                height: auto !important;
+            .compare-portrait {
+                max-height: 280px !important;
+            }
+            .compare-portrait__line {
+                stroke-width: 2.6 !important;
+                opacity: 1 !important;
             }
         """
     )
-    _save_optimized_png(
+    _save_locator_png(
         page,
+        ".compare-analysis-panel",
         output_dir / "readme-compare-results-hero.png",
-        full_page=True,
     )
 
 
@@ -171,16 +150,11 @@ def _capture_uniform_2_3_workspace(page: Page, output_dir: Path) -> None:
     _save_optimized_png(page, output_dir / "readme-uniform-2-3-overview.png")
 
 
-def _capture_pinwheel_workspace(page: Page, output_dir: Path) -> None:
+def _capture_picker_thumbnails(page: Page, output_dir: Path) -> None:
     select_tiling_family(page, "pinwheel", timeout_ms=TIMEOUT_MS)
     _wait_ready(page)
     set_patch_depth(page, 3, timeout_ms=TIMEOUT_MS)
     _wait_ready(page)
-    page.evaluate("window.scrollTo(0, 0)")
-    _save_optimized_png(page, output_dir / "readme-pinwheel-overview.png")
-
-
-def _capture_picker_thumbnails(page: Page, output_dir: Path) -> None:
     _click(page, "#tiling-picker-toggle")
     page.locator("#tiling-picker-menu").wait_for(state="visible", timeout=TIMEOUT_MS)
     search = page.locator("#tiling-picker-menu .tiling-picker-search")
@@ -201,18 +175,17 @@ window.localStorage.setItem(
 """
 
 
-def capture_readme_screenshots(output_dir: Path) -> None:
+def capture_readme_screenshots(output_dir: Path, selected_scenarios: set[str]) -> None:
     ensure_current_standalone_build(str(ROOT_DIR))
     # Each scenario: (capture, route, seed_demo_seen). Editor scenarios open the
     # Lab route; wall scenarios land on the bare URL. Pre-seeding the demo flag
     # keeps the featured demo from racing a scripted setup — only the wall hero
     # wants the demo (reduced motion parks it on a lively still frame).
-    scenarios: tuple[tuple[Callable[[Page, Path], None], str, bool], ...] = (
-        (_capture_wall_hero, "", False),
-        (_capture_compare_results, "", True),
-        (_capture_uniform_2_3_workspace, "#/lab", True),
-        (_capture_pinwheel_workspace, "#/lab", True),
-        (_capture_picker_thumbnails, "#/lab", True),
+    scenarios: tuple[tuple[str, Callable[[Page, Path], None], str, bool], ...] = (
+        ("wall", _capture_wall_hero, "", False),
+        ("analysis", _capture_compare_results, "", True),
+        ("uniform", _capture_uniform_2_3_workspace, "#/lab", True),
+        ("picker", _capture_picker_thumbnails, "#/lab", True),
     )
     host = StandaloneRuntimeHost()
     host.start()
@@ -220,7 +193,9 @@ def capture_readme_screenshots(output_dir: Path) -> None:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
             try:
-                for scenario, route, seed_demo_seen in scenarios:
+                for name, scenario, route, seed_demo_seen in scenarios:
+                    if selected_scenarios and name not in selected_scenarios:
+                        continue
                     context = browser.new_context(
                         viewport=VIEWPORT,
                         device_scale_factor=1,
@@ -250,12 +225,19 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_OUTPUT_DIR,
         help=f"directory for captured PNGs (default: {DEFAULT_OUTPUT_DIR})",
     )
+    parser.add_argument(
+        "--scenario",
+        action="append",
+        choices=("wall", "analysis", "uniform", "picker"),
+        default=[],
+        help="capture only this named scenario; repeat to select more than one",
+    )
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
-    capture_readme_screenshots(args.output_dir)
+    capture_readme_screenshots(args.output_dir, set(args.scenario))
     return 0
 
 
