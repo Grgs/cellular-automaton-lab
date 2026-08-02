@@ -26,13 +26,13 @@ Cellular Automaton Lab is a browser-based playground built around topology-first
 
 | Compare | Explore | Extend |
 |:--|:--|:--|
-| Run one seed on several tilings in lockstep, then inspect how their populations diverge. | Move through 56 shipped tiling families, from square and hex grids to Penrose, Pinwheel, Hat, Turtle, and Spectre patches. | Add rules and topologies behind one shared `next_state(ctx)` protocol instead of building a new simulator for every lattice. |
+| Run one seed on several tilings in lockstep, then inspect how their populations diverge. | Move through 68 shipped tiling families, from square and hex grids to Penrose, Pinwheel, Hat, Turtle, and Spectre patches. | Add rules and topologies behind one shared `next_state(ctx)` protocol instead of building a new simulator for every lattice. |
 
 ### Highlights
 
 - a comparison wall with synchronized playback, speaker view, live forks, editable seeds, saved runs, and portable run links
-- 56 tiling families: 3 regular grids, 29 periodic mixed tilings, and 24 aperiodic patches
-- 16 built-in Life-like, mixed-tiling, excitable, and signal rules
+- 68 tiling families: 3 regular grids, 41 periodic mixed tilings, and 24 aperiodic patches
+- 15 built-in Life-like, mixed-tiling, excitable, and signal rules
 - canvas editing with brush, line, rectangle, fill, undo/redo, presets, and pattern import/export
 - sparse pattern persistence keyed by stable topology cell IDs
 - a standalone Pyodide build that runs the Python simulation stack directly in the browser
@@ -74,7 +74,9 @@ For speaker view, live forks, shared-seed editing, analysis, saved runs, and rou
 - Pattern files store sparse `cells_by_id` payloads instead of dense grid-only formats.
 - The static demo runs the same Python simulation model in a browser worker through Pyodide.
 
-Read [Architecture](docs/ARCHITECTURE.md) for runtime boundaries or the [Code map](docs/CODE_MAP.md) for file-level navigation.
+Read [Design](docs/DESIGN.md) for the choices and tradeoffs behind the app,
+[Architecture](docs/ARCHITECTURE.md) for current runtime boundaries, or the
+[Code map](docs/CODE_MAP.md) for file-level navigation.
 
 ## Quick start
 
@@ -95,17 +97,23 @@ Then open [http://127.0.0.1:5000](http://127.0.0.1:5000). For virtual-environmen
 |:--|:--|
 | Use the comparison wall | [Comparison wall guide](docs/COMPARISON_WALL.md) |
 | Find the right setup or test command | [Onboarding](docs/ONBOARDING.md) · [Testing changes](docs/TESTING_CHANGES.md) |
-| Understand the system | [Architecture](docs/ARCHITECTURE.md) · [Code map](docs/CODE_MAP.md) |
+| Understand why the system is designed this way | [Design](docs/DESIGN.md) |
+| Understand the current implementation | [Architecture](docs/ARCHITECTURE.md) · [Code map](docs/CODE_MAP.md) |
 | Add a rule, topology, or preset | [Adding rules](docs/ADDING_RULES.md) · [Adding topologies](docs/ADDING_TOPOLOGIES.md) · [Adding presets](docs/ADDING_PRESETS_AND_PATTERNS.md) |
 | Use the Python subsystems directly | [Runnable examples](examples/README.md) |
 | Contribute | [Contributing guide](CONTRIBUTING.md) |
 
 ## Preview status
 
-The current public release is the `v0.5.0` preview. It is ready for evaluation, local experimentation, and contribution, but it does not promise long-term API or feature stability yet.
+The latest tagged public release is the `v0.5.0` preview; current development
+targets `v0.6.0`. The project is ready for evaluation, local experimentation,
+and contribution, but it does not promise long-term API or feature stability
+yet.
 
 - Releases ship as tagged source, the GitHub Pages standalone demo, and local source checkout; there is no npm or PyPI package yet.
-- The standalone demo needs network access because it loads Pyodide from a CDN.
+- Current standalone builds package the pinned Pyodide runtime and application
+  Python sources with the site. They need an HTTP origin, but no separate
+  Python server or runtime CDN.
 - Mathematical and rendering qualifications are tracked in [Tiling known deviations](docs/TILING_KNOWN_DEVIATIONS.md); active follow-up work lives in [TODO.md](TODO.md).
 
 Cellular Automaton Lab is available under the [MIT License](LICENSE).

@@ -4,12 +4,18 @@ Active work. Completed work lives in [CHANGELOG.md](CHANGELOG.md).
 
 ## Public Release Follow-up
 
-The `v0.4.0` public preview has been released (after `v0.1.0`, `v0.2.0`, and `v0.3.0`). Keep this section for follow-up work that affects future preview releases or the published standalone demo.
+The `v0.5.0` public preview is the latest tagged release. Current development
+targets `v0.6.0`. Keep this section for follow-up work that affects future
+preview releases or the published standalone demo.
 
 ### Current preview limitations
 
-- Keep `dodecagonal-square-triangle` documented as a decorated `3.12.12` Archimedean generator, not a canonical Schlottmann quasi-periodic marked-prototile implementation.
-- Keep the standalone public demo's Pyodide CDN dependency documented until full offline bundling is implemented.
+- Keep `socolar-hexagonal` in the `Experimental` picker group until its
+  implemented cut-and-project geometry receives independent manual visual
+  review.
+- Keep the standalone artifact's Pyodide size and cold-start cost explicit.
+  The runtime is now vendored into the artifact; there is no remaining CDN or
+  separate-backend requirement.
 - Keep finite-sample verifier boundaries and exact-path render tolerances documented in the known-deviation notes until stronger verification replaces them.
 
 ### Future release follow-up
@@ -48,7 +54,6 @@ history-gated demo prominence; true code-split of the analytics charts.
 
 ## Now
 
-- For `dodecagonal-square-triangle` (catalog label "Schlottmann Square-Triangle"), the runtime is now the genuine Schlottmann quasi-periodic square-triangle pseudo substitution (inflation `2 + sqrt(3)`, five marked prototiles, interlocking supertiles deduplicated in the exact `Z[zeta12]` module). The rule was extracted from the Tilings Encyclopedia figure and verified tile-for-tile against the encyclopedia's 4999-cell literature patch. It scales without depth limit and uses no vendored data. Manual visual review accepted the rendered field on July 2, 2026 and the family was promoted to the main `Aperiodic` group, leaving the Experimental group empty.
 - For a fresh visual-review pass, rebuild `frontend` and `standalone` artifacts on the current HEAD before trusting standalone provenance or comparing newly generated render-review bundles.
 
 ## Next

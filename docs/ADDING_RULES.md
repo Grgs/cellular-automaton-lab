@@ -101,9 +101,9 @@ Useful commands:
 
 ```powershell
 npm run test:frontend
-py -3 -m unittest -q tests.unit.test_simulation_engine
-py -3 -m unittest -q tests.api.test_api_state_and_rules
-py -3 -m mypy --config-file pyproject.toml
+python -m pytest -q tests/unit/test_simulation_engine.py
+python -m pytest -q tests/api/test_api_state_and_rules.py
+python -m mypy --config-file pyproject.toml
 ```
 
 ## Common Pitfalls

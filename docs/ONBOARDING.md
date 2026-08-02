@@ -11,6 +11,7 @@ want to do; follow the link.
 | **Add a new automaton rule** | [`docs/ADDING_RULES.md`](ADDING_RULES.md) |
 | **Add a preset or pattern** | [`docs/ADDING_PRESETS_AND_PATTERNS.md`](ADDING_PRESETS_AND_PATTERNS.md) |
 | **Verify a tiling against a literature spec** | [`examples/verify_against_spec.py`](../examples/verify_against_spec.py) + [`docs/TILING_VERIFICATION_STATUS.md`](TILING_VERIFICATION_STATUS.md) |
+| **Understand the design choices** | [`docs/DESIGN.md`](DESIGN.md) |
 | **Understand the architecture** | [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) |
 | **Find a specific file** | [`docs/CODE_MAP.md`](CODE_MAP.md) |
 | **Run / debug tests** | [`docs/TESTING.md`](TESTING.md) |
@@ -46,7 +47,7 @@ Want to skip the local server and just see the app? Open the
 
 ## Use the topology library from Python
 
-The catalog of 37 tilings + the simulation engine work as a plain Python
+The catalog of 68 tilings and the simulation engine work as a plain Python
 library; you don't need Flask or the frontend to drive them.
 
 ```python
@@ -127,8 +128,8 @@ and `backend/rules/hexlife.py` are the closest reference.
 - **Don't edit the canonical reference fixtures by hand** -- same; use
   `python -m tools fixtures reference`.
 - **Don't promote an aperiodic family out of `Experimental` without manual
-  visual review** against the published substitution. The pinwheel and
-  pinwheel-2-1 entries are intentionally gated this way; see
+  visual review** against an independent published reference.
+  `socolar-hexagonal` is currently gated this way; see
   [`docs/TILING_KNOWN_DEVIATIONS.md`](TILING_KNOWN_DEVIATIONS.md).
 
 ## Asking for more

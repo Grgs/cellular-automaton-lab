@@ -1,6 +1,10 @@
 # Tiling Reference Sources
 
-This file lists the current literature or catalog references used when writing and maintaining `backend/simulation/literature_reference_specs.py`.
+This file lists the current literature or catalog references used when writing
+and maintaining the reference specs. For periodic-face families, the
+machine-readable `source_urls` in
+`backend/simulation/data/periodic_face_catalog/*.json` are canonical; this file
+adds the human context and should cover every public family ID.
 
 The order is intentional:
 
@@ -37,6 +41,39 @@ The order is intentional:
   - [Snub trihexagonal tiling](https://en.wikipedia.org/wiki/Snub_trihexagonal_tiling)
 - `trihexagonal-3-6-3-6`
   - [Trihexagonal tiling](https://en.wikipedia.org/wiki/Trihexagonal_tiling)
+- `right-triangle`
+  - Elementary 45-45-90 bisection of the square lattice; no external source URL
+    is currently recorded in its descriptor.
+- `tiltwork`
+  - Repo-defined periodic diamond-and-triangle construction; no external source
+    URL is currently recorded in its descriptor.
+- `pythagorean`
+  - [Pythagorean tiling](https://en.wikipedia.org/wiki/Pythagorean_tiling)
+- `herringbone`
+  - [Herringbone pattern](https://en.wikipedia.org/wiki/Herringbone_pattern)
+- `triangular-square-2uniform`
+  - [List of k-uniform tilings](https://en.wikipedia.org/wiki/List_of_k-uniform_tilings)
+- `basketweave`
+  - [Basket weave pattern](https://en.wikipedia.org/wiki/Basket_weave_(pattern))
+- `pentagon-crosses`
+  - Repo-defined periodic pentagon-cross construction; no external source URL
+    is currently recorded in its descriptor.
+- `trihex-2uniform-3636-3366`
+  - [Euclidean tilings by convex regular polygons](https://en.wikipedia.org/wiki/Euclidean_tilings_by_convex_regular_polygons)
+- `stein-14-pentagonal`
+  - [Pentagonal tiling](https://en.wikipedia.org/wiki/Pentagonal_tiling)
+- `uniform-2-18-36-33434`
+  - [List of k-uniform tilings](https://en.wikipedia.org/wiki/List_of_k-uniform_tilings)
+  - [2-uniform #18 reference image](https://commons.wikimedia.org/wiki/File:2-uniform_n18.svg)
+- `uniform-3-4-6-12`
+  - [3-4-6-12 tiling](https://en.wikipedia.org/wiki/3-4-6-12_tiling)
+- `uniform-2-13-36-32412`
+  - [List of k-uniform tilings](https://en.wikipedia.org/wiki/List_of_k-uniform_tilings)
+  - [2-uniform #13 reference image](https://commons.wikimedia.org/wiki/File:2-uniform_n13.svg)
+- `uniform-2-12-3262-346`
+  - [2-uniform #12 reference image](https://commons.wikimedia.org/wiki/File:2-uniform_n12.svg)
+- `uniform-2-3-44-33344`
+  - [2-uniform #3 reference image](https://commons.wikimedia.org/wiki/File:2-uniform_n3.svg)
 - `uniform-2-10-36-3262`
   - [List of k-uniform tilings](https://en.wikipedia.org/wiki/List_of_k-uniform_tilings)
   - [2-uniform #10 reference image](https://commons.wikimedia.org/wiki/File:2-uniform_n10.svg)
@@ -241,6 +278,8 @@ The order is intentional:
 - `pinwheel`
   - [The pinwheel tilings of the plane](https://annals.math.princeton.edu/1994/139-3/p05)
   - [Pinwheel](https://tilings.math.uni-bielefeld.de/substitution/pinwheel/)
+- `pinwheel-2-1`
+  - [Pinwheel 2:1](https://tilings.math.uni-bielefeld.de/substitution/pinwheel-2-1/)
 
 ## Notes
 

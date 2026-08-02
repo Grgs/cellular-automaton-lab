@@ -1,19 +1,33 @@
 # Architecture
 
-`cellular-automaton-lab` is a topology-first cellular automaton app with a Flask backend and a Vite-built TypeScript frontend.
+`cellular-automaton-lab` is a topology-first cellular automaton app with a
+Python simulation core, a Vite-built TypeScript frontend, and two runtime
+hosts: Flask over HTTP and Pyodide in a browser worker.
 
-The backend owns canonical simulation state, rule evaluation, topology transitions, persistence, and background stepping. In server mode, that state is scoped by browser session id: the frontend creates a stable local session id and sends simulation traffic through `/api/sessions/<session_id>/...`, while each session owns its own coordinator and persisted snapshot. The frontend renders that state, lets the user edit cells and controls, and sends explicit HTTP mutations back to the backend. The browser does not evolve the automaton locally.
+The active Python runtime owns canonical simulation state, rule evaluation,
+topology transitions, persistence, and stepping. In server mode it runs in the
+Flask process and is scoped by browser session ID. In standalone mode it runs
+inside a Pyodide Web Worker and persists through browser storage. The shared
+frontend renders snapshots and sends explicit mutations through a host-neutral
+`SimulationBackend` contract.
+
+For the reasons behind these boundaries, including why Flask and Pyodide are
+separate adapters around one Python core, read [DESIGN.md](DESIGN.md).
 
 ## System Overview
 
 ```mermaid
 flowchart LR
     Browser["Browser"] --> Frontend["TypeScript app"]
-    Frontend --> Routes["Flask routes"]
+    Frontend --> BackendContract["SimulationBackend"]
+    BackendContract --> Routes["Flask routes"]
+    BackendContract --> Worker["Standalone worker"]
     Routes --> Sessions["SimulationSessionRegistry"]
     Routes --> StateActions["StateActionService"]
+    Worker --> BrowserRuntime["Pyodide browser runtime"]
     StateActions --> Coordinator["SimulationCoordinator"]
     Sessions --> Coordinator
+    BrowserRuntime --> Service["SimulationService"]
     Coordinator --> Runtime["SimulationRuntime"]
     Coordinator --> Persist["Coordinator persistence + restore"]
     Coordinator --> Service["SimulationService"]
@@ -33,6 +47,10 @@ flowchart LR
 - [frontend/shell/app-shell-body.html](../frontend/shell/app-shell-body.html) is the shared shell source consumed by both Flask and the standalone build.
 - [backend/app_shell.py](../backend/app_shell.py) renders the shared shell for the server host and generates the standalone shell document that the standalone build stages into its transient input directory.
 - [frontend/server-entry.ts](../frontend/server-entry.ts) is the canonical server host entrypoint.
+- [frontend/standalone.ts](../frontend/standalone.ts) is the standalone host entrypoint.
+- [frontend/standalone/worker-client.ts](../frontend/standalone/worker-client.ts) adapts worker messages to `SimulationBackend`.
+- [frontend/standalone-worker.ts](../frontend/standalone-worker.ts) loads the packaged Pyodide runtime and Python bundle.
+- [backend/browser_runtime.py](../backend/browser_runtime.py) exposes the framework-neutral Python command host used inside Pyodide.
 - [frontend/app-runtime.ts](../frontend/app-runtime.ts) owns the shared `initApp(...)` / `disposeApp()` lifecycle API.
 - [frontend/types/controller-*.d.ts](../frontend/types) split the controller/runtime contracts by concern and re-export them through [frontend/types/controller.d.ts](../frontend/types/controller.d.ts).
 
@@ -40,25 +58,17 @@ Important rules:
 
 - `frontend/` is the only authored frontend source tree.
 - `static/dist/` is generated build output.
-- Backend snapshots are authoritative for topology, rule, speed, running state, generation, cell states, and the monotonic `state_revision` within a live session.
+- `output/standalone/` is generated static-site output.
+- Snapshots from the active runtime host are authoritative for topology, rule, speed, running state, generation, cell states, and the monotonic `state_revision` within a live session.
 - Frontend edits and control changes are explicit mutations. Controls return the next canonical snapshot; cell writes return a revisioned delta that the frontend applies to its cached snapshot or rejects in favor of a full-state resynchronization.
 - `state_revision` advances exactly once for each effective observable mutation. It is intentionally ephemeral: persistence omits it and a new or restored runtime begins at revision zero.
 - `state_epoch` identifies the runtime lifetime that minted a revision. Every freshly constructed state (initial build, restore, replace) takes a strictly larger epoch within its hosting process — wall-clock microseconds with a same-process monotonic floor — so clients can order snapshots across revision resets while that runtime is live. The epoch is not a persistent cross-process clock and, like the revision, is never persisted.
 
 Maintenance workflows and repo-owned guardrails live in [MAINTENANCE.md](./MAINTENANCE.md).
 
-## Current Code Quality Focus
-
-The app has usable subsystem boundaries, but the next cleanup work should focus on high-change seams rather than broad rewrites. The current priorities are documented in [CODE_QUALITY_ROADMAP.md](./CODE_QUALITY_ROADMAP.md).
-
-The short version:
-
-- Interaction state needs an explicit gesture/session model. `surface-bindings.ts` currently coordinates too many pointer modes directly.
-- Canvas transient overlays need their own state and renderer. `canvas-view.ts` should not keep accumulating hover, selection, preview, and gesture-flash lifecycle policy.
-- Drawer sections should be independently owned. The right-click metadata inspector should move out of the broad drawer model into a section-specific model.
-- Aperiodic tilings need per-family implementation contracts so true substitutions, exact-affine paths, canonical reference patches, and known deviations are not treated as equivalent.
-- Literature verification should be split into smaller modules before more families or fixture modes are added.
-- Frontend/backend payload drift needs stronger mechanical protection as the API, standalone worker protocol, and topology metadata grow.
+Current structural priorities live in
+[CODE_QUALITY_ROADMAP.md](CODE_QUALITY_ROADMAP.md); they are intentionally not
+duplicated here.
 
 ## Backend
 
@@ -185,7 +195,12 @@ The catalog remains the canonical source of:
 - default rule selection
 - frontend bootstrapped topology metadata, including `render_kind`
 
-Topology cell payloads may also carry optional metadata fields such as `tile_family`, `orientation_token`, `chirality_token`, and `decoration_tokens`. These are currently ignored by the renderer and control shell, but they let the backend expose richer substitution-family state for diagnostics and future decorated or chiral tilings without changing the base canvas model.
+Topology cell payloads may also carry optional metadata fields such as
+`tile_family`, `orientation_token`, `chirality_token`, and
+`decoration_tokens`. The selection inspector exposes them, and the family dead
+palette can select colors from kind, slot, family, chirality, or orientation.
+The base canvas model therefore supports richer substitution-family state
+without requiring a different cell type.
 
 The catalog does not decide how a geometry is built. That implementation dispatch now lives in [backend/simulation/topology_implementation_registry.py](../backend/simulation/topology_implementation_registry.py), which maps each geometry key to a backend `builder_kind`, a frontend-facing `render_kind`, and the concrete builder entrypoint consumed by [backend/simulation/topology_builders.py](../backend/simulation/topology_builders.py).
 
@@ -346,7 +361,7 @@ Important persistence rule:
 
 ## State Flow
 
-The main runtime loop is:
+### Server host
 
 1. Flask loads the canonical defaults from `config/defaults.json`, then renders the server wrapper and injects bootstrapped defaults, topology catalog entries, periodic-face descriptors, and the shared shell markup.
 2. The frontend builds controller, view, config-sync, session, and interaction layers.
@@ -355,7 +370,23 @@ The main runtime loop is:
 5. The backend applies the mutation and returns either the next canonical control snapshot or a revisioned cell delta.
 6. The frontend validates and applies the response, fetching a full snapshot on any delta mismatch, then re-renders controls and canvas.
 
-This keeps topology transitions, rule evaluation, and persistence centralized in the backend while preserving a responsive editor and control panel in the browser.
+### Standalone host
+
+1. The static entrypoint loads `standalone-bootstrap.json` and starts the shared
+   frontend controller stack with a worker-backed `SimulationBackend`.
+2. The worker loads the packaged Pyodide runtime and
+   `standalone-python-bundle.json`, then initializes
+   `backend.browser_runtime`.
+3. Frontend requests use API-shaped worker commands instead of HTTP.
+4. The worker applies mutations through the shared Python simulation service and
+   returns canonical snapshots or revisioned deltas.
+5. The frontend follows the same validation, reconciliation, and rendering path
+   as server mode.
+6. Standalone simulation persistence is written to IndexedDB, with
+   `localStorage` as a fallback.
+
+Both flows keep topology transitions and rule evaluation in the Python runtime
+while preserving one frontend controller and rendering path.
 
 ## Build And Test
 
@@ -364,12 +395,17 @@ This keeps topology transitions, rule evaluation, and persistence centralized in
 - `npm run build:frontend` builds the Vite app into `static/dist/`
 - Flask startup requires `static/dist/manifest.json`
 - `npm run dev:frontend` keeps the frontend bundle updated during local development
+- `npm run build:frontend:standalone` builds the static site into
+  `output/standalone/`, including the pinned Pyodide runtime and application
+  Python bundle
 
 ### Tests
 
 - frontend unit and module tests run in Vitest against `frontend/`
-- backend, API, and integration tests run in Python `unittest`
-- browser end-to-end coverage runs through Playwright-based Python tests
+- pytest collects backend unit, API, and Python integration tests (many test
+  classes retain `unittest` style internally)
+- browser end-to-end coverage runs through Playwright-based Python tests via the
+  repo-owned npm or `python -m tools test e2e` entrypoints
 
 ### CI Invariants
 

@@ -10,10 +10,14 @@ This is the short version of how tilings fit into the app.
 - Periodic mixed / periodic-face families
   - built from descriptor data in `backend/simulation/periodic_face_tilings.py`
   - examples: Archimedean variants, Cairo, Rhombille, dual/uniform-derived mixed tilings
-- Aperiodic substitution families
+- Aperiodic families
   - built through `backend/simulation/aperiodic_registry.py`
+  - implementation contracts distinguish true substitutions, exact-affine
+    paths, canonical patches, and known deviations
   - shared helpers live in `backend/simulation/aperiodic_substitution.py` and the `backend/simulation/aperiodic_support/` package (`affine.py`, `geometry.py`, `neighbors.py`, `patches.py`, `types.py`)
-  - examples: Penrose, Ammann-Beenker, Spectre, Taylor-Socolar, Sphinx, Hat, Chair, Robinson, Tuebingen Triangle, Schlottmann Square-Triangle, Shield, Pinwheel
+  - examples include substitution families, multigrid crops, exact-affine
+    Pinwheel variants, continuum deformations, and the cut-and-project
+    `socolar-hexagonal` generator
 
 ## Verification Layers
 
@@ -29,11 +33,16 @@ This is the short version of how tilings fit into the app.
 - Regular and periodic families are checked on canonical `3x3` samples because the app builds finite open-boundary boards for those geometries.
 - Aperiodic families are checked on patch-depth samples because that is the public sizing mode and the natural way their generators expose structure.
 
-## Exact-Affine Special Case
+## Exact-Record Special Cases
 
-- `pinwheel` uses an exact-affine helper path for verification.
-- The goal is to avoid trusting rounded float edge coincidence for a family with dense orientation diversity.
-- Other families still verify through the normal topology payload unless they later need exact-record verification too.
+- `pinwheel` and `pinwheel-2-1` use exact-affine records for construction and
+  verification.
+- The goal is to avoid trusting rounded float edge coincidence for families
+  with dense orientation diversity.
+- `socolar-hexagonal` uses exact `Z[zeta12]` module coordinates and
+  `Q(sqrt(3))` acceptance-window tests before final float serialization.
+- Other families verify through normal topology payloads unless their
+  construction needs a stronger exact-record path.
 
 ## Where To Extend Things
 

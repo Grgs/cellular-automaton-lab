@@ -8,6 +8,7 @@ This repo now has enough moving parts that maintenance guidance needs one home. 
 - `CONTRIBUTING.md`: contributor setup, common workflow, and contribution expectations
 - `SECURITY.md`: vulnerability-reporting expectations and security guardrail pointers
 - `docs/ADDING_RULES.md`, `docs/ADDING_TOPOLOGIES.md`, `docs/ADDING_PRESETS_AND_PATTERNS.md`, `docs/TESTING_CHANGES.md`: task guides for contributors adding app behavior
+- `docs/DESIGN.md`: product goals, durable decisions, tradeoffs, and alternatives
 - `docs/ARCHITECTURE.md`: runtime boundaries and subsystem ownership
 - `docs/CODE_MAP.md`: navigation for specific files and call paths
 - `docs/TESTING.md`: test strategy, failure classes, and browser-support details
@@ -18,6 +19,17 @@ This repo now has enough moving parts that maintenance guidance needs one home. 
 - `.github/ISSUE_TEMPLATE/` and `.github/PULL_REQUEST_TEMPLATE.md`: lightweight public contribution forms
 
 If a note is only about hygiene, guardrails, or how to maintain the repo, put it here instead of growing another planning document.
+
+Keep the design, architecture, and code-map boundaries distinct:
+
+- change `DESIGN.md` when a product constraint, source of truth, host boundary,
+  state owner, or durable tradeoff changes
+- change `ARCHITECTURE.md` when subsystem structure or runtime flow changes
+- change `CODE_MAP.md` when files, entrypoints, or call paths move
+
+Release notes are historical records. Do not rewrite an old release's behavior
+to match the development branch; correct current-facing docs and add a new
+changelog or release-note entry instead.
 
 ## Guardrails
 
@@ -77,11 +89,11 @@ npm run check:bundle-size:fresh
 npm run smoke:standalone
 npm run check:doc-links
 npm run audit:supply-chain
-py -3 -m mypy --config-file pyproject.toml
-py -3 -m unittest discover -s tests -p "test_*.py"
+python -m mypy --config-file pyproject.toml
+python -m pytest -q -rs tests/unit tests/api tests/e2e
 python -m tools tilings validate
 python -m tools tilings verify
-py -3 -m pre_commit run --hook-stage pre-push --all-files
+python -m pre_commit run --hook-stage pre-push --all-files
 ```
 
 6. Merge the release-candidate PR into `main`, then fetch and fast-forward local `main` to the merged commit:

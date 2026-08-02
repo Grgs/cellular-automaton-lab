@@ -211,10 +211,10 @@ python -m tools tilings validate
 python -m tools tilings verify
 npm run fixtures:reference:check
 npm run test:frontend -- frontend/geometry/polygon-overlap.test.ts frontend/geometry/render-bounds.test.ts
-py -3 -m unittest -q tests.unit.test_topology_validation
-py -3 -m unittest -q tests.unit.test_periodic_face_tilings
-py -3 -m unittest -q tests.unit.test_tiling_preview_coverage
-py -3 -m unittest -q tests.api.test_api_state_and_rules
+python -m pytest -q tests/unit/test_topology_validation.py
+python -m pytest -q tests/unit/test_periodic_face_tilings.py
+python -m pytest -q tests/unit/test_tiling_preview_coverage.py
+python -m pytest -q tests/api/test_api_state_and_rules.py
 npm run test:e2e:playwright:server
 ```
 
@@ -240,7 +240,7 @@ When choosing the rotation: orient the tiling so one basis vector becomes horizo
 - For periodic face tilings, geometry belongs in `periodic_face_patterns/<geometry-key>.json` and catalog metadata belongs in `periodic_face_catalog/<geometry-key>.json`. Regeneration rejects missing or orphaned source files.
 - Do not set both `row_offset_x` and `lattice_skew_x` in the same descriptor; they describe mutually exclusive lattice semantics. See the "Periodic Face Tilings With Skewed Or Non-Edge-To-Edge Lattices" section above.
 - For Laves (dual) tilings, cross-link the primal tiling's reference spec with `expected_dual_geometry` so the duality relationship is verified automatically.
-- Python files must pass `ruff format` or the pre-commit hook will reject the commit. Run `py -3 -m ruff format <file>` before staging if you write or generate Python with non-standard formatting.
+- Python files must pass `ruff format` or the pre-commit hook will reject the commit. Run `python -m ruff format <file>` before staging if you write or generate Python with non-standard formatting.
 
 ## Checklist
 

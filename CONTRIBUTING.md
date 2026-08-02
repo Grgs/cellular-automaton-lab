@@ -47,6 +47,7 @@ For focused change-specific commands, use [docs/TESTING_CHANGES.md](docs/TESTING
 
 - `README.md`: product overview, local setup, and the public command surface
 - `CONTRIBUTING.md`: contributor setup and workflow entrypoint
+- `docs/DESIGN.md`: product goals, durable design decisions, and tradeoffs
 - `docs/ARCHITECTURE.md`: runtime boundaries and subsystem ownership
 - `docs/CODE_MAP.md`: file-level navigation and call paths
 - `docs/TESTING.md`: test strategy and browser diagnosis
@@ -58,4 +59,7 @@ For focused change-specific commands, use [docs/TESTING_CHANGES.md](docs/TESTING
 
 Before opening a PR, run the narrow checks that match your change and record them in the PR description. For release-facing or cross-boundary changes, run the broader release-confidence commands listed in [README.md](README.md).
 
-Do not promote `pinwheel` or `dodecagonal-square-triangle` status unless the implementation and visible-review blockers in [TODO.md](TODO.md) and [docs/TILING_KNOWN_DEVIATIONS.md](docs/TILING_KNOWN_DEVIATIONS.md) are resolved in the same change.
+Do not promote an experimental tiling family unless its implementation and
+visible-review blockers in [TODO.md](TODO.md), its manifest metadata, and
+[docs/TILING_KNOWN_DEVIATIONS.md](docs/TILING_KNOWN_DEVIATIONS.md) are resolved
+in the same change.

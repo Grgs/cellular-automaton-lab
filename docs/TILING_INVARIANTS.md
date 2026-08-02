@@ -84,11 +84,20 @@ It is intentionally shorter than `backend/simulation/literature_reference_specs.
   - direct canonical patch fixtures now pin both the first handed substitution patch and the representative depth-`3` sample
 - `dodecagonal-square-triangle`
   - public output collapses internal marked tiles to square/triangle kinds, but orientation and chirality metadata remain meaningful
-  - the runtime uses the finite Bielefeld vector crop and caps public depth at `40`; strict overlap-free and hole-free validation is currently proven through depth `11`
-  - the checked-in rule-image spec remains diagnostic tooling only because the current five labels do not form a valid recursive tile substitution
-  - representative verified samples must stay connected, overlap-clean, hole-free, and exact on public kind counts plus signature
-  - rooted local-reference fixtures now pin canonical square/triangle neighborhoods inside the finite literature-cropped sample
+  - the runtime uses the Schlottmann quasi-periodic square-triangle pseudo substitution with inflation `2 + sqrt(3)` and five marked prototiles
+  - child placements are verified against a two-level decomposition of the Tilings Encyclopedia's 4999-cell literature patch
+  - re-expanding the decomposed coarse configuration must reproduce the literature patch tile-for-tile, including marking colors
+  - `sigma^2` supertile patches must remain gap-free and overlap-free
+  - the triangle:square census must converge to `4 / sqrt(3)`
+  - rooted local-reference fixtures pin canonical square/triangle neighborhoods inside the substitution patch
   - direct canonical patch fixtures now check the normalized public square/triangle serialization exactly at both depth `1` and depth `3`
+- `socolar-hexagonal`
+  - the runtime uses exact cut-and-project acceptance windows in the `Z[zeta12]` module for 13 tile classes
+  - emitted prototiles are unit-edge regular hexagons, squares, and 30-degree rhombs
+  - matching-rule geometry forbids same-kind edge contacts
+  - shallower patch IDs must remain subsets of deeper patch IDs
+  - a vendored literature sample is re-diffed bidirectionally against runtime output
+  - automated checks pass, but picker promotion still requires independent manual visual review
 - `robinson-triangles`
   - direct canonical patch fixtures now pin both the first refined Robinson triangle patch and the representative depth-`3` sample
 - `chair`
