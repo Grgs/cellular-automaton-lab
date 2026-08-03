@@ -99,6 +99,7 @@ def _is_frontend_path(path: str) -> bool:
 def _is_standalone_path(path: str) -> bool:
     return path.startswith(("frontend/standalone/", "tools/standalone_")) or path in {
         "tools/standalone_build.py",
+        "tools/profile_standalone_runtime.py",
         "tools/smoke_test_standalone.py",
         "tools/commands/build.py",
     }

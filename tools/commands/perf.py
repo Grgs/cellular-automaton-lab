@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import argparse
 
-from tools import bench_engine, profile_refactor_baseline, profile_tiling_latency
+from tools import (
+    bench_engine,
+    profile_refactor_baseline,
+    profile_standalone_runtime,
+    profile_tiling_latency,
+)
 from tools.cli_support import add_passthrough_command
 from tools.command_docs import command_doc
 
@@ -31,6 +36,10 @@ def _baseline_parser() -> argparse.ArgumentParser:
     return profile_refactor_baseline.build_parser()
 
 
+def _standalone_runtime_parser() -> argparse.ArgumentParser:
+    return profile_standalone_runtime.build_parser()
+
+
 def _run_bench(argv: list[str] | None = None) -> int:
     _bench_parser().parse_args(argv)
     return bench_engine.main() or 0
@@ -43,6 +52,10 @@ def _run_latency(argv: list[str] | None = None) -> int:
 
 def _run_baseline(argv: list[str] | None = None) -> int:
     return profile_refactor_baseline.main(argv)
+
+
+def _run_standalone_runtime(argv: list[str] | None = None) -> int:
+    return profile_standalone_runtime.main(argv)
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -66,4 +79,11 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         doc=command_doc("perf", "baseline"),
         target_main=_run_baseline,
         parser_factory=_baseline_parser,
+    )
+    add_passthrough_command(
+        subparsers,
+        name="standalone-runtime",
+        doc=command_doc("perf", "standalone-runtime"),
+        target_main=_run_standalone_runtime,
+        parser_factory=_standalone_runtime_parser,
     )

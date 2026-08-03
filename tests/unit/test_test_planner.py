@@ -49,6 +49,12 @@ class TestPlannerTests(unittest.TestCase):
             }.issubset(commands)
         )
 
+    def test_standalone_runtime_profiler_plans_standalone_validation(self) -> None:
+        commands = _commands(["tools/profile_standalone_runtime.py"])
+
+        self.assertIn("npm run smoke:standalone", commands)
+        self.assertIn("python -m tools test e2e --suite standalone", commands)
+
     def test_tiling_catalog_paths_plan_catalog_fixture_and_runtime_checks(self) -> None:
         commands = _commands(["backend/simulation/topology_catalog.py"])
 
