@@ -79,6 +79,13 @@ frontend categories retain approximately `max(1%, 1 KiB)` of headroom; gzip
 ceilings remain tighter and should only move with an intentional, measured bundle
 change.
 
+Standalone cold start has a separate observed-baseline policy in
+`tools/standalone_runtime_budget.json`. CI runs three fresh Chromium processes
+with 4× CPU throttling, fails when the maximum exceeds the checked-in limit, and
+uploads the raw report as `standalone-runtime-profile`. Reproduce that gate with
+`python -m tools perf standalone-runtime --check-budget`; change the observed
+baseline, explicit regression margin, and limit together when recalibrating it.
+
 Python type checking runs at both pre-commit and pre-push when the affected paths
 include `app.py`, `pyproject.toml`, or Python files under `backend/`, `tests/`, or
 `tools/`. The hook checks the complete configured mypy project so cross-file

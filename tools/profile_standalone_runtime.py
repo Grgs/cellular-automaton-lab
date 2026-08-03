@@ -27,6 +27,11 @@ from tests.e2e.support_runtime_host import (  # noqa: E402
     load_standalone_build_manifest,
     missing_standalone_output_files,
 )
+from tools.standalone_runtime_budget import (  # noqa: E402
+    DEFAULT_RUNTIME_BUDGET_PATH,
+    evaluate_runtime_report,
+    load_runtime_budget,
+)
 
 DEFAULT_VIEWPORT: Final[ViewportSize] = {"width": 1280, "height": 720}
 
@@ -414,6 +419,14 @@ def render_summary(report: dict[str, object]) -> str:
                     f"(max {fork['startupMsMax']:.1f} ms) | incremental memory median "
                     f"{_mib(fork['incrementalMemoryBytesMedian'])}"
                 )
+    budget_evaluation = report.get("budgetEvaluation")
+    if isinstance(budget_evaluation, dict):
+        limit = budget_evaluation.get("coldStartLimitMs")
+        violations = budget_evaluation.get("violations")
+        if isinstance(limit, (int, float)) and isinstance(violations, list):
+            status = "PASS" if not violations else "FAIL"
+            lines.append(f"cold-start budget: {status} | limit {float(limit):.1f} ms")
+            lines.extend(f"  - {violation}" for violation in violations)
     return "\n".join(lines)
 
 
@@ -445,6 +458,17 @@ def build_parser() -> argparse.ArgumentParser:
         default=ROOT_DIR / "output" / "standalone",
         help="standalone build directory",
     )
+    parser.add_argument(
+        "--budget",
+        type=Path,
+        default=DEFAULT_RUNTIME_BUDGET_PATH,
+        help="runtime budget policy (default: tools/standalone_runtime_budget.json)",
+    )
+    parser.add_argument(
+        "--check-budget",
+        action="store_true",
+        help="fail when the report profile or cold-start maximum violates the policy",
+    )
     parser.add_argument("--format", choices=("summary", "json"), default="summary")
     parser.add_argument("--output", type=Path, default=None)
     return parser
@@ -461,6 +485,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--timeout-seconds must be positive")
 
     try:
+        budget = load_runtime_budget(args.budget)
         report = profile_standalone_runtime(
             repeats=args.repeats,
             forks_per_run=args.forks,
@@ -470,6 +495,13 @@ def main(argv: list[str] | None = None) -> int:
         )
     except Exception as exc:
         parser.exit(1, f"standalone runtime profile failed: {exc}\n")
+    violations = evaluate_runtime_report(report, budget)
+    report["budget"] = budget.to_report_payload()
+    report["budgetEvaluation"] = {
+        "coldStartLimitMs": budget.cold_start_limit_ms,
+        "passed": not violations,
+        "violations": list(violations),
+    }
     rendered = (
         json.dumps(report, indent=2, sort_keys=True)
         if args.format == "json"
@@ -479,7 +511,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.output is not None:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(rendered + "\n", encoding="utf-8")
-    return 0
+    return 1 if args.check_budget and violations else 0
 
 
 if __name__ == "__main__":

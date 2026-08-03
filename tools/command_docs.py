@@ -384,10 +384,10 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ("perf", "standalone-runtime"),
         "perf",
         "Measure standalone cold start and live-fork startup/memory in Chromium.",
-        "Runs fresh Chromium processes against a cross-origin-isolated standalone build, applies configurable CPU throttling, retains up to two Pyodide live forks, and reports aggregate browser-process RSS with runtime and device metadata.",
+        "Runs fresh Chromium processes against a cross-origin-isolated standalone build, applies configurable CPU throttling, retains up to two Pyodide live forks, and reports aggregate browser-process RSS with runtime and device metadata. Pass `--check-budget` to enforce the checked-in lower-end profile and cold-start limit.",
         (
             "python -m tools perf standalone-runtime",
-            "python -m tools perf standalone-runtime --format json --output output/standalone-runtime-profile.json",
+            "python -m tools perf standalone-runtime --check-budget --format json --output output/standalone-runtime-profile.json",
         ),
     ),
     CommandDoc(
