@@ -476,11 +476,22 @@ python -m tools repo tools-docs --check
 python -m tools repo tools-docs --write
 ```
 
+### `python -m tools repo command-contract`
+
+Generate or check the TypeScript application-command contract.
+
+Renders command ids, request/result types, and transport paths from the executable Python registry.
+
+```powershell
+python -m tools repo command-contract --check
+python -m tools repo command-contract --write
+```
+
 ### `python -m tools repo generated-check`
 
 Run freshness checks for generated repo-owned files.
 
-Umbrella check for generated surfaces that otherwise require separate commands: tools docs, bootstrap test fixture data, frontend topology fixtures, frontend fixture size limits, and reference fixtures. Focused commands remain available for targeted refreshes.
+Umbrella check for generated surfaces that otherwise require separate commands: tools docs, the TypeScript application-command contract, bootstrap test fixture data, frontend topology fixtures, frontend fixture size limits, and reference fixtures. Focused commands remain available for targeted refreshes.
 
 ```powershell
 python -m tools repo generated-check
