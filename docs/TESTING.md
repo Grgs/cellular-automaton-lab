@@ -12,6 +12,8 @@ In practice, the test stack is:
 
 The repository does not rely on a single “everything is tested in the browser” approach. Most logic is validated before a real browser is involved.
 
+Generated contract surfaces are part of the cheapest layer. Run `python -m tools repo generated-check` after changing an authoritative registry. In particular, `backend/application_commands/contracts.py` generates the frontend semantic-command and transport-path maps through `python -m tools repo command-contract --write`.
+
 ## Tool Entrypoints
 
 Prefer the repo-owned npm scripts and `python -m tools ...` commands when they exist. The npm scripts in [package.json](../package.json) call the same Python-first tools CLI through `tools/internal/python_tools_entry.mjs`, which keeps local runs aligned with CI and with the documented tool surface in [TOOLS.md](TOOLS.md).

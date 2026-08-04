@@ -12,6 +12,7 @@ class GeneratedCheckToolTests(unittest.TestCase):
             _parse_only([]),
             (
                 "tools-docs",
+                "command-contract",
                 "periodic-catalog",
                 "bootstrap",
                 "frontend-fixtures",

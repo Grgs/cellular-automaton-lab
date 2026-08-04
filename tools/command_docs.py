@@ -433,10 +433,20 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ),
     ),
     CommandDoc(
+        ("repo", "command-contract"),
+        "repo",
+        "Generate or check the TypeScript application-command contract.",
+        "Renders command ids, request/result types, and transport paths from the executable Python registry.",
+        (
+            "python -m tools repo command-contract --check",
+            "python -m tools repo command-contract --write",
+        ),
+    ),
+    CommandDoc(
         ("repo", "generated-check"),
         "repo",
         "Run freshness checks for generated repo-owned files.",
-        "Umbrella check for generated surfaces that otherwise require separate commands: tools docs, bootstrap test fixture data, frontend topology fixtures, frontend fixture size limits, and reference fixtures. Focused commands remain available for targeted refreshes.",
+        "Umbrella check for generated surfaces that otherwise require separate commands: tools docs, the TypeScript application-command contract, bootstrap test fixture data, frontend topology fixtures, frontend fixture size limits, and reference fixtures. Focused commands remain available for targeted refreshes.",
         (
             "python -m tools repo generated-check",
             "python -m tools repo generated-check --only tools-docs",

@@ -8,7 +8,6 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.application_commands import COMMAND_SPECS
 from backend.payload_contracts import (
     frontend_property_type_contracts,
     frontend_type_alias_contracts,
@@ -27,7 +26,6 @@ _TYPE_ALIAS_PATTERN = re.compile(
     r"export type (?P<name>[A-Za-z0-9_]+)\s*=\s*(?P<body>.*?);",
     re.DOTALL,
 )
-_COMMAND_MAP_KEY_PATTERN = re.compile(r'^\s*"(?P<command>[a-z0-9_.]+)"\s*:', re.MULTILINE)
 
 
 @dataclass(frozen=True)
@@ -130,13 +128,6 @@ def _parse_type_aliases(relative_path: str) -> dict[str, str]:
 
 
 class PayloadContractTests(unittest.TestCase):
-    def test_frontend_command_map_matches_application_registry(self) -> None:
-        command_map = _load_text("frontend/application-command-contract.ts")
-        self.assertEqual(
-            set(_COMMAND_MAP_KEY_PATTERN.findall(command_map)),
-            {spec.command.value for spec in COMMAND_SPECS},
-        )
-
     def test_frontend_types_cover_backend_payload_fields(self) -> None:
         frontend_paths = sorted({contract.frontend_path for contract in payload_field_contracts()})
         frontend_interfaces = _parse_frontend_interfaces(frontend_paths)
@@ -195,7 +186,6 @@ class PayloadContractTests(unittest.TestCase):
     def test_frontend_worker_request_payload_union_matches_backend_contract(self) -> None:
         for contract in payload_type_union_contracts():
             with self.subTest(type_name=contract.type_name):
-                interfaces = _parse_frontend_interfaces([contract.frontend_path])
                 type_aliases = _parse_type_aliases(contract.frontend_path)
 
                 self.assertIn(contract.type_name, type_aliases)
@@ -205,6 +195,8 @@ class PayloadContractTests(unittest.TestCase):
                 )
                 if contract.host_interface_name is None or contract.host_property_name is None:
                     continue
+                host_frontend_path = contract.host_frontend_path or contract.frontend_path
+                interfaces = _parse_frontend_interfaces([host_frontend_path])
                 self.assertIn(contract.host_interface_name, interfaces)
                 self.assertEqual(
                     interfaces[contract.host_interface_name].property_types.get(

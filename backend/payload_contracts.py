@@ -8,6 +8,7 @@ from backend import payload_types
 DOMAIN_FRONTEND_PATH = "frontend/types/domain.d.ts"
 CONTROLLER_API_FRONTEND_PATH = "frontend/types/controller-api.d.ts"
 STANDALONE_PROTOCOL_FRONTEND_PATH = "frontend/standalone/protocol.ts"
+APPLICATION_COMMAND_CONTRACT_FRONTEND_PATH = "frontend/application-command-contract.ts"
 RENDERING_FRONTEND_PATH = "frontend/types/rendering.d.ts"
 CONTROLLER_VIEW_FRONTEND_PATH = "frontend/types/controller-view.d.ts"
 CONTROLLER_SYNC_SESSION_FRONTEND_PATH = "frontend/types/controller-sync-session.d.ts"
@@ -84,6 +85,7 @@ class PayloadTypeUnionContract:
     type_name: str
     members: tuple[str, ...]
     frontend_path: str
+    host_frontend_path: str | None = None
     host_interface_name: str | None = None
     host_property_name: str | None = None
 
@@ -354,7 +356,8 @@ PAYLOAD_TYPE_UNION_CONTRACTS: tuple[PayloadTypeUnionContract, ...] = (
             "FilmstripRequest",
             "TopologyPreviewRequest",
         ),
-        frontend_path=STANDALONE_PROTOCOL_FRONTEND_PATH,
+        frontend_path=APPLICATION_COMMAND_CONTRACT_FRONTEND_PATH,
+        host_frontend_path=STANDALONE_PROTOCOL_FRONTEND_PATH,
         host_interface_name="StandaloneRequestMessage",
         host_property_name="payload",
     ),
