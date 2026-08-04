@@ -3335,7 +3335,7 @@ class StandaloneRuntimeFailureTests(BrowserAppTestCase):
     page_viewport: ClassVar[ViewportSize | None] = {"width": 1280, "height": 900}
 
     def test_worker_init_failure_shows_startup_error_banner(self) -> None:
-        self.context.route("**/pyodide.js", lambda route: route.abort())
+        self.context.route("**/pyodide.mjs", lambda route: route.abort())
         self.page.goto(f"{self.host.base_url}/", wait_until="load")
 
         cast(Any, expect(self.page.locator("#app-startup-error"))).to_be_visible()
