@@ -124,6 +124,7 @@ async function flushAsyncStartup(): Promise<void> {
 }
 
 afterEach(() => {
+    delete window.__sf;
     vi.resetModules();
     vi.restoreAllMocks();
     vi.doUnmock("./bootstrap-data.js");
@@ -250,5 +251,43 @@ describe("standalone startup", () => {
         expect(errorElement?.classList.contains("startup-error-visible")).toBe(true);
         expect(errorElement?.textContent).toContain("Standalone runtime failed to initialize");
         expect(errorElement?.textContent).toContain("worker initialization failed");
+    });
+
+    it("exposes live forks for runtime profiling", async () => {
+        installStandaloneShell();
+        const backendFactory = vi.fn();
+        const liveForks = {
+            kind: "supported" as const,
+            baseSessionId: "standalone",
+            backendFactory,
+            maxConcurrent: 2,
+        };
+
+        vi.doMock("./bootstrap-data.js", () => ({
+            fetchBootstrapData: vi.fn(async () => bootstrapData),
+            installBootstrapData: vi.fn((payload) => payload),
+        }));
+        vi.doMock("./standalone/worker-client.js", () => ({
+            createStandaloneEnvironment: vi.fn(async () => ({
+                backend: {},
+                bootstrapData,
+                runtimeEnvironment: {
+                    liveForks,
+                    persistence: {
+                        scope: "browser-device",
+                        guarantee: "best-effort-local",
+                    },
+                },
+            })),
+        }));
+        vi.doMock("./app-runtime.js", () => ({
+            disposeApp: vi.fn(),
+            initApp: vi.fn(async () => {}),
+        }));
+
+        await import("./standalone.js");
+        await flushAsyncStartup();
+
+        expect(window.__sf).toBe(liveForks);
     });
 });

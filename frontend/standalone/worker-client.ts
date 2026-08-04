@@ -22,6 +22,7 @@ import { BackendRequestError } from "../backend-request-error.js";
 
 export interface StandaloneEnvironmentOptions {
     persistState?: boolean;
+    signal?: AbortSignal;
 }
 
 // Each live fork boots a persist-free Pyodide runtime. Two concurrent forks
@@ -54,7 +55,7 @@ function createStandalonePaneBackendFactory(
     bootstrapData: AppBootstrapData,
 ): (sessionId: string) => SimulationBackend {
     return () => {
-        let backend: SimulationBackend | null = null;
+        const abortController = new AbortController();
         let environmentPromise: Promise<SimulationBackend> | null = null;
         let disposed = false;
 
@@ -65,12 +66,12 @@ function createStandalonePaneBackendFactory(
             if (!environmentPromise) {
                 environmentPromise = createStandaloneEnvironment(bootstrapData, {
                     persistState: false,
+                    signal: abortController.signal,
                 }).then((environment) => {
                     if (disposed) {
                         void environment.backend.dispose();
                         throw new Error("Standalone pane runtime was disposed.");
                     }
-                    backend = environment.backend;
                     return environment.backend;
                 });
             }
@@ -91,14 +92,7 @@ function createStandalonePaneBackendFactory(
             getRules: async () => (await resolveBackend()).getRules(),
             dispose: () => {
                 disposed = true;
-                if (backend) {
-                    void backend.dispose();
-                    return;
-                }
-                // A replaced wall can dispose a fork while it is still booting.
-                void environmentPromise
-                    ?.then((resolvedBackend) => resolvedBackend.dispose())
-                    .catch(() => undefined);
+                abortController.abort();
             },
             postControl,
             toggleCell: async (cell) => (await resolveBackend()).toggleCell(cell),
@@ -130,13 +124,16 @@ function standaloneRuntimeEnvironment(
 
 export async function createStandaloneEnvironment(
     bootstrapData: AppBootstrapData,
-    { persistState = true }: StandaloneEnvironmentOptions = {},
+    { persistState = true, signal }: StandaloneEnvironmentOptions = {},
 ): Promise<{
     backend: SimulationBackend;
     bootstrapData: AppBootstrapData;
     runtimeEnvironment: AppRuntimeEnvironment;
 }> {
     const persistence = persistState ? await createSimulationStatePersistence() : null;
+    if (signal?.aborted) {
+        throw new Error("Standalone runtime startup was aborted.");
+    }
     const worker = new Worker(new URL("../standalone-worker.ts", import.meta.url), {
         type: "classic",
     });
@@ -186,6 +183,7 @@ export async function createStandaloneEnvironment(
 
     worker.addEventListener("error", handleWorkerError);
     worker.addEventListener("message", handleWorkerMessage);
+    signal?.addEventListener("abort", dispose, { once: true });
 
     async function sendMessage(
         message: StandaloneWorkerIncomingMessage,

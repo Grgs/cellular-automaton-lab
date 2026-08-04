@@ -15,6 +15,7 @@ import type {
 class FakeWorker {
     readonly postedMessages: StandaloneWorkerIncomingMessage[] = [];
     terminated = false;
+    terminationCount = 0;
     private listeners = new Map<
         string,
         Set<(event: MessageEvent<StandaloneWorkerOutgoingMessage> | ErrorEvent) => void>
@@ -42,6 +43,7 @@ class FakeWorker {
 
     terminate(): void {
         this.terminated = true;
+        this.terminationCount += 1;
     }
 
     dispatchMessage(message: StandaloneWorkerOutgoingMessage): void {
@@ -153,9 +155,9 @@ async function loadWorkerClientModule() {
         save: vi.fn<(nextSnapshot: PersistedSimulationSnapshotV5) => Promise<void>>(async () => {}),
     };
     const createSimulationStatePersistence = vi.fn(async () => persistence);
-    let lastWorker: FakeWorker | null = null;
+    const workers: FakeWorker[] = [];
     function rememberWorker(worker: FakeWorker): void {
-        lastWorker = worker;
+        workers.push(worker);
     }
 
     vi.stubGlobal(
@@ -177,11 +179,13 @@ async function loadWorkerClientModule() {
         module,
         persistence,
         createSimulationStatePersistence,
-        worker: () => {
-            if (!lastWorker) {
+        workers,
+        worker: (index = workers.length - 1) => {
+            const resolvedWorker = workers[index];
+            if (!resolvedWorker) {
                 throw new Error("worker was not created");
             }
-            return lastWorker;
+            return resolvedWorker;
         },
     };
 }
@@ -296,6 +300,83 @@ describe("standalone worker client", () => {
             }),
         );
         expect(persistence.save).not.toHaveBeenCalled();
+    });
+
+    it("does not create a worker when initialization is already aborted", async () => {
+        const { module, workers } = await loadWorkerClientModule();
+        const abortController = new AbortController();
+        abortController.abort();
+
+        await expect(
+            module.createStandaloneEnvironment(bootstrapData, {
+                signal: abortController.signal,
+            }),
+        ).rejects.toThrow("aborted");
+        expect(workers).toHaveLength(0);
+    });
+
+    it("terminates a worker when initialization is aborted", async () => {
+        const { module, worker } = await loadWorkerClientModule();
+        const abortController = new AbortController();
+
+        const environmentPromise = module.createStandaloneEnvironment(bootstrapData, {
+            persistState: false,
+            signal: abortController.signal,
+        });
+        await flushAsyncStartup();
+        const initMessage = lastInitMessage(worker());
+
+        abortController.abort();
+        worker().dispatchMessage({
+            type: "ready",
+            requestId: initMessage.requestId,
+            snapshot,
+            persistedSnapshot: null,
+        });
+
+        await expect(environmentPromise).rejects.toThrow("disposed");
+        expect(worker().terminated).toBe(true);
+        expect(worker().terminationCount).toBe(1);
+    });
+
+    it("immediately terminates a live fork disposed during startup", async () => {
+        const { module, worker, workers } = await loadWorkerClientModule();
+        const environmentPromise = module.createStandaloneEnvironment(bootstrapData, {
+            persistState: false,
+        });
+        await flushAsyncStartup();
+        const mainInitMessage = lastInitMessage(worker(0));
+        worker(0).dispatchMessage({
+            type: "ready",
+            requestId: mainInitMessage.requestId,
+            snapshot,
+            persistedSnapshot: null,
+        });
+        const environment = await environmentPromise;
+        if (environment.runtimeEnvironment.liveForks.kind !== "supported") {
+            throw new Error("expected live forks to be supported");
+        }
+
+        const fork = environment.runtimeEnvironment.liveForks.backendFactory("profile-fork");
+        const statePromise = fork.getState();
+        await flushAsyncStartup();
+        expect(workers).toHaveLength(2);
+        const forkWorker = worker(1);
+        const forkInitMessage = lastInitMessage(forkWorker);
+
+        fork.dispose();
+        fork.dispose();
+        forkWorker.dispatchMessage({
+            type: "ready",
+            requestId: forkInitMessage.requestId,
+            snapshot,
+            persistedSnapshot: null,
+        });
+
+        await expect(statePromise).rejects.toThrow("disposed");
+        expect(forkWorker.terminated).toBe(true);
+        expect(forkWorker.terminationCount).toBe(1);
+        expect(worker(0).terminated).toBe(false);
     });
 
     it("rejects failed command responses", async () => {

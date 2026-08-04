@@ -426,6 +426,17 @@ python -m tools perf baseline
 python -m tools perf baseline --format json --output output/refactor-baseline.json
 ```
 
+### `python -m tools perf standalone-runtime`
+
+Measure standalone cold start and live-fork startup/memory in Chromium.
+
+Runs fresh Chromium processes against a cross-origin-isolated standalone build, applies configurable CPU throttling, retains up to two Pyodide live forks, and reports aggregate browser-process RSS with runtime and device metadata.
+
+```powershell
+python -m tools perf standalone-runtime
+python -m tools perf standalone-runtime --format json --output output/standalone-runtime-profile.json
+```
+
 ## Repo
 
 Run repo-level maintenance commands.

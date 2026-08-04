@@ -127,10 +127,10 @@ when the UI is only polling state snapshots.
 - Shared UI-flow tests now run against both hosts through the same base browser case.
 - Server-only coverage keeps backend restart persistence assertions.
 - Standalone-only coverage adds:
-  - static-host startup
-  - a measured 30-second cold-start budget exposed as `window.__standaloneStartupMs`
-  - browser storage restore on reload
-  - visible startup error messaging when Pyodide initialization fails
+    - static-host startup
+    - a measured 30-second cold-start budget exposed as `window.__standaloneStartupMs`
+    - browser storage restore on reload
+    - visible startup error messaging when Pyodide initialization fails
 - The shard machinery in `tests/e2e/playwright_suite_support.py` now targets server-host tests only. Standalone tests are intentionally excluded from those shards and run through their dedicated suite entrypoint.
 - `tests/e2e/playwright_suite_support.py` is also the canonical suite manifest for the Node Playwright runner. npm entrypoints now select suites by semantic name instead of hardcoding Python module names.
 
@@ -138,6 +138,9 @@ when the UI is only polling state snapshots.
 
 - `SimulationBackend.dispose()` is a no-op for HTTP and terminates the worker
   for standalone.
+- Lazy standalone live forks own an `AbortController`. Disposing a fork while
+  Pyodide is still starting aborts initialization and terminates its worker
+  immediately instead of waiting for the runtime to become ready.
 - `AppController.dispose()` releases UI-owned resources.
 - Both entrypoints install `pagehide` cleanup.
 - The worker chains operations so two Python commands cannot mutate its runtime
@@ -148,15 +151,58 @@ when the UI is only polling state snapshots.
 
 ## Persistence Differences
 
-| Behavior | Server | Standalone |
-|---|---|---|
-| Simulation state | Backend session store | IndexedDB or `localStorage` |
-| Restart behavior | Session restore after server restart | Restore after page reload |
-| Multiple independent sessions | Session registry | One runtime per worker environment |
-| UI preferences and saved wall runs | Browser storage | Browser storage |
+| Behavior                           | Server                               | Standalone                         |
+| ---------------------------------- | ------------------------------------ | ---------------------------------- |
+| Simulation state                   | Backend session store                | IndexedDB or `localStorage`        |
+| Restart behavior                   | Session restore after server restart | Restore after page reload          |
+| Multiple independent sessions      | Session registry                     | One runtime per worker environment |
+| UI preferences and saved wall runs | Browser storage                      | Browser storage                    |
 
 Saved comparison runs and preferences remain device-local in both hosts.
 Portable run links are the cross-device handoff format.
+
+## Runtime Profiling
+
+Build the standalone artifact, then collect the default lower-end desktop
+profile:
+
+```powershell
+npm run build:frontend:standalone
+python -m tools perf standalone-runtime --format json --output output/standalone-runtime-profile.json
+```
+
+The command starts a fresh Chromium process for each of three runs, applies a
+4× CPU slowdown, measures cold start, and retains two independent Pyodide live
+forks in sequence. Each report records the browser version, user agent,
+reported hardware concurrency/device memory, host platform, build provenance,
+and every raw sample. Use `--cpu-throttle-rate 1` for unthrottled host
+measurements, or change `--repeats` while investigating variance.
+
+The expected device class is a lower-end desktop or laptop CPU represented by
+4× Chromium throttling at a 1280×720 viewport. Memory is not emulated. The
+reported memory is aggregate resident set size across the fresh Chromium
+process tree, so it includes browser/renderer overhead and shared pages. Treat
+the incremental fork values as conservative resource measurements, not precise
+Pyodide heap attribution.
+
+The first three-run reference observation on August 2, 2026 used headless
+Chromium 145 under WSL2. Chromium reported 12 hardware threads and 8 GiB device
+memory; the 4× slowdown is the relevant CPU expectation:
+
+| Measurement                      |  Median | Maximum |
+| -------------------------------- | ------: | ------: |
+| Cold start                       |  3.56 s |  3.69 s |
+| First live-fork startup          |  2.19 s |  2.47 s |
+| Second live-fork startup         |  2.26 s |  2.46 s |
+| Main runtime incremental RSS     | 244 MiB |       — |
+| First live-fork incremental RSS  | 103 MiB | 105 MiB |
+| Second live-fork incremental RSS | 137 MiB | 159 MiB |
+| Peak Chromium RSS with two forks | 798 MiB | 821 MiB |
+
+These observations establish the measurement method and an initial reference,
+not a CI threshold. Collect comparable results on at least one physical
+lower-end device before tightening the existing cold-start budget in a follow-up
+change.
 
 ## Testing
 

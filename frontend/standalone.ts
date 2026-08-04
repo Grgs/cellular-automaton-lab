@@ -1,5 +1,6 @@
 import { fetchBootstrapData, installBootstrapData } from "./bootstrap-data.js";
 import { createStandaloneEnvironment } from "./standalone/worker-client.js";
+import type { LiveForkCapability } from "./types/controller.js";
 
 let disposeStandaloneApp = (): void => {};
 const standaloneStartupStartedAt = performance.now();
@@ -112,6 +113,12 @@ export async function startStandaloneApp(): Promise<void> {
     showStartupOverlay(STARTUP_STAGE_STARTING_PYTHON);
     const environment = await createStandaloneEnvironment(bootstrapData);
     const { disposeApp, initApp } = await import("./app-runtime.js");
+    // Intentionally terse: this profiler-only seam lives in the tightly
+    // budgeted standalone entry chunk; the repo-owned browser tool is its only consumer.
+    window.__sf = environment.runtimeEnvironment.liveForks as Extract<
+        LiveForkCapability,
+        { kind: "supported" }
+    >;
     disposeStandaloneApp = disposeApp;
     await initApp({
         backend: environment.backend,
