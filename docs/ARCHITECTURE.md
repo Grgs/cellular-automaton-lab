@@ -83,7 +83,7 @@ duplicated here.
 - response helpers
 - application-command selection and response encoding
 
-Request decoding and domain dispatch live in [backend/application_commands](../backend/application_commands). The same dispatcher is used by Flask through a coordinator-backed target and by Pyodide through a service-backed target. HTTP paths and worker paths are transport mappings; semantic identities such as `simulation.reset` and `cells.set_many` are the application contract. The executable inventory and its host-only exclusions are documented in [COMMAND_CONTRACTS.md](./COMMAND_CONTRACTS.md).
+Request decoding and domain dispatch live in [backend/application_commands](../backend/application_commands). The same dispatcher is used by Flask through a coordinator-backed target and by Pyodide through a service-backed target. HTTP paths and worker paths are transport mappings; semantic identities such as `simulation.reset` and `cells.set_many` are the application contract. The executable Python inventory generates the frontend command and path maps, while registry-keyed API scenarios verify both transports and both Flask route families. Its host-only exclusions and extension workflow are documented in [COMMAND_CONTRACTS.md](./COMMAND_CONTRACTS.md).
 
 Server-mode simulation endpoints are exposed under `/api/sessions/<session_id>/...`. The unscoped `/api/...` simulation endpoints remain as a default-session compatibility shim for local tools and older tests.
 

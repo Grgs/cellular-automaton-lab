@@ -99,6 +99,7 @@ def _is_frontend_path(path: str) -> bool:
 def _is_standalone_path(path: str) -> bool:
     return path.startswith(("frontend/standalone/", "tools/standalone_")) or path in {
         "tools/standalone_build.py",
+        "tools/profile_standalone_runtime.py",
         "tools/smoke_test_standalone.py",
         "tools/commands/build.py",
     }
@@ -122,9 +123,12 @@ def _is_tiling_path(path: str) -> bool:
 
 def _is_generated_fixture_path(path: str) -> bool:
     return path.startswith("frontend/test-fixtures/") or path in {
+        "backend/application_commands/contracts.py",
         "docs/TOOLS.md",
+        "frontend/application-command-contract.ts",
         "frontend/canvas/family-dead-palette-manifest.json",
         "backend/simulation/topology_family_manifest.py",
+        "tools/application_command_contract.py",
     }
 
 
@@ -162,7 +166,12 @@ def build_validation_plan(paths: list[str] | tuple[str, ...]) -> ValidationPlan:
         _append_unique(focused, _e2e_suite("standalone"), "standalone browser coverage")
 
     backend_changed = _has_prefix(changed_paths, "backend/", "app.py")
-    api_changed = _has_prefix(changed_paths, "backend/web/", "app.py")
+    api_changed = _has_prefix(
+        changed_paths,
+        "backend/application_commands/",
+        "backend/web/",
+        "app.py",
+    )
     if backend_changed:
         _append_unique(
             focused,

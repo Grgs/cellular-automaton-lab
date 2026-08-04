@@ -12,6 +12,7 @@ from tools.tools_docs import TOOLS_DOC_PATH, render_tools_reference
 BOOTSTRAP_FIXTURE_PATH = ROOT_DIR / "frontend" / "test-fixtures" / "bootstrap-data.json"
 CheckName = Literal[
     "tools-docs",
+    "command-contract",
     "periodic-catalog",
     "bootstrap",
     "frontend-fixtures",
@@ -21,6 +22,7 @@ CheckName = Literal[
 ]
 ALL_CHECKS: tuple[CheckName, ...] = (
     "tools-docs",
+    "command-contract",
     "periodic-catalog",
     "bootstrap",
     "frontend-fixtures",
@@ -53,6 +55,22 @@ def _check_tools_docs() -> GeneratedCheckResult:
         "docs/TOOLS.md is up to date"
         if current == expected
         else "docs/TOOLS.md is out of date; run `python -m tools repo tools-docs --write`",
+    )
+
+
+def _check_application_command_contract() -> GeneratedCheckResult:
+    from tools.application_command_contract import contract_is_current
+
+    current = contract_is_current()
+    return GeneratedCheckResult(
+        "command-contract",
+        current,
+        "frontend/application-command-contract.ts is up to date"
+        if current
+        else (
+            "frontend/application-command-contract.ts is out of date; run "
+            "`python -m tools repo command-contract --write`"
+        ),
     )
 
 
@@ -175,6 +193,7 @@ def _check_decoder_contract_fixture() -> GeneratedCheckResult:
 def run_selected_checks(selected: tuple[CheckName, ...]) -> tuple[GeneratedCheckResult, ...]:
     checks = {
         "tools-docs": _check_tools_docs,
+        "command-contract": _check_application_command_contract,
         "periodic-catalog": _check_periodic_catalog,
         "bootstrap": _check_bootstrap_fixture,
         "frontend-fixtures": _check_frontend_fixtures,

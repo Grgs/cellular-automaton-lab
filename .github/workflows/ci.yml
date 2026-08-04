@@ -541,6 +541,22 @@ jobs:
           path: output/standalone-smoke
           if-no-files-found: warn
 
+      - name: Profile standalone runtime budget
+        run: |
+          mkdir -p output/standalone-runtime-profile
+          python -m tools perf standalone-runtime \
+            --check-budget \
+            --format json \
+            --output output/standalone-runtime-profile/report.json
+
+      - name: Upload standalone runtime profile
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: standalone-runtime-profile
+          path: output/standalone-runtime-profile
+          if-no-files-found: warn
+
       - name: Run standalone Playwright suite
         env:
           E2E_ARTIFACTS_DIR: ${{ github.workspace }}/e2e-artifacts/standalone-browser

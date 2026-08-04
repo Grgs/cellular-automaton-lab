@@ -21,7 +21,15 @@ Flask and the standalone Pyodide runtime share one transport-neutral command lay
 | `cell.set` | `/api/cells/set` | cell delta | yes |
 | `cells.set_many` | `/api/cells/set-many` | cell delta | yes |
 
-`backend/application_commands/contracts.py` is the executable inventory. `frontend/application-command-contract.ts` is its TypeScript request/result map, and `tests/unit/test_payload_contracts.py` requires the two command-id sets to match.
+`backend/application_commands/contracts.py` is the executable inventory. It owns each semantic id, transport method/path, backend payload name, and frontend request/result expression. `frontend/application-command-contract.ts` is generated from that registry and also exports the transport-path map used by the standalone worker protocol.
+
+After changing the registry, regenerate the frontend surface with:
+
+```powershell
+python -m tools repo command-contract --write
+```
+
+`python -m tools repo generated-check` compares the complete generated file, including request types, result types, and paths. A matching command-id set alone is not sufficient.
 
 ## Boundary rules
 
@@ -29,6 +37,6 @@ Flask and the standalone Pyodide runtime share one transport-neutral command lay
 - Flask owns session lookup, HTTP status codes, JSON response encoding, server bootstrap/meta, background stepping, and persistence scheduling.
 - The standalone host owns initialization/restore, worker envelopes, JS tick timers, and browser-local persistence emission.
 - Both transports expose the same structured public error fields through `BackendRequestError`.
-- `tests/api/test_command_parity.py` runs representative valid and invalid requests through both targets. It normalizes transport envelopes and the host-local `state_epoch` before comparing domain results.
+- `tests/api/test_command_parity.py` keys its scenario table by semantic command. Every registry entry must have a valid scenario, and every command that accepts a payload must have an invalid scenario. The same test verifies Flask's default and session routes, executes both transports, and normalizes transport envelopes plus the host-local `state_epoch` before comparing domain results.
 
-Do not add a command to only one dispatcher. Add it to the Python inventory, TypeScript map, payload contracts, runtime decoders when applicable, and parity coverage together.
+To add a command, update the Python inventory and dispatcher, add its registry-keyed parity scenarios, regenerate the TypeScript contract, and update payload contracts or runtime decoders when applicable. CI fails when the dispatcher, either Flask route family, generated frontend contract, or parity inventory is incomplete.

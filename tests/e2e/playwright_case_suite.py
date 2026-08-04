@@ -26,6 +26,7 @@ try:
         select_tiling_family,
         set_patch_depth,
     )
+    from tools.standalone_runtime_budget import load_runtime_budget
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from backend.rules import RuleRegistry
@@ -41,6 +42,7 @@ except ModuleNotFoundError:
         select_tiling_family,
         set_patch_depth,
     )
+    from tools.standalone_runtime_budget import load_runtime_budget
 
 
 def _encode_compare_run_fragment(config: dict[str, object]) -> str:
@@ -3213,19 +3215,10 @@ class StandaloneCellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         self.initialize_shared_ui_flow()
 
     def test_cold_start_stays_within_the_explicit_budget(self) -> None:
-        measurement = self.page.evaluate(
-            """() => ({
-                elapsed: window.__standaloneStartupMs,
-                budget: window.__standaloneStartupBudgetMs,
-            })"""
-        )
-        if not isinstance(measurement, dict):
+        measurement = self.page.evaluate("() => window.__standaloneStartupMs")
+        if not isinstance(measurement, (int, float)):
             raise AssertionError(f"invalid standalone startup measurement: {measurement!r}")
-        elapsed = measurement.get("elapsed")
-        budget = measurement.get("budget")
-        if not isinstance(elapsed, (int, float)) or not isinstance(budget, (int, float)):
-            raise AssertionError(f"invalid standalone startup measurement: {measurement!r}")
-        self.assertLessEqual(elapsed, budget)
+        self.assertLessEqual(measurement, load_runtime_budget().cold_start_limit_ms)
 
     def test_reload_restores_browser_persisted_state(self) -> None:
         self.page.select_option("#rule-select", "highlife")

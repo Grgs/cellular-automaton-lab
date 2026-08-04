@@ -7,6 +7,7 @@ import type {
 } from "./types/domain.js";
 import type { PeriodicFaceTilingDescriptor } from "./types/rendering.js";
 import type { RenderDiagnosticsSnapshot } from "./types/rendering.js";
+import type { LiveForkCapability } from "./types/controller.js";
 
 export interface AppReadinessDiagnosticsSnapshot {
     appReady: boolean;
@@ -54,7 +55,8 @@ declare global {
         APP_SESSION_ID?: string;
         __appReady?: boolean;
         __standaloneStartupMs?: number;
-        __standaloneStartupBudgetMs?: number;
+        /** Standalone live-fork seam consumed only by the repo runtime profiler. */
+        __sf?: Extract<LiveForkCapability, { kind: "supported" }>;
         __reviewApi?: ReviewApi | null;
     }
 }

@@ -1,9 +1,9 @@
 import { fetchBootstrapData, installBootstrapData } from "./bootstrap-data.js";
 import { createStandaloneEnvironment } from "./standalone/worker-client.js";
+import type { LiveForkCapability } from "./types/controller.js";
 
 let disposeStandaloneApp = (): void => {};
 const standaloneStartupStartedAt = performance.now();
-const STANDALONE_COLD_START_BUDGET_MS = 30_000;
 
 interface StartupStage {
     message: string;
@@ -112,6 +112,12 @@ export async function startStandaloneApp(): Promise<void> {
     showStartupOverlay(STARTUP_STAGE_STARTING_PYTHON);
     const environment = await createStandaloneEnvironment(bootstrapData);
     const { disposeApp, initApp } = await import("./app-runtime.js");
+    // Intentionally terse: this profiler-only seam lives in the tightly
+    // budgeted standalone entry chunk; the repo-owned browser tool is its only consumer.
+    window.__sf = environment.runtimeEnvironment.liveForks as Extract<
+        LiveForkCapability,
+        { kind: "supported" }
+    >;
     disposeStandaloneApp = disposeApp;
     await initApp({
         backend: environment.backend,
@@ -119,7 +125,6 @@ export async function startStandaloneApp(): Promise<void> {
         runtimeEnvironment: environment.runtimeEnvironment,
     });
     window.__standaloneStartupMs = performance.now() - standaloneStartupStartedAt;
-    window.__standaloneStartupBudgetMs = STANDALONE_COLD_START_BUDGET_MS;
     hideStartupOverlay();
     installPageLifecycleDisposal();
 }

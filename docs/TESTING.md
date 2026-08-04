@@ -12,6 +12,8 @@ In practice, the test stack is:
 
 The repository does not rely on a single “everything is tested in the browser” approach. Most logic is validated before a real browser is involved.
 
+Generated contract surfaces are part of the cheapest layer. Run `python -m tools repo generated-check` after changing an authoritative registry. In particular, `backend/application_commands/contracts.py` generates the frontend semantic-command and transport-path maps through `python -m tools repo command-contract --write`.
+
 ## Tool Entrypoints
 
 Prefer the repo-owned npm scripts and `python -m tools ...` commands when they exist. The npm scripts in [package.json](../package.json) call the same Python-first tools CLI through `tools/internal/python_tools_entry.mjs`, which keeps local runs aligned with CI and with the documented tool surface in [TOOLS.md](TOOLS.md).
@@ -78,6 +80,13 @@ with `npm run check:bundle-size:fresh`. Raw budgets for actively changing
 frontend categories retain approximately `max(1%, 1 KiB)` of headroom; gzip
 ceilings remain tighter and should only move with an intentional, measured bundle
 change.
+
+Standalone cold start has a separate observed-baseline policy in
+`tools/standalone_runtime_budget.json`. CI runs three fresh Chromium processes
+with 4× CPU throttling, fails when the maximum exceeds the checked-in limit, and
+uploads the raw report as `standalone-runtime-profile`. Reproduce that gate with
+`python -m tools perf standalone-runtime --check-budget`; change the observed
+baseline, explicit regression margin, and limit together when recalibrating it.
 
 Python type checking runs at both pre-commit and pre-push when the affected paths
 include `app.py`, `pyproject.toml`, or Python files under `backend/`, `tests/`, or

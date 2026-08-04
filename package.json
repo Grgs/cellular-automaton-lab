@@ -41,7 +41,7 @@
     "devDependencies": {
         "@types/node": "^26.1.2",
         "@vitest/coverage-v8": "^4.1.10",
-        "jsdom": "^29.1.1",
+        "jsdom": "^30.0.1",
         "linkinator": "8.0.3",
         "match-sorter": "^8.3.0",
         "oxlint": "^1.76.0",

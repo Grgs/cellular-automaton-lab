@@ -170,6 +170,10 @@ class ToolsCliTests(unittest.TestCase):
         with patch("tools.profile_refactor_baseline.main", return_value=11):
             self.assertEqual(tools_main(["perf", "baseline"]), 11)
 
+    def test_perf_standalone_runtime_propagates_nonzero_exit_code(self) -> None:
+        with patch("tools.profile_standalone_runtime.main", return_value=13):
+            self.assertEqual(tools_main(["perf", "standalone-runtime"]), 13)
+
     def test_git_dirty_status_distinguishes_clean_dirty_and_unavailable(self) -> None:
         with patch("tools.provenance.read_git_status_porcelain", return_value=""):
             self.assertFalse(provenance.git_dirty_status(ROOT))

@@ -381,6 +381,16 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ),
     ),
     CommandDoc(
+        ("perf", "standalone-runtime"),
+        "perf",
+        "Measure standalone cold start and live-fork startup/memory in Chromium.",
+        "Runs fresh Chromium processes against a cross-origin-isolated standalone build, applies configurable CPU throttling, retains up to two Pyodide live forks, and reports aggregate browser-process RSS with runtime and device metadata. Pass `--check-budget` to enforce the checked-in lower-end profile and cold-start limit.",
+        (
+            "python -m tools perf standalone-runtime",
+            "python -m tools perf standalone-runtime --check-budget --format json --output output/standalone-runtime-profile.json",
+        ),
+    ),
+    CommandDoc(
         ("repo", "processes"),
         "repo",
         "Inspect or clean up repo-scoped helper processes.",
@@ -423,10 +433,20 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ),
     ),
     CommandDoc(
+        ("repo", "command-contract"),
+        "repo",
+        "Generate or check the TypeScript application-command contract.",
+        "Renders command ids, request/result types, and transport paths from the executable Python registry.",
+        (
+            "python -m tools repo command-contract --check",
+            "python -m tools repo command-contract --write",
+        ),
+    ),
+    CommandDoc(
         ("repo", "generated-check"),
         "repo",
         "Run freshness checks for generated repo-owned files.",
-        "Umbrella check for generated surfaces that otherwise require separate commands: tools docs, bootstrap test fixture data, frontend topology fixtures, frontend fixture size limits, and reference fixtures. Focused commands remain available for targeted refreshes.",
+        "Umbrella check for generated surfaces that otherwise require separate commands: tools docs, the TypeScript application-command contract, bootstrap test fixture data, frontend topology fixtures, frontend fixture size limits, and reference fixtures. Focused commands remain available for targeted refreshes.",
         (
             "python -m tools repo generated-check",
             "python -m tools repo generated-check --only tools-docs",

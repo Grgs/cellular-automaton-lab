@@ -49,6 +49,12 @@ class TestPlannerTests(unittest.TestCase):
             }.issubset(commands)
         )
 
+    def test_standalone_runtime_profiler_plans_standalone_validation(self) -> None:
+        commands = _commands(["tools/profile_standalone_runtime.py"])
+
+        self.assertIn("npm run smoke:standalone", commands)
+        self.assertIn("python -m tools test e2e --suite standalone", commands)
+
     def test_tiling_catalog_paths_plan_catalog_fixture_and_runtime_checks(self) -> None:
         commands = _commands(["backend/simulation/topology_catalog.py"])
 
@@ -66,6 +72,12 @@ class TestPlannerTests(unittest.TestCase):
     def test_generated_fixture_paths_plan_generated_check(self) -> None:
         commands = _commands(["frontend/test-fixtures/topologies/fixture-manifest.json"])
 
+        self.assertIn("python -m tools repo generated-check", commands)
+
+    def test_command_registry_plans_api_and_generated_contract_checks(self) -> None:
+        commands = _commands(["backend/application_commands/contracts.py"])
+
+        self.assertIn("python -m pytest -q -rs tests/api", commands)
         self.assertIn("python -m tools repo generated-check", commands)
 
     def test_test_only_paths_run_changed_python_tests(self) -> None:

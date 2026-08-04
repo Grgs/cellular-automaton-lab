@@ -2,7 +2,13 @@ from __future__ import annotations
 
 import argparse
 
-from tools import dev_processes, generated_check, release_check, run_python_style
+from tools import (
+    application_command_contract,
+    dev_processes,
+    generated_check,
+    release_check,
+    run_python_style,
+)
 from tools.cli_support import add_passthrough_command
 from tools.command_docs import command_doc
 from tools.tools_docs import build_parser as tools_docs_parser
@@ -37,6 +43,13 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         doc=command_doc("repo", "tools-docs"),
         target_main=tools_docs_main,
         parser_factory=tools_docs_parser,
+    )
+    add_passthrough_command(
+        subparsers,
+        name="command-contract",
+        doc=command_doc("repo", "command-contract"),
+        target_main=application_command_contract.main,
+        parser_factory=application_command_contract.build_parser,
     )
     add_passthrough_command(
         subparsers,
