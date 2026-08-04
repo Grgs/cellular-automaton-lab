@@ -138,7 +138,7 @@ export async function createStandaloneEnvironment(
 }> {
     const persistence = persistState ? await createSimulationStatePersistence() : null;
     const worker = new Worker(new URL("../standalone-worker.ts", import.meta.url), {
-        type: "classic",
+        type: "module",
     });
     const pendingRequests = new Map<string, PendingRequest>();
     let fatalError: Error | null = null;
