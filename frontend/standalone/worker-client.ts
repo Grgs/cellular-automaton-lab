@@ -135,7 +135,7 @@ export async function createStandaloneEnvironment(
         throw new Error("Standalone runtime startup was aborted.");
     }
     const worker = new Worker(new URL("../standalone-worker.ts", import.meta.url), {
-        type: "classic",
+        type: "module",
     });
     const pendingRequests = new Map<string, PendingRequest>();
     let fatalError: Error | null = null;

@@ -45,8 +45,9 @@ broader subsystem map, read [ARCHITECTURE.md](ARCHITECTURE.md).
   the shared app runtime.
 - [frontend/standalone/worker-client.ts](../frontend/standalone/worker-client.ts)
   adapts worker messages to `SimulationBackend`.
-- [frontend/standalone-worker.ts](../frontend/standalone-worker.ts) loads
-  `../pyodide/pyodide.js`, installs the packaged Python bundle into Pyodide's
+- [frontend/standalone-worker.ts](../frontend/standalone-worker.ts) runs as a
+  module worker, loads `../pyodide/pyodide.mjs`, and installs the packaged
+  Python bundle into Pyodide's
   virtual filesystem, and imports
   [backend/browser_runtime.py](../backend/browser_runtime.py).
 - The worker serializes operations and owns the run loop through JavaScript

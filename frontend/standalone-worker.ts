@@ -13,11 +13,8 @@ import {
     decodeTickResponse,
 } from "./standalone/runtime-decoders.js";
 
-declare function importScripts(...urls: string[]): void;
-declare let loadPyodide: ((options: { indexURL: string }) => Promise<PyodideRuntime>) | undefined;
-
 const PYODIDE_BASE_URL = "../pyodide/";
-const PYODIDE_SCRIPT_URL = `${PYODIDE_BASE_URL}pyodide.js`;
+const PYODIDE_SCRIPT_URL = `${PYODIDE_BASE_URL}pyodide.mjs`;
 
 interface PyodideRuntime {
     globals: {
@@ -28,6 +25,10 @@ interface PyodideRuntime {
         writeFile(path: string, contents: string, options: { encoding: "utf8" }): void;
     };
     runPythonAsync(expression: string): Promise<unknown>;
+}
+
+interface PyodideLoaderModule {
+    loadPyodide?: (options: { indexURL: string }) => Promise<PyodideRuntime>;
 }
 
 interface PythonBundleEntry {
@@ -126,11 +127,11 @@ async function ensurePyodide(pythonBundleUrl: string): Promise<void> {
     if (pyodideInstance) {
         return;
     }
-    importScripts(PYODIDE_SCRIPT_URL);
-    if (typeof loadPyodide !== "function") {
+    const loader = (await import(/* @vite-ignore */ PYODIDE_SCRIPT_URL)) as PyodideLoaderModule;
+    if (typeof loader.loadPyodide !== "function") {
         throw new Error("Pyodide loader did not become available inside the standalone worker.");
     }
-    pyodideInstance = await loadPyodide({ indexURL: PYODIDE_BASE_URL });
+    pyodideInstance = await loader.loadPyodide({ indexURL: PYODIDE_BASE_URL });
     await installPythonBundle(pythonBundleUrl);
     await pyodideInstance.runPythonAsync(`
 import sys
