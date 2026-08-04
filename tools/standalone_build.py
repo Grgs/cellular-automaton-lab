@@ -32,8 +32,8 @@ STANDALONE_BUILD_INPUT_DIR = ROOT_DIR / "output" / ".standalone-build-input"
 STANDALONE_HTML_INPUT_PATH = STANDALONE_BUILD_INPUT_DIR / "standalone.html"
 PYODIDE_PACKAGE_DIR = ROOT_DIR / "node_modules" / "pyodide"
 PYODIDE_RUNTIME_FILES = (
-    "pyodide.js",
-    "pyodide.asm.js",
+    "pyodide.mjs",
+    "pyodide.asm.mjs",
     "pyodide.asm.wasm",
     "pyodide-lock.json",
     "python_stdlib.zip",
