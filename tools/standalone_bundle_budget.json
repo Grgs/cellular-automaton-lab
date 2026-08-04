@@ -13,7 +13,7 @@
             "name": "pyodide-runtime",
             "patterns": ["pyodide/*"],
             "raw": 13981600,
-            "gzip": 5725500
+            "gzip": 6387000
         },
         {
             "name": "build-manifest",
@@ -44,5 +44,5 @@
         { "name": "favicon", "patterns": ["assets/favicon-*"], "raw": 5000 },
         { "name": "other", "patterns": ["*"], "raw": 1000 }
     ],
-    "total": { "raw": 21610000, "gzip": 6470000 }
+    "total": { "raw": 21610000, "gzip": 7130900 }
 }

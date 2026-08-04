@@ -127,9 +127,7 @@ async function ensurePyodide(pythonBundleUrl: string): Promise<void> {
     if (pyodideInstance) {
         return;
     }
-    const loader = (await import(
-        /* @vite-ignore */ PYODIDE_SCRIPT_URL
-    )) as PyodideLoaderModule;
+    const loader = (await import(/* @vite-ignore */ PYODIDE_SCRIPT_URL)) as PyodideLoaderModule;
     if (typeof loader.loadPyodide !== "function") {
         throw new Error("Pyodide loader did not become available inside the standalone worker.");
     }
