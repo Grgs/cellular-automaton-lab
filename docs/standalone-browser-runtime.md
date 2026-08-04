@@ -199,10 +199,39 @@ memory; the 4× slowdown is the relevant CPU expectation:
 | Second live-fork incremental RSS | 137 MiB | 159 MiB |
 | Peak Chromium RSS with two forks | 798 MiB | 821 MiB |
 
-These observations establish the measurement method and an initial reference,
-not a CI threshold. Collect comparable results on at least one physical
-lower-end device before tightening the existing cold-start budget in a follow-up
-change.
+`tools/standalone_runtime_budget.json` turns that observation into the supported
+lower-end proxy policy. The 3.69-second observed maximum plus a 4.31-second
+regression and runner-variance margin produces an 8-second limit. This replaces
+the former 30-second ceiling with a threshold that is 73% lower while retaining
+117% headroom over the observed maximum. The standalone browser suite applies
+the same conservative limit to its unthrottled smoke journey.
+
+CI runs the three-repeat, 4×-throttled profile with budget enforcement and
+uploads the complete `standalone-runtime-profile` JSON artifact. Run the same
+gate locally with:
+
+```powershell
+python -m tools perf standalone-runtime --check-budget --format json --output output/standalone-runtime-profile.json
+```
+
+The throttled profile is the repeatable merge gate. Periodic physical-device
+measurements remain a calibration check: record them with the same command and
+metadata, and revise the observed baseline, explicit margin, and limit together
+when sustained results show that the proxy no longer represents the supported
+lower-end desktop or laptop class.
+
+The August 3, 2026 reference build also ratcheted the two recently raised gzip
+ceilings without treating them as available feature headroom:
+
+| Bundle category | Observed gzip | Regression margin | Ceiling |
+| --------------- | ------------: | ----------------: | ------: |
+| `js-runtime`    |  83,757 bytes |         143 bytes |  83,900 |
+| `js-standalone` |   8,680 bytes |          10 bytes |   8,690 |
+
+Gzip output is deterministic. Any increase beyond those small margins requires
+an intentional optimization or a freshly measured, documented budget change;
+raw-byte categories retain the broader maintenance headroom described in the
+bundle budget policy.
 
 ## Testing
 
@@ -214,7 +243,7 @@ npm run smoke:standalone
 npm run test:e2e:playwright:standalone
 ```
 
-Cold start is guarded by the standalone Playwright suite. Artifact size is guarded separately by `tools/standalone_bundle_budget.json` through `npm run check:bundle-size:fresh`; a Pyodide replacement should be considered only when measured startup or bundle budgets fail persistently.
+Cold start is guarded by `tools/standalone_runtime_budget.json` in both the standalone Playwright suite and the throttled CI profile. Artifact size is guarded separately by `tools/standalone_bundle_budget.json` through `npm run check:bundle-size:fresh`; a Pyodide replacement should be considered only when measured startup or bundle budgets fail persistently.
 
 The host-aware Playwright support:
 
@@ -240,6 +269,7 @@ The CI workflow treats standalone as an independent signal:
 
 - the primary build job creates the server frontend and standalone artifact
 - a dedicated standalone Playwright job consumes that artifact
+- that job records and enforces the throttled runtime profile before browser journeys
 - `pages-build` uploads `output/standalone/` only after required quality gates
 - `pages-deploy` publishes the artifact to GitHub Pages
 

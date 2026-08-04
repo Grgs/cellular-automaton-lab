@@ -4,7 +4,6 @@ import type { LiveForkCapability } from "./types/controller.js";
 
 let disposeStandaloneApp = (): void => {};
 const standaloneStartupStartedAt = performance.now();
-const STANDALONE_COLD_START_BUDGET_MS = 30_000;
 
 interface StartupStage {
     message: string;
@@ -126,7 +125,6 @@ export async function startStandaloneApp(): Promise<void> {
         runtimeEnvironment: environment.runtimeEnvironment,
     });
     window.__standaloneStartupMs = performance.now() - standaloneStartupStartedAt;
-    window.__standaloneStartupBudgetMs = STANDALONE_COLD_START_BUDGET_MS;
     hideStartupOverlay();
     installPageLifecycleDisposal();
 }

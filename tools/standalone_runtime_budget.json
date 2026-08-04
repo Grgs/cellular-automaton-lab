@@ -1,0 +1,15 @@
+{
+    "_comment": "Standalone runtime budget derived from the August 2, 2026 three-run Chromium 145 reference profile. The 8-second cold-start limit adds 4.31 seconds (117%) to the observed 3.69-second maximum for runner and device variance while replacing the former 30-second ceiling with a useful regression gate.",
+    "schemaVersion": 1,
+    "profile": {
+        "name": "emulated-lower-end-desktop",
+        "cpuThrottleRate": 4,
+        "minimumRepeats": 3,
+        "forksPerRun": 2
+    },
+    "coldStartMs": {
+        "observedBaseline": 3690,
+        "regressionMargin": 4310,
+        "limit": 8000
+    }
+}
