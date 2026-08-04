@@ -43,10 +43,37 @@ class CommandResult:
 class CommandSpec:
     command: ApplicationCommand
     transport_path: str
+    http_method: Literal["GET", "POST"]
     request: str
     result: CommandResultKind
     mutates_state: bool
     payload_requirement: Literal["none", "optional", "required"]
+    frontend_request: str
+    frontend_result: str
+
+
+# The generator for frontend/application-command-contract.ts resolves every
+# capitalized type named by a command through this inventory. Keeping the type
+# expression and its import source next to the executable registry makes a new
+# command one coordinated change instead of another hand-maintained mirror.
+TYPESCRIPT_TYPE_MODULES = MappingProxyType(
+    {
+        "CellMutationDelta": "./types/domain.js",
+        "CellTargetRequest": "./types/controller-api.js",
+        "CellUpdateRequest": "./types/controller-api.js",
+        "CellUpdatesRequest": "./types/controller-api.js",
+        "CompareRequest": "./types/domain.js",
+        "ConfigSyncBody": "./types/controller-api.js",
+        "FilmstripRequest": "./types/domain.js",
+        "ResetControlBody": "./types/controller-api.js",
+        "RuleDefinition": "./types/domain.js",
+        "SeedComparisonResult": "./types/domain.js",
+        "SeedFilmstripResult": "./types/domain.js",
+        "SimulationSnapshot": "./types/domain.js",
+        "TopologyPreview": "./types/domain.js",
+        "TopologyPreviewRequest": "./types/domain.js",
+    }
+)
 
 
 # This is the executable command inventory. Host-only operations deliberately
@@ -56,114 +83,156 @@ COMMAND_SPECS: tuple[CommandSpec, ...] = (
     CommandSpec(
         ApplicationCommand.STATE_GET,
         "/api/state",
+        "GET",
         "EmptyCommandRequestPayload",
         CommandResultKind.SNAPSHOT,
         False,
         "none",
+        "undefined",
+        "SimulationSnapshot",
     ),
     CommandSpec(
         ApplicationCommand.RULES_LIST,
         "/api/rules",
+        "GET",
         "EmptyCommandRequestPayload",
         CommandResultKind.RULES,
         False,
         "none",
+        "undefined",
+        "{ rules: RuleDefinition[] }",
     ),
     CommandSpec(
         ApplicationCommand.COMPARE_RUN,
         "/api/compare",
+        "POST",
         "CompareRequestPayload",
         CommandResultKind.COMPARISON,
         False,
         "required",
+        "CompareRequest",
+        "{ comparison: SeedComparisonResult }",
     ),
     CommandSpec(
         ApplicationCommand.FILMSTRIP_RUN,
         "/api/compare/filmstrip",
+        "POST",
         "FilmstripRequestPayload",
         CommandResultKind.FILMSTRIP,
         False,
         "required",
+        "FilmstripRequest",
+        "{ filmstrip: SeedFilmstripResult }",
     ),
     CommandSpec(
         ApplicationCommand.TOPOLOGY_PREVIEW,
         "/api/topology/preview",
+        "POST",
         "TopologyPreviewRequestPayload",
         CommandResultKind.TOPOLOGY_PREVIEW,
         False,
         "required",
+        "TopologyPreviewRequest",
+        "{ topology_preview: TopologyPreview }",
     ),
     CommandSpec(
         ApplicationCommand.SIMULATION_START,
         "/api/control/start",
+        "POST",
         "EmptyCommandRequestPayload",
         CommandResultKind.SNAPSHOT,
         True,
         "none",
+        "undefined",
+        "SimulationSnapshot",
     ),
     CommandSpec(
         ApplicationCommand.SIMULATION_PAUSE,
         "/api/control/pause",
+        "POST",
         "EmptyCommandRequestPayload",
         CommandResultKind.SNAPSHOT,
         True,
         "none",
+        "undefined",
+        "SimulationSnapshot",
     ),
     CommandSpec(
         ApplicationCommand.SIMULATION_RESUME,
         "/api/control/resume",
+        "POST",
         "EmptyCommandRequestPayload",
         CommandResultKind.SNAPSHOT,
         True,
         "none",
+        "undefined",
+        "SimulationSnapshot",
     ),
     CommandSpec(
         ApplicationCommand.SIMULATION_STEP,
         "/api/control/step",
+        "POST",
         "EmptyCommandRequestPayload",
         CommandResultKind.SNAPSHOT,
         True,
         "none",
+        "undefined",
+        "SimulationSnapshot",
     ),
     CommandSpec(
         ApplicationCommand.SIMULATION_RESET,
         "/api/control/reset",
+        "POST",
         "ResetControlRequestPayload",
         CommandResultKind.SNAPSHOT,
         True,
         "optional",
+        "ResetControlBody | undefined",
+        "SimulationSnapshot",
     ),
     CommandSpec(
         ApplicationCommand.SIMULATION_CONFIGURE,
         "/api/config",
+        "POST",
         "ConfigSyncRequestPayload",
         CommandResultKind.SNAPSHOT,
         True,
         "optional",
+        "ConfigSyncBody | undefined",
+        "SimulationSnapshot",
     ),
     CommandSpec(
         ApplicationCommand.CELL_TOGGLE,
         "/api/cells/toggle",
+        "POST",
         "CellTargetPayload",
         CommandResultKind.CELL_DELTA,
         True,
         "required",
+        "CellTargetRequest",
+        "CellMutationDelta",
     ),
     CommandSpec(
         ApplicationCommand.CELL_SET,
         "/api/cells/set",
+        "POST",
         "CellUpdatePayload",
         CommandResultKind.CELL_DELTA,
         True,
         "required",
+        "CellUpdateRequest",
+        "CellMutationDelta",
     ),
     CommandSpec(
         ApplicationCommand.CELLS_SET_MANY,
         "/api/cells/set-many",
+        "POST",
         "CellUpdatesRequestPayload",
         CommandResultKind.CELL_DELTA,
         True,
         "required",
+        "CellUpdatesRequest",
+        "CellMutationDelta",
     ),
 )
 

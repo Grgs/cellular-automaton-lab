@@ -68,6 +68,12 @@ class TestPlannerTests(unittest.TestCase):
 
         self.assertIn("python -m tools repo generated-check", commands)
 
+    def test_command_registry_plans_api_and_generated_contract_checks(self) -> None:
+        commands = _commands(["backend/application_commands/contracts.py"])
+
+        self.assertIn("python -m pytest -q -rs tests/api", commands)
+        self.assertIn("python -m tools repo generated-check", commands)
+
     def test_test_only_paths_run_changed_python_tests(self) -> None:
         commands = _commands(["tests/unit/test_tools_cli.py"])
 
