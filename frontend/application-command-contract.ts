@@ -17,12 +17,15 @@ import type {
     ResetControlBody,
 } from "./types/controller-api.js";
 
+/**
+ * Generated from backend/application_commands/contracts.py.
+ * Regenerate with `python -m tools repo command-contract --write`.
+ */
 interface CommandContract<TRequest, TResult> {
     request: TRequest;
     result: TResult;
 }
 
-/** Compile-time mirror of the transport-neutral Python application registry. */
 export interface ApplicationCommandMap {
     "state.get": CommandContract<undefined, SimulationSnapshot>;
     "rules.list": CommandContract<undefined, { rules: RuleDefinition[] }>;
@@ -43,7 +46,35 @@ export interface ApplicationCommandMap {
     "cells.set_many": CommandContract<CellUpdatesRequest, CellMutationDelta>;
 }
 
+export interface ApplicationCommandPathMap {
+    "/api/state": ApplicationCommandMap["state.get"];
+    "/api/rules": ApplicationCommandMap["rules.list"];
+    "/api/compare": ApplicationCommandMap["compare.run"];
+    "/api/compare/filmstrip": ApplicationCommandMap["filmstrip.run"];
+    "/api/topology/preview": ApplicationCommandMap["topology.preview"];
+    "/api/control/start": ApplicationCommandMap["simulation.start"];
+    "/api/control/pause": ApplicationCommandMap["simulation.pause"];
+    "/api/control/resume": ApplicationCommandMap["simulation.resume"];
+    "/api/control/step": ApplicationCommandMap["simulation.step"];
+    "/api/control/reset": ApplicationCommandMap["simulation.reset"];
+    "/api/config": ApplicationCommandMap["simulation.configure"];
+    "/api/cells/toggle": ApplicationCommandMap["cell.toggle"];
+    "/api/cells/set": ApplicationCommandMap["cell.set"];
+    "/api/cells/set-many": ApplicationCommandMap["cells.set_many"];
+}
+
+export type StandaloneRequestPayload =
+    | CompareRequest
+    | FilmstripRequest
+    | TopologyPreviewRequest
+    | ResetControlBody
+    | ConfigSyncBody
+    | CellTargetRequest
+    | CellUpdateRequest
+    | CellUpdatesRequest;
+
 export type ApplicationCommandId = keyof ApplicationCommandMap;
+export type ApplicationCommandPath = keyof ApplicationCommandPathMap;
 export type ApplicationCommandRequest<TCommand extends ApplicationCommandId> =
     ApplicationCommandMap[TCommand]["request"];
 export type ApplicationCommandResult<TCommand extends ApplicationCommandId> =

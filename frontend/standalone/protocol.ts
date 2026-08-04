@@ -1,36 +1,19 @@
 import type {
     CellMutationDelta,
-    CompareRequest,
-    FilmstripRequest,
     PersistedSimulationSnapshotV5,
     RulesResponse,
     SeedComparisonResult,
     SeedFilmstripResult,
     SimulationSnapshot,
     TopologyPreview,
-    TopologyPreviewRequest,
 } from "../types/domain.js";
 import type {
-    CellTargetRequest,
-    CellUpdateRequest,
-    CellUpdatesRequest,
-    ConfigSyncBody,
-    EmptyControlCommandPath,
-    ResetControlBody,
-} from "../types/controller.js";
+    ApplicationCommandPath,
+    StandaloneRequestPayload,
+} from "../application-command-contract.js";
+export type { StandaloneRequestPayload } from "../application-command-contract.js";
 
-export type StandaloneCommandPath =
-    | "/api/state"
-    | "/api/rules"
-    | "/api/compare"
-    | "/api/compare/filmstrip"
-    | "/api/topology/preview"
-    | "/api/cells/toggle"
-    | "/api/cells/set"
-    | "/api/cells/set-many"
-    | EmptyControlCommandPath
-    | "/api/control/reset"
-    | "/api/config";
+export type StandaloneCommandPath = ApplicationCommandPath;
 
 export interface StandaloneInitMessage {
     type: "init";
@@ -38,16 +21,6 @@ export interface StandaloneInitMessage {
     persistedSnapshot: PersistedSimulationSnapshotV5 | null;
     pythonBundleUrl: string;
 }
-
-export type StandaloneRequestPayload =
-    | ResetControlBody
-    | ConfigSyncBody
-    | CellTargetRequest
-    | CellUpdateRequest
-    | CellUpdatesRequest
-    | CompareRequest
-    | FilmstripRequest
-    | TopologyPreviewRequest;
 
 export interface StandaloneRequestMessage {
     type: "request";
