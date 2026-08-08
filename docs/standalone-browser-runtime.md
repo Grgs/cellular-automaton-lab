@@ -129,7 +129,8 @@ when the UI is only polling state snapshots.
 - Server-only coverage keeps backend restart persistence assertions.
 - Standalone-only coverage adds:
     - static-host startup
-    - a measured 30-second cold-start budget exposed as `window.__standaloneStartupMs`
+    - the checked-in 8-second cold-start budget, measured through
+      `window.__standaloneStartupMs`
     - browser storage restore on reload
     - visible startup error messaging when Pyodide initialization fails
 - The shard machinery in `tests/e2e/playwright_suite_support.py` now targets server-host tests only. Standalone tests are intentionally excluded from those shards and run through their dedicated suite entrypoint.
