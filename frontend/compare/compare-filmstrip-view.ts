@@ -137,6 +137,7 @@ interface BoardEntry {
     slot: HTMLElement;
     label: HTMLElement;
     countLabel: HTMLElement;
+    expandGlyph: HTMLElement;
     preview?: TopologyPreview;
     error?: string;
     overlaid?: boolean;
@@ -244,6 +245,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             entry.cell.classList.toggle("is-hero", isHero);
             entry.cell.classList.toggle("is-strip", speaker && !isHero);
             entry.cell.classList.toggle("is-selected", isSelected);
+            entry.expandGlyph.hidden = isHero;
             if (isSelected) {
                 entry.cell.setAttribute("aria-current", "true");
             } else {
@@ -628,6 +630,7 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
             slot,
             label,
             countLabel,
+            expandGlyph,
         };
     }
 

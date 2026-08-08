@@ -837,12 +837,23 @@ describe("createFilmstripView", () => {
 
         expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(false);
         expect(view.element.querySelector(".compare-filmstrip-focus")).toBeNull();
+        expect(
+            boardFor(view, "square").querySelector<HTMLElement>(".compare-filmstrip-expand")
+                ?.hidden,
+        ).toBe(false);
 
         boardFor(view, "square").click();
 
         expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(true);
         expect(boardFor(view, "square").classList.contains("is-hero")).toBe(true);
         expect(boardFor(view, "hex").classList.contains("is-strip")).toBe(true);
+        expect(
+            boardFor(view, "square").querySelector<HTMLElement>(".compare-filmstrip-expand")
+                ?.hidden,
+        ).toBe(true);
+        expect(
+            boardFor(view, "hex").querySelector<HTMLElement>(".compare-filmstrip-expand")?.hidden,
+        ).toBe(false);
         expect(boardFor(view, "square").getAttribute("aria-label")).toBe(
             "square: back to the wall",
         );
@@ -851,6 +862,10 @@ describe("createFilmstripView", () => {
         // Clicking the hero exits speaker view.
         boardFor(view, "square").click();
         expect(view.element.classList.contains("compare-filmstrip--speaker")).toBe(false);
+        expect(
+            boardFor(view, "square").querySelector<HTMLElement>(".compare-filmstrip-expand")
+                ?.hidden,
+        ).toBe(false);
         expect(focusEvents).toEqual(["square", null]);
     });
 

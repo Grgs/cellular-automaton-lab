@@ -1764,6 +1764,21 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         reset.click()
         expect(counter).to_have_text(f"gen 0 / {final_generation}")
 
+    def test_focused_wall_board_hides_its_expand_affordance(self) -> None:
+        case = self._case()
+        self._mark_compare_demo_seen()
+        case.page.click("#wall-view-btn")
+        self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
+
+        first_board = case.page.locator(".compare-filmstrip-board").first
+        expand = first_board.locator(".compare-filmstrip-expand")
+        expect(expand).to_be_visible()
+
+        first_board.click()
+
+        expect(first_board).to_have_class(re.compile(r"\bis-hero\b"))
+        expect(expand).to_be_hidden()
+
     def test_wall_rerun_resets_the_focused_explainer_generation(self) -> None:
         case = self._case()
         self._mark_compare_demo_seen()
