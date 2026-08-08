@@ -36,13 +36,15 @@
         "check:bundle-size": "node ./tools/internal/python_tools_entry.mjs build bundle-size",
         "check:bundle-size:fresh": "npm run build:frontend:standalone && npm run check:bundle-size",
         "smoke:standalone": "node ./tools/internal/python_tools_entry.mjs browser smoke-standalone",
-        "check:doc-links": "linkinator \"*.md\" \".github/**/*.md\" \"docs/**/*.md\""
+        "check:doc-links": "node ./tools/internal/check_doc_links.mjs"
     },
     "devDependencies": {
         "@types/node": "^26.1.2",
         "@vitest/coverage-v8": "^4.1.10",
+        "htmlparser2": "^12.0.0",
         "jsdom": "^30.0.1",
-        "linkinator": "8.0.3",
+        "marked": "^18.0.0",
+        "marked-gfm-heading-id": "^4.1.4",
         "match-sorter": "^8.3.0",
         "oxlint": "^1.76.0",
         "polygon-clipping": "^0.15.7",

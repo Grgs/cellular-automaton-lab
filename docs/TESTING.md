@@ -73,13 +73,14 @@ rebuilds the standalone frontend and enforces its bundle-size budget, so a stale
 `output/standalone/` directory cannot hide a regression. Its inputs are the
 packaged backend/configuration Python and JSON, frontend source, staged shell
 assets, and the package, Vite, and standalone-builder configuration that creates
-the artifact. Documentation-link checking likewise runs only for the root,
-`.github/`, and `docs/` Markdown globs used by Linkinator. The full-repository
-privacy and secret scans remain unconditional. Run the standalone guard directly
-with `npm run check:bundle-size:fresh`. Raw budgets for actively changing
-frontend categories retain approximately `max(1%, 1 KiB)` of headroom; gzip
-ceilings remain tighter and should only move with an intentional, measured bundle
-change.
+the artifact. Documentation-link checking likewise runs only for Markdown in the
+repository root, `.github/`, and `docs/`; it validates local paths and
+GitHub-style heading anchors directly from the filesystem without requiring a
+local server or network access. The full-repository privacy and secret scans
+remain unconditional. Run the standalone guard directly with
+`npm run check:bundle-size:fresh`. Raw budgets for actively changing frontend
+categories retain approximately `max(1%, 1 KiB)` of headroom; gzip ceilings
+remain tighter and should only move with an intentional, measured bundle change.
 
 Standalone cold start has a separate observed-baseline policy in
 `tools/standalone_runtime_budget.json`. CI runs three fresh Chromium processes
