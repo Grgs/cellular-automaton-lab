@@ -4,6 +4,9 @@
     "engines": {
         "node": ">=22"
     },
+    "overrides": {
+        "rolldown": "1.2.1"
+    },
     "scripts": {
         "build:frontend": "vite build --mode server",
         "build:frontend:server": "vite build --mode server",
@@ -36,20 +39,22 @@
         "check:bundle-size": "node ./tools/internal/python_tools_entry.mjs build bundle-size",
         "check:bundle-size:fresh": "npm run build:frontend:standalone && npm run check:bundle-size",
         "smoke:standalone": "node ./tools/internal/python_tools_entry.mjs browser smoke-standalone",
-        "check:doc-links": "linkinator \"*.md\" \".github/**/*.md\" \"docs/**/*.md\""
+        "check:doc-links": "node ./tools/internal/check_doc_links.mjs"
     },
     "devDependencies": {
-        "@types/node": "^26.1.2",
+        "@types/node": "^26.2.0",
         "@vitest/coverage-v8": "^4.1.10",
+        "htmlparser2": "^12.0.0",
         "jsdom": "^30.0.1",
-        "linkinator": "8.0.3",
+        "marked": "^18.0.9",
+        "marked-gfm-heading-id": "^4.1.4",
         "match-sorter": "^8.3.0",
-        "oxlint": "^1.76.0",
+        "oxlint": "^1.77.0",
         "polygon-clipping": "^0.15.7",
         "prettier": "^3.9.6",
         "pyodide": "314.0.3",
         "typescript": "^7.0.2",
-        "vite": "^8.2.0",
+        "vite": "^8.2.1",
         "vitest": "^4.1.2"
     }
 }

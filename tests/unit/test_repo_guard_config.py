@@ -55,11 +55,11 @@ class RepoGuardConfigTests(unittest.TestCase):
         self.assertIn("pass_filenames: false", hook)
         self.assertIn("stages: [pre-push, manual]", hook)
 
-    def test_doc_links_only_run_for_documented_linkinator_globs(self) -> None:
+    def test_doc_links_use_the_filesystem_checker(self) -> None:
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         self.assertEqual(
             package["scripts"]["check:doc-links"],
-            'linkinator "*.md" ".github/**/*.md" "docs/**/*.md"',
+            "node ./tools/internal/check_doc_links.mjs",
         )
 
         config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
