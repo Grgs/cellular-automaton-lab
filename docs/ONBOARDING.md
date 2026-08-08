@@ -112,7 +112,7 @@ and `backend/rules/hexlife.py` are the closest reference.
 | Backend API tests | `python -m pytest tests/api` |
 | Frontend unit tests | `npm run test:frontend` |
 | Frontend lint suite | `npm run lint:frontend` |
-| Linkinator + doc links | `npm run check:doc-links` |
+| Local documentation links and anchors | `npm run check:doc-links` |
 | Mypy | `npm run typecheck:python` |
 | Python lint + format + mypy (one shot) | `npm run check:python` |
 | Full reference verification | `python -m tools tilings verify` |
