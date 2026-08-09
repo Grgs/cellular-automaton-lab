@@ -1,12 +1,7 @@
 import { isPlainObject } from "../runtime-validation.js";
 import {
-    defaultCellSizeForTilingFamily,
-    defaultPatchDepthForTilingFamily,
-    normalizeCellSize,
     normalizeCellSizeForTilingFamily,
-    normalizePatchDepth,
     normalizePatchDepthForTilingFamily,
-    normalizeRenderCellSize,
 } from "../state/sizing-state.js";
 
 function parseNumberRecord(
@@ -23,27 +18,6 @@ function parseNumberRecord(
             .map(([key, rawValue]) => [key, normalizeEntry(key, rawValue)])
             .filter(([, normalizedValue]) => Number.isInteger(normalizedValue)),
     );
-}
-
-export function parseCellSize(value: unknown): number {
-    const parsed = Number(value);
-    return Number.isFinite(parsed)
-        ? normalizeCellSize(parsed)
-        : normalizeCellSize(defaultCellSizeForTilingFamily(null));
-}
-
-export function parseRenderCellSize(value: unknown): number {
-    const parsed = Number(value);
-    return Number.isFinite(parsed)
-        ? normalizeRenderCellSize(parsed)
-        : normalizeRenderCellSize(defaultCellSizeForTilingFamily(null));
-}
-
-export function parsePatchDepth(value: unknown): number {
-    const parsed = Number(value);
-    return Number.isFinite(parsed)
-        ? normalizePatchDepth(parsed)
-        : normalizePatchDepth(defaultPatchDepthForTilingFamily(null));
 }
 
 export function parseCellSizeByTilingFamily(

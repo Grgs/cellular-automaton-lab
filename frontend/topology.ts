@@ -34,28 +34,6 @@ export const PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal";
 export const FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal";
 export const SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual";
 export const TYPE_7_PENTAGONAL_GEOMETRY = "type-7-pentagonal";
-export const PENROSE_GEOMETRIES = Object.freeze([PENROSE_GEOMETRY, PENROSE_VERTEX_GEOMETRY]);
-export const PERIODIC_MIXED_GEOMETRIES = Object.freeze([
-    ARCHIMEDEAN_488_GEOMETRY,
-    ARCHIMEDEAN_31212_GEOMETRY,
-    ARCHIMEDEAN_3464_GEOMETRY,
-    ARCHIMEDEAN_4612_GEOMETRY,
-    ARCHIMEDEAN_33434_GEOMETRY,
-    ARCHIMEDEAN_33344_GEOMETRY,
-    ARCHIMEDEAN_33336_GEOMETRY,
-    KAGOME_GEOMETRY,
-    CAIRO_GEOMETRY,
-    RHOMBILLE_GEOMETRY,
-    DELTOIDAL_HEXAGONAL_GEOMETRY,
-    DELTOIDAL_TRIHEXAGONAL_GEOMETRY,
-    TETRAKIS_SQUARE_GEOMETRY,
-    TRIAKIS_TRIANGULAR_GEOMETRY,
-    PRISMATIC_PENTAGONAL_GEOMETRY,
-    FLORET_PENTAGONAL_GEOMETRY,
-    SNUB_SQUARE_DUAL_GEOMETRY,
-    TYPE_7_PENTAGONAL_GEOMETRY,
-]);
-
 export function topologyVariantKey(topology: TopologyPayload | null | undefined): string {
     const topologySpec = topology?.topology_spec;
     if (!topologySpec || typeof topologySpec !== "object") {
@@ -74,10 +52,6 @@ export function topologyHeight(topology: TopologyPayload | null | undefined): nu
 
 export function isRegularGeometry(geometry: string): boolean {
     return geometry === "square" || geometry === "hex" || geometry === "triangle";
-}
-
-export function isPenroseGeometry(geometry: string): boolean {
-    return geometry === PENROSE_GEOMETRY || geometry === PENROSE_VERTEX_GEOMETRY;
 }
 
 export function regularCellId(x: number, y: number): string {

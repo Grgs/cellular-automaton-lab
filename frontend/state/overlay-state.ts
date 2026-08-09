@@ -58,14 +58,6 @@ export function setInspectorOccludesGrid(state: AppState, inspectorOccludesGrid:
     state.inspectorOccludesGrid = inspectorOccludesGrid;
 }
 
-export function setEditArmed(state: AppState, editArmed: boolean): void {
-    state.editArmed = editArmed;
-}
-
-export function setEditCueVisible(state: AppState, editCueVisible: boolean): void {
-    state.editCueVisible = editCueVisible;
-}
-
 export function armEditMode(
     state: AppState,
     { showCue = true }: { showCue?: boolean } = {},
