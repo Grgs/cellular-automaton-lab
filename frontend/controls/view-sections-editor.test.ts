@@ -20,7 +20,6 @@ function createElements(): DomElements {
         pastePatternBtn: document.createElement("button"),
         patternStatus: document.createElement("p"),
         paintPalette: document.createElement("div"),
-        themeToggleBtn: null,
     } as Partial<DomElements> as DomElements;
 }
 

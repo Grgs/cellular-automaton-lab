@@ -131,7 +131,6 @@ function buildElements(canvas: HTMLCanvasElement): DomElements {
         patchDepthField: null,
         patchDepthInput: null,
         patchDepthLabel: null,
-        themeToggleBtn: null,
         ruleSearchInput: null,
         ruleSearchStatus: null,
         ruleSelect: null,

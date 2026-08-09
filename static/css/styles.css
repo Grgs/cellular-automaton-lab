@@ -1297,54 +1297,6 @@ button.is-running:hover:not(:disabled) {
     background-color: #0d131d;
 }
 
-button.theme-toggle {
-    width: 42px;
-    min-width: 42px;
-    padding: 0;
-    border-radius: 999px;
-    display: grid;
-    place-items: center;
-    background-color: var(--panel);
-    color: var(--ink);
-    border-color: var(--line);
-    box-shadow: var(--shadow);
-    position: relative;
-    overflow: hidden;
-}
-
-button.theme-toggle:hover:not(:disabled) {
-    background-color: var(--panel-strong);
-}
-
-button.theme-toggle .theme-toggle-icon {
-    position: absolute;
-    font-size: 1.15rem;
-    line-height: 1;
-    transition:
-        opacity 140ms ease,
-        transform 140ms ease;
-}
-
-button.theme-toggle .theme-icon-sun {
-    opacity: 0;
-    transform: translateY(5px) scale(0.82);
-}
-
-button.theme-toggle .theme-icon-moon {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-
-:root[data-theme="dark"] button.theme-toggle .theme-icon-sun {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-
-:root[data-theme="dark"] button.theme-toggle .theme-icon-moon {
-    opacity: 0;
-    transform: translateY(-5px) scale(0.82);
-}
-
 .drawer-toggle {
     min-width: 102px;
 }

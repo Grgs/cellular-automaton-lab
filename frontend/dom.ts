@@ -72,7 +72,6 @@ export const elements: DomElements = {
     patchDepthField: elementById("patch-depth-field"),
     patchDepthInput: elementById("patch-depth-input"),
     patchDepthLabel: elementById("patch-depth-label"),
-    themeToggleBtn: elementById("theme-toggle-btn"),
     ruleSearchInput: elementById("rule-search-input"),
     ruleSearchStatus: elementById("rule-search-status"),
     ruleSelect: elementById("rule-select"),

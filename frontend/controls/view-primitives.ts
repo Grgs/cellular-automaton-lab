@@ -1,6 +1,5 @@
 import type { DomElements } from "../types/dom.js";
 import type { LabeledOption, PaintPaletteState } from "../types/ui.js";
-import type { ThemeName } from "../theme.js";
 
 export function renderToggleButtons<TValue extends string | number>(
     container: HTMLElement | null,
@@ -120,18 +119,4 @@ export function renderRangeControl({
         label.textContent = labelText;
         label.hidden = !visible;
     }
-}
-
-export function renderThemeToggle(elements: DomElements, theme: ThemeName): void {
-    if (!elements.themeToggleBtn) {
-        return;
-    }
-
-    const isDark = theme === "dark";
-    elements.themeToggleBtn.dataset.theme = theme;
-    elements.themeToggleBtn.setAttribute("aria-pressed", isDark ? "true" : "false");
-
-    const label = isDark ? "Switch to light mode" : "Switch to dark mode";
-    elements.themeToggleBtn.setAttribute("aria-label", label);
-    elements.themeToggleBtn.title = label;
 }

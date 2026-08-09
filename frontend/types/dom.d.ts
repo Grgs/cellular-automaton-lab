@@ -66,7 +66,6 @@ export interface DomElements {
     patchDepthField: HTMLElement | null;
     patchDepthInput: HTMLInputElement | null;
     patchDepthLabel: HTMLElement | null;
-    themeToggleBtn: HTMLButtonElement | null;
     ruleSearchInput: HTMLInputElement | null;
     ruleSearchStatus: HTMLElement | null;
     ruleSelect: HTMLSelectElement | null;

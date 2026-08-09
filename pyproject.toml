@@ -70,7 +70,5 @@ module = [
     "networkx.*",
     "shapely.*",
     "playwright.*",
-    "fitz",
-    "fitz.*",
 ]
 ignore_missing_imports = true
