@@ -17,7 +17,6 @@ import type { GridView, ViewportDimensions } from "../types/controller-view.js";
 import type {
     AppBootstrapData,
     BootstrappedTopologyDefinition,
-    IndexedTopologyCell,
     PatternPayload,
     SimulationSnapshot,
     TopologyIndex,
@@ -74,13 +73,6 @@ export function paneSessionId(baseSessionId: string, paneId: string): string {
 
 export function indexPaneTopology(snapshot: SimulationSnapshot): TopologyIndex {
     return indexTopology(snapshot.topology);
-}
-
-export function findPaneCellById(
-    topologyIndex: TopologyIndex,
-    cellId: string,
-): IndexedTopologyCell | null {
-    return topologyIndex.byId.get(cellId) ?? null;
 }
 
 export function resolvePanePaintState(

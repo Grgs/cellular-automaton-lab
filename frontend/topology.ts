@@ -9,13 +9,6 @@ import type {
 import { findTopologyCellById } from "./topology-index.js";
 export { findTopologyCellById, indexTopology } from "./topology-index.js";
 
-// Penrose geometry strings are referenced directly by penrose-adapter.ts and
-// the helpers below. The rest of the aperiodic family universe is consumed at
-// runtime through the bootstrap payload (window.APP_TOPOLOGIES), so no further
-// constants need a hard-coded TypeScript counterpart of the backend manifest.
-export const PENROSE_GEOMETRY = "penrose-p3-rhombs";
-export const PENROSE_VERTEX_GEOMETRY = "penrose-p3-rhombs-vertex";
-
 export const ARCHIMEDEAN_488_GEOMETRY = "archimedean-4-8-8";
 export const ARCHIMEDEAN_31212_GEOMETRY = "archimedean-3-12-12";
 export const ARCHIMEDEAN_3464_GEOMETRY = "archimedean-3-4-6-4";

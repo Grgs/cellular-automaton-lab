@@ -12,7 +12,6 @@ export const DEFAULT_TOPOLOGY_VARIANT_KEY = resolveTopologyVariantKey(
 );
 export const MIN_CELL_SIZE = FRONTEND_DEFAULTS.ui.min_cell_size;
 export const MAX_CELL_SIZE = FRONTEND_DEFAULTS.ui.max_cell_size;
-export const AUTO_FIT_TARGET_CELL_SIZE = DEFAULT_CELL_SIZE;
 export const MIN_RENDER_CELL_SIZE = 0.25;
 export const MAX_RENDER_CELL_SIZE = 240;
 export const DEFAULT_SPEED = FRONTEND_DEFAULTS.simulation.speed;

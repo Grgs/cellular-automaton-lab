@@ -42,14 +42,6 @@ def _open_fresh_page(host: StandaloneRuntimeHost, page: Page, *, route: str = ""
         page.locator(".wall-page").wait_for(state="visible", timeout=TIMEOUT_MS)
 
 
-def _open_inspector_sheet(page: Page) -> None:
-    # The Lab's inspector is a bottom sheet, closed (and inert) by default;
-    # controls like the rule picker live inside it.
-    if page.locator("#control-drawer").get_attribute("data-open") != "true":
-        page.locator("#drawer-toggle-btn").click(timeout=TIMEOUT_MS)
-        page.locator('#control-drawer[data-open="true"]').wait_for(timeout=TIMEOUT_MS)
-
-
 def _save_optimized_png(page: Page, path: Path, *, full_page: bool = False) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     page.screenshot(path=str(path), full_page=full_page)
@@ -65,10 +57,6 @@ def _save_locator_png(page: Page, selector: str, path: Path) -> None:
 def _optimize_png(path: Path) -> None:
     with Image.open(path) as image:
         image.save(path, optimize=True)
-
-
-def _select_native_value(page: Page, selector: str, value: str) -> None:
-    page.locator(selector).select_option(value, timeout=TIMEOUT_MS)
 
 
 def _click(page: Page, selector: str) -> None:

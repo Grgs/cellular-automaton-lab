@@ -55,7 +55,3 @@ export function normalizeGeometryKey(geometry: string | null | undefined): strin
 export function getGeometryAdapter(geometry = DEFAULT_GEOMETRY): GeometryAdapter {
     return GEOMETRY_ADAPTERS.get(normalizeGeometryKey(geometry)) || squareGeometryAdapter;
 }
-
-export function listGeometryAdapters(): GeometryAdapter[] {
-    return Array.from(GEOMETRY_ADAPTERS.values());
-}

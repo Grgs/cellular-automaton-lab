@@ -99,24 +99,6 @@ export const FAMILY_DEAD_PALETTE_REGISTRY: readonly FamilyDeadPaletteDefinition[
     })),
 );
 
-export const PALETTE_BROWSER_ALIAS_COVERAGE: readonly {
-    geometry: string;
-    fixturePath: string;
-    selectorFields: readonly (keyof FamilyDeadPaletteVariantSelector)[];
-}[] = Object.freeze(
-    FAMILY_DEAD_PALETTE_REGISTRY.flatMap((familyPalette) =>
-        familyPalette.browserAliasCoverage
-            ? [
-                  {
-                      geometry: familyPalette.geometry,
-                      fixturePath: familyPalette.browserAliasCoverage.fixturePath,
-                      selectorFields: familyPalette.browserAliasCoverage.selectorFields,
-                  },
-              ]
-            : [],
-    ),
-);
-
 export const FAMILY_DEAD_PALETTE_VARIANTS: readonly FamilyDeadPaletteVariantDefinition[] =
     Object.freeze(FAMILY_DEAD_PALETTE_REGISTRY.flatMap((familyPalette) => familyPalette.variants));
 

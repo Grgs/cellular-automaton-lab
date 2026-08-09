@@ -7,7 +7,6 @@ import statistics
 import sys
 import time
 import urllib.request
-from collections.abc import Callable
 from pathlib import Path
 from typing import TypedDict
 
@@ -145,11 +144,6 @@ def post_toggle(
         payload_bytes,
         elapsed_ms,
     )
-
-
-def median_elapsed_ms(callback: Callable[[], float], *, repeats: int = 5) -> float:
-    values = [callback() for _ in range(repeats)]
-    return statistics.median(values)
 
 
 def benchmark_topology_build_ms(

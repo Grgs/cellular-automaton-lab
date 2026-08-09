@@ -354,16 +354,6 @@ P1_STAR = "p1-star"
 P1_OTHER = "p1-other"
 
 
-def _polygon_edge_lengths(vertices: tuple[tuple[float, float], ...]) -> list[float]:
-    return [
-        math.hypot(
-            vertices[(i + 1) % len(vertices)][0] - vertices[i][0],
-            vertices[(i + 1) % len(vertices)][1] - vertices[i][1],
-        )
-        for i in range(len(vertices))
-    ]
-
-
 def _polygon_interior_angles_degrees(
     vertices: tuple[tuple[float, float], ...],
 ) -> list[float]:
@@ -438,20 +428,6 @@ def classify_p1_prototile(
     if n == 10:
         return P1_STAR
     return P1_OTHER
-
-
-def _polygon_centroid(
-    vertices: tuple[tuple[float, float], ...],
-) -> tuple[float, float]:
-    # Simple arithmetic mean of vertex coordinates. Sufficient for the
-    # vertex-merge bookkeeping below; we don't need the geometric (area-
-    # weighted) centroid because the polygons here are always convex
-    # rhombs.
-    n = len(vertices)
-    return (
-        sum(v[0] for v in vertices) / n,
-        sum(v[1] for v in vertices) / n,
-    )
 
 
 def _signature(attendees: list[tuple[int, float, str]]) -> tuple[tuple[str, int], ...]:

@@ -780,12 +780,6 @@ def _square_grid_center(width: int, height: int) -> tuple[float, float]:
     return (width - 1) / 2, (height - 1) / 2
 
 
-def _square_max_radius(width: int, height: int) -> float:
-    cx, cy = _square_grid_center(width, height)
-    corners = ((0.0, 0.0), (width - 1.0, 0.0), (0.0, height - 1.0), (width - 1.0, height - 1.0))
-    return max(*(math.hypot(x - cx, y - cy) for x, y in corners), 1.0)
-
-
 _HEX_HEIGHT = 1.0
 _HEX_RADIUS = _HEX_HEIGHT / 2
 _HEX_WIDTH = math.sqrt(3) * _HEX_RADIUS

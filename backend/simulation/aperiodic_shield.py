@@ -46,8 +46,6 @@ _THETA = math.sqrt(2.0 + _SQRT3)
 _TR3A = _THETA / 2.0
 _TR3B = math.sqrt(2.0 - _SQRT3) / 2.0
 _DEFAULT_COMPATIBILITY_SCALE = 1.0
-_DEFAULT_COMPATIBILITY_WINDOW = 1.0
-
 _TRIANGLE_VERTICES: tuple[Vec, ...] = (
     Vec(0.0, 0.0),
     Vec(1.0, 0.0),
@@ -321,7 +319,3 @@ def build_shield_patch_for_cleanup_scale(
 ) -> AperiodicPatch:
     del cleanup_scale
     return build_shield_patch(patch_depth)
-
-
-def default_shield_window_threshold() -> float:
-    return _DEFAULT_COMPATIBILITY_WINDOW

@@ -210,14 +210,13 @@ Browser UI
 - [frontend/canvas/cache.ts](../frontend/canvas/cache.ts)
   `resolveGeometryCache(...)`
 - [frontend/geometry/registry.ts](../frontend/geometry/registry.ts)
-  `getGeometryAdapter(...)`, `listGeometryAdapters()`
+  `getGeometryAdapter(...)`
   Bootstraps geometry adapters from topology `render_kind` metadata instead of hand-maintained geometry lists.
 - [frontend/geometry/square-adapter.ts](../frontend/geometry/square-adapter.ts)
 - [frontend/geometry/hex-adapter.ts](../frontend/geometry/hex-adapter.ts)
 - [frontend/geometry/triangle-adapter.ts](../frontend/geometry/triangle-adapter.ts)
 - [frontend/geometry/periodic-mixed-adapter.ts](../frontend/geometry/periodic-mixed-adapter.ts)
   Main mixed-tiling adapter.
-- [frontend/geometry/penrose-adapter.ts](../frontend/geometry/penrose-adapter.ts)
 - [frontend/geometry/aperiodic-prototile-adapter.ts](../frontend/geometry/aperiodic-prototile-adapter.ts)
 
 ### Interaction and editor stack

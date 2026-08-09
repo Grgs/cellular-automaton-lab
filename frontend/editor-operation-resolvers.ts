@@ -101,28 +101,6 @@ export function resolveSampledCell(
     );
 }
 
-export function geometryCacheForState(state: AppState): GeometryCache | null {
-    const nextRenderCellSize = renderCellSize(state);
-    const topologyVariantKey = currentTopologyVariantKey(state);
-    const metrics = gridMetrics(
-        state.width,
-        state.height,
-        nextRenderCellSize,
-        topologyVariantKey,
-        state.topology,
-    );
-    return resolveGeometryCache({
-        existingKey: "",
-        existingCache: null,
-        width: state.width,
-        height: state.height,
-        cellSize: nextRenderCellSize,
-        geometry: topologyVariantKey,
-        metrics,
-        topology: state.topology,
-    }).geometryCache;
-}
-
 export function geometryContextForState(state: AppState): EditorGeometryContext {
     const nextRenderCellSize = renderCellSize(state);
     const topologyVariantKey = currentTopologyVariantKey(state);

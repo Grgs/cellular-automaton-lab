@@ -2,11 +2,6 @@ from __future__ import annotations
 
 import math
 
-from backend.simulation.aperiodic_family_manifest import (
-    ROBINSON_THICK_KIND,
-    ROBINSON_THIN_KIND,
-    ROBINSON_TILE_FAMILY,
-)
 from backend.simulation.aperiodic_support import (
     PatchRecord,
     Vec,
@@ -72,31 +67,3 @@ def triangle_record(
             else triangle_chirality(triangle_vertices)
         ),
     }
-
-
-def split_penrose_p2_cell_to_robinson_records(
-    *,
-    cell_id: str,
-    kind: str,
-    vertices: tuple[tuple[float, float], ...],
-) -> tuple[PatchRecord, PatchRecord]:
-    if len(vertices) != 4:
-        raise ValueError("Penrose P2 cells must have four vertices.")
-
-    triangle_kind = ROBINSON_THICK_KIND if kind == "kite" else ROBINSON_THIN_KIND
-    triangles = (
-        (vertices[0], vertices[1], vertices[2]),
-        (vertices[0], vertices[2], vertices[3]),
-    )
-
-    records: list[PatchRecord] = []
-    for index, triangle in enumerate(triangles):
-        records.append(
-            triangle_record(
-                cell_id=f"{cell_id}:{index}",
-                kind=triangle_kind,
-                vertices=triangle,
-                tile_family=ROBINSON_TILE_FAMILY,
-            )
-        )
-    return records[0], records[1]

@@ -43,7 +43,3 @@ export function getPeriodicFaceTilingDescriptor(
 ): PeriodicFaceTilingDescriptor | null {
     return PERIODIC_FACE_TILING_BY_GEOMETRY.get(geometry) ?? null;
 }
-
-export function isPeriodicFaceTilingGeometry(geometry: string): boolean {
-    return PERIODIC_FACE_TILING_BY_GEOMETRY.has(geometry);
-}

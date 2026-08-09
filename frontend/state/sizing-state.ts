@@ -87,11 +87,6 @@ export function maxCellSizeForTilingFamily(
     return policy.control === "cell_size" ? policy.max : MAX_CELL_SIZE;
 }
 
-export function normalizeCellSize(value: number): number {
-    const parsed = Number(value);
-    return Math.min(MAX_CELL_SIZE, Math.max(MIN_CELL_SIZE, Math.round(parsed)));
-}
-
 export function normalizeCellSizeForTilingFamily(
     tilingFamily: string | null | undefined,
     value: number,
@@ -107,11 +102,6 @@ export function normalizeCellSizeForTilingFamily(
 export function normalizeRenderCellSize(value: number): number {
     const parsed = Number(value);
     return Math.min(MAX_RENDER_CELL_SIZE, Math.max(MIN_RENDER_CELL_SIZE, parsed));
-}
-
-export function normalizePatchDepth(value: number): number {
-    const parsed = Number(value);
-    return Math.min(MAX_PATCH_DEPTH, Math.max(MIN_PATCH_DEPTH, Math.round(parsed)));
 }
 
 export function maxPatchDepthForTilingFamily(

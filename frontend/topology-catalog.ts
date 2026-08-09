@@ -132,11 +132,6 @@ export function getTopologySizingPolicy(
     return definition.sizing_policy;
 }
 
-export function isSupportedTopologyFamily(tilingFamily: string | null | undefined): boolean {
-    const canonical = canonicalizeTopologyIdentity(tilingFamily);
-    return TOPOLOGY_BY_FAMILY.has(canonical.tilingFamily);
-}
-
 export function resolveAdjacencyMode(
     tilingFamily: string | null | undefined,
     adjacencyMode: string | null = null,
@@ -198,21 +193,6 @@ export function topologyUsesPatchDepth(
     void adjacencyMode;
     const definition = definitionFromSpecOrFamily(topologySpecOrFamily);
     return definition?.sizing_mode === "patch_depth";
-}
-
-export function topologyUsesBackendViewportSync(
-    topologySpecOrFamily: string | Partial<TopologySpec> | null | undefined,
-): boolean {
-    const definition = definitionFromSpecOrFamily(topologySpecOrFamily);
-    return definition?.viewport_sync_mode === "backend-sync";
-}
-
-export function isPenroseTilingFamily(tilingFamily: string | null | undefined): boolean {
-    return String(tilingFamily) === "penrose-p3-rhombs";
-}
-
-export function topologyVariantKeyFromSpec(topologySpec: Partial<TopologySpec> = {}): string {
-    return resolveTopologyVariantKey(topologySpec.tiling_family, topologySpec.adjacency_mode);
 }
 
 function fallbackTopologyModeLabel(definition: TopologyDefinition | null, mode: string): string {

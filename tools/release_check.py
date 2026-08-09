@@ -30,10 +30,6 @@ def _run_command(args: list[str]) -> subprocess.CompletedProcess[str]:
     )
 
 
-def _output(result: subprocess.CompletedProcess[str]) -> str:
-    return (result.stdout or result.stderr or "").strip()
-
-
 def _git_output(*args: str) -> str | None:
     result = _run_command(["git", *args])
     if result.returncode != 0:
