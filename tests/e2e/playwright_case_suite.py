@@ -1475,40 +1475,6 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#drawer-toggle-btn")
         self._expect("#control-drawer").to_have_attribute("data-open", "true")
 
-    def test_canvas_hud_does_not_overlap_canvas_at_supported_widths(self) -> None:
-        case = self._case()
-
-        for width in (1280, 820):
-            with case.subTest(width=width):
-                case.page.set_viewport_size({"width": width, "height": 900})
-                case.page.wait_for_function(
-                    "([width, height]) => innerWidth === width && innerHeight === height",
-                    arg=[width, 900],
-                )
-                geometry = cast(
-                    dict[str, float],
-                    case.page.evaluate(
-                        """() => {
-                            const hud = document.getElementById("canvas-hud");
-                            const viewport = document.getElementById("grid-viewport");
-                            const canvas = document.getElementById("grid");
-                            if (!hud || !viewport || !(canvas instanceof HTMLCanvasElement)) {
-                                throw new Error("Lab canvas geometry is unavailable");
-                            }
-                            const hudRect = hud.getBoundingClientRect();
-                            const viewportRect = viewport.getBoundingClientRect();
-                            const canvasRect = canvas.getBoundingClientRect();
-                            return {
-                                hudBottom: hudRect.bottom,
-                                viewportTop: viewportRect.top,
-                                canvasTop: canvasRect.top,
-                            };
-                        }"""
-                    ),
-                )
-                case.assertGreaterEqual(geometry["viewportTop"], geometry["hudBottom"])
-                case.assertGreaterEqual(geometry["canvasTop"], geometry["hudBottom"])
-
     def test_canvas_stays_fixed_when_lab_overlays_change(self) -> None:
         case = self._case()
 
@@ -1583,7 +1549,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             ):
                 case.assertLessEqual(
                     abs(float(actual[key]) - float(expected[key])),
-                    0.25,
+                    0.1,
                     f"{transition} changed {key}",
                 )
 
@@ -1804,7 +1770,10 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#wall-view-btn")
         self._expect(".compare-filmstrip-board").to_have_count(4, timeout=60_000)
 
-        first_board = case.page.locator(".compare-filmstrip-board").first
+        first_board = case.page.locator(
+            ".compare-filmstrip-board",
+            has=case.page.locator(".compare-filmstrip-label", has_text="Trihexagonal"),
+        )
         expand = first_board.locator(".compare-filmstrip-expand")
         expect(expand).to_be_visible()
 
@@ -1812,6 +1781,33 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
 
         expect(first_board).to_have_class(re.compile(r"\bis-hero\b"))
         expect(expand).to_be_hidden()
+        stage_caption = case.page.locator(".compare-stage-caption")
+        toolbelt = first_board.locator(".compare-hero-toolbelt")
+        board_slot = first_board.locator(".compare-filmstrip-slot")
+
+        for width in (390, 820, 1280):
+            with case.subTest(width=width):
+                case.page.set_viewport_size({"width": width, "height": 900})
+                case.page.wait_for_function(
+                    "([width, height]) => innerWidth === width && innerHeight === height",
+                    arg=[width, 900],
+                )
+                expect(stage_caption).to_be_hidden()
+                geometry = cast(
+                    dict[str, float],
+                    case.page.evaluate(
+                        """([toolbelt, boardSlot]) => {
+                            const toolbeltRect = toolbelt.getBoundingClientRect();
+                            const boardSlotRect = boardSlot.getBoundingClientRect();
+                            return {
+                                toolbeltBottom: toolbeltRect.bottom,
+                                boardSlotTop: boardSlotRect.top,
+                            };
+                        }""",
+                        [toolbelt.element_handle(), board_slot.element_handle()],
+                    ),
+                )
+                case.assertLessEqual(geometry["toolbeltBottom"], geometry["boardSlotTop"])
 
     def test_wall_rerun_resets_the_focused_explainer_generation(self) -> None:
         case = self._case()

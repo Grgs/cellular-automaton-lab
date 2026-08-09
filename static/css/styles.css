@@ -1324,29 +1324,22 @@ button.is-running:hover:not(:disabled) {
 .grid-panel {
     display: flex;
     flex-direction: column;
-    gap: 8px;
     height: 100%;
     min-height: 0;
     position: relative;
 }
 
-/* Keep the board-identifying labels in a reserved strip above the viewport.
-   Other transient Lab chrome can overlay the board without hiding its top. */
+/* Dynamic Lab chrome overlays the board so opening controls, editing, or
+   running never changes the viewport used to fit the canvas. */
 .canvas-hud {
-    position: relative;
+    position: absolute;
+    top: 14px;
+    left: 14px;
     z-index: 5;
-    flex: 0 0 auto;
     display: grid;
     gap: 8px;
-    width: min(460px, 100%);
+    width: min(460px, calc(100% - 28px));
     pointer-events: none;
-}
-
-/* Overlay policy can temporarily hide the HUD while running or interacting.
-   Preserve its layout slot so those transitions do not resize the canvas. */
-.canvas-hud[hidden] {
-    display: grid !important;
-    visibility: hidden;
 }
 
 .canvas-edit-cue {
@@ -2783,7 +2776,9 @@ button.is-running:hover:not(:disabled) {
     }
 
     .canvas-hud {
-        width: 100%;
+        top: 12px;
+        left: 12px;
+        width: min(100%, calc(100% - 24px));
         grid-template-columns: 1fr;
         gap: 6px;
     }
