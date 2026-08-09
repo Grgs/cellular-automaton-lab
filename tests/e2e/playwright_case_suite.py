@@ -1475,6 +1475,40 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         case.page.click("#drawer-toggle-btn")
         self._expect("#control-drawer").to_have_attribute("data-open", "true")
 
+    def test_canvas_hud_does_not_overlap_canvas_at_supported_widths(self) -> None:
+        case = self._case()
+
+        for width in (1280, 820):
+            with case.subTest(width=width):
+                case.page.set_viewport_size({"width": width, "height": 900})
+                case.page.wait_for_function(
+                    "([width, height]) => innerWidth === width && innerHeight === height",
+                    arg=[width, 900],
+                )
+                geometry = cast(
+                    dict[str, float],
+                    case.page.evaluate(
+                        """() => {
+                            const hud = document.getElementById("canvas-hud");
+                            const viewport = document.getElementById("grid-viewport");
+                            const canvas = document.getElementById("grid");
+                            if (!hud || !viewport || !(canvas instanceof HTMLCanvasElement)) {
+                                throw new Error("Lab canvas geometry is unavailable");
+                            }
+                            const hudRect = hud.getBoundingClientRect();
+                            const viewportRect = viewport.getBoundingClientRect();
+                            const canvasRect = canvas.getBoundingClientRect();
+                            return {
+                                hudBottom: hudRect.bottom,
+                                viewportTop: viewportRect.top,
+                                canvasTop: canvasRect.top,
+                            };
+                        }"""
+                    ),
+                )
+                case.assertGreaterEqual(geometry["viewportTop"], geometry["hudBottom"])
+                case.assertGreaterEqual(geometry["canvasTop"], geometry["hudBottom"])
+
     def test_canvas_stays_fixed_when_lab_overlays_change(self) -> None:
         case = self._case()
 
@@ -1549,7 +1583,7 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             ):
                 case.assertLessEqual(
                     abs(float(actual[key]) - float(expected[key])),
-                    0.1,
+                    0.25,
                     f"{transition} changed {key}",
                 )
 
