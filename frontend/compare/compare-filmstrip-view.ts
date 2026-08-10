@@ -556,7 +556,6 @@ export function createFilmstripView(options: FilmstripViewOptions): FilmstripVie
     }
 
     function refreshManagementControls(): void {
-        const disabledReason = managementDisabledReason();
         const addButton = wallActions.querySelector<HTMLButtonElement>(".compare-filmstrip-add");
         if (addButton) {
             updateAddControlState(addButton);

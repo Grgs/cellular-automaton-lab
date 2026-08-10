@@ -92,35 +92,6 @@ def equilateral_triangle(
     return (_round(p1), _round(apex), _round(p2))
 
 
-def isoceles_right_triangle(
-    leg_p1: tuple[float, float],
-    leg_p2: tuple[float, float],
-    *,
-    side: str = "above",
-) -> tuple[Vertex, Vertex, Vertex]:
-    """Isoceles right triangle with legs from a shared right-angle vertex.
-
-    leg_p1 and leg_p2 are the two non-right-angle vertices; the right
-    angle is placed perpendicular-out from the midpoint of leg_p1->leg_p2
-    on the chosen side. Useful for tetrakis-square-like patterns.
-    """
-    if side not in ("above", "below"):
-        raise ValueError(f"side must be 'above' or 'below', got {side!r}")
-    dx = leg_p2[0] - leg_p1[0]
-    dy = leg_p2[1] - leg_p1[1]
-    length = math.hypot(dx, dy)
-    if length < 1e-9:
-        raise ValueError("leg_p1 and leg_p2 must be distinct")
-    midpoint = ((leg_p1[0] + leg_p2[0]) / 2.0, (leg_p1[1] + leg_p2[1]) / 2.0)
-    perp = (-dy / length, dx / length)
-    sign = 1.0 if side == "above" else -1.0
-    height = length / 2.0
-    apex = (midpoint[0] + sign * perp[0] * height, midpoint[1] + sign * perp[1] * height)
-    if side == "above":
-        return (_round(leg_p1), _round(leg_p2), _round(apex))
-    return (_round(leg_p1), _round(apex), _round(leg_p2))
-
-
 # --- Squares ----------------------------------------------------------------
 
 
@@ -220,7 +191,6 @@ def regular_hexagon(
 __all__ = [
     "Vertex",
     "equilateral_triangle",
-    "isoceles_right_triangle",
     "regular_hexagon",
     "square",
     "square_with_mid_edge_vertices",

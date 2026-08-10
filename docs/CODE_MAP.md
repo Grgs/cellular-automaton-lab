@@ -476,8 +476,6 @@ A self-contained overlay that runs one seed under one rule across many tilings a
   Manifest-wide geometric sanity checker for catalog tilings.
 - [tools/verify_reference_tilings.py](../tools/verify_reference_tilings.py)
   Literature-faithfulness verifier for the full topology catalog.
-- [tools/export_bootstrap_data.py](../tools/export_bootstrap_data.py)
-  Exports bootstrap metadata for standalone mode.
 - [tools/tools_docs.py](../tools/tools_docs.py)
   Generates and checks `docs/TOOLS.md` from the command registry.
 - [tools/render_review/browser_support/artifacts.py](../tools/render_review/browser_support/artifacts.py)

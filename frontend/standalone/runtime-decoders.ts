@@ -77,10 +77,6 @@ function optionalString(value: unknown, context: string, detail: string): string
     return value === undefined ? undefined : string(value, context, detail);
 }
 
-function optionalNumber(value: unknown, context: string, detail: string): number | undefined {
-    return value === undefined ? undefined : number(value, context, detail);
-}
-
 function numberRecord(value: unknown, context: string, detail: string): Record<string, number> {
     const record = object(value, context, detail);
     for (const [key, entry] of Object.entries(record)) {

@@ -89,17 +89,11 @@ class RuleContext:
     def topology_revision(self) -> str:
         return self._frame.topology_revision
 
-    def for_cell_id(self, cell_id: str) -> RuleContext:
-        return RuleContext(self._frame, self._cell_states, self._frame.index_for(cell_id))
-
     def has_cell(self, cell_id: str) -> bool:
         return self._frame.has_cell(cell_id)
 
     def state_for(self, cell_id: str) -> int:
         return int(self._cell_states[self._frame.index_for(cell_id)])
-
-    def kind_for(self, cell_id: str) -> str:
-        return self._frame.cell_kind_for(self._frame.index_for(cell_id))
 
     def shell_rank_for(self, cell_id: str) -> int:
         return self._frame.shell_rank_for(self._frame.index_for(cell_id))

@@ -118,7 +118,7 @@ describe("runtime decoder contract fixtures", () => {
         expect(Object.keys(fixtureDocument.responses).sort()).toEqual([...EXPECTED_ENTRIES].sort());
     });
 
-    it.each(entries)("decodes the %s response without loss", (name, entry) => {
+    it.each(entries)("decodes the %s response without loss", (_name, entry) => {
         const decoded = decodeEntry(entry) as Record<string, unknown>;
 
         // Compare the complete envelope after the explicit public adapters

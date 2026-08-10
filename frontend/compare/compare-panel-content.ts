@@ -19,7 +19,6 @@ import type {
     PatternPayload,
     RuleDefinition,
     SeedComparisonResult,
-    SeedFilmstripResult,
     TopologyFilmstrip,
 } from "../types/domain.js";
 import type { SimulationBackend } from "../types/controller.js";
@@ -229,7 +228,6 @@ export function createComparePanelContent(
     let rulesLoaded = false;
     let disposed = false;
     let tilingSearchQuery = "";
-    let activeConfigTab: ConfigTab = "setup";
     const analysisCache = new Map<string, SeedComparisonResult>();
     const presetButtons = new Map<TilingPreset, HTMLButtonElement>();
     // True while the stage-wide analysis overlay is open; gates the analysis
@@ -2047,7 +2045,6 @@ export function createComparePanelContent(
     }
 
     function activateConfigTab(tab: ConfigTab, options: { focus?: boolean } = {}): void {
-        activeConfigTab = tab;
         for (const [candidate, button] of configTabButtons) {
             const active = candidate === tab;
             button.classList.toggle("is-active", active);

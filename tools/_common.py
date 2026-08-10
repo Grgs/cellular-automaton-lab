@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import shutil
 import subprocess
-import sys
 from collections.abc import Callable
 from pathlib import Path
 from typing import Final
@@ -26,12 +25,6 @@ def write_text_lf(path: Path, content: str) -> None:
 
 def resolve_node_executable() -> str:
     return shutil.which("node") or shutil.which("node.exe") or "node"
-
-
-def resolve_npm_executable() -> str:
-    if sys.platform == "win32":
-        return shutil.which("npm.cmd") or shutil.which("npm") or "npm.cmd"
-    return shutil.which("npm") or "npm"
 
 
 def run_command(

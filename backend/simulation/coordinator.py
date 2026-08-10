@@ -90,9 +90,6 @@ class SimulationCoordinator:
     ) -> R:
         return self.mutation_dispatcher.run_deferred(action, *args, **kwargs)
 
-    def _save_state_to_store(self) -> None:
-        self.persistence_runtime.save_to_store()
-
     def persist_state(self) -> None:
         self.persistence_runtime.persist_state()
 
@@ -117,10 +114,6 @@ class SimulationCoordinator:
 
     def get_topology(self) -> LatticeTopology:
         return self.service.state.topology
-
-    def get_topology_revision(self) -> str | None:
-        topology = self.get_topology()
-        return topology.topology_revision if topology is not None else None
 
     def get_rule(self) -> AutomatonRule:
         return self.service.state.rule

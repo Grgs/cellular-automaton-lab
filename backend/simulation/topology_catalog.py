@@ -65,7 +65,6 @@ __all__ = [
     "get_topology_variant_for_geometry",
     "is_aperiodic_geometry",
     "is_penrose_geometry",
-    "is_supported_topology_family",
     "maximum_patch_depth_for_tiling_family",
     "minimum_grid_dimension_for_geometry",
     "minimum_patch_depth_for_tiling_family",
@@ -112,10 +111,6 @@ def describe_topologies() -> list[TopologyCatalogEntryPayload]:
 
 def describe_topology_variants() -> list[TopologyVariantPayload]:
     return describe_variant_entries(TOPOLOGY_VARIANTS)
-
-
-def is_supported_topology_family(tiling_family: str) -> bool:
-    return tiling_family in TOPOLOGY_BY_FAMILY
 
 
 def get_topology_definition(tiling_family: str) -> TopologyDefinition:

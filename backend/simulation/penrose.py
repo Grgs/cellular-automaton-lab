@@ -233,30 +233,6 @@ class _Strip:
             raise ValueError("Parallel strips do not intersect.")
         return (intersection - self.origin()).dot(self.family.direction())
 
-    def rhombus_at_intersection(self, other: _Strip) -> _Rhombus:
-        lattice_coords = [0] * 5
-        lattice_coords[self.family.pent_angle.index] = self.multiple
-        distance = self.intersection_distance_from_point(other)
-
-        for pent_angle in _other_pent_angles(self.family.pent_angle.index):
-            if pent_angle.index == other.family.pent_angle.index:
-                lattice_coords[other.family.pent_angle.index] = other.multiple
-                continue
-
-            other_family = self.family.tiling.strip_family(pent_angle)
-            initial_intersection = self.intersection_distance_from_point(other_family.strip(0))
-            delta = initial_intersection - distance
-            inverse_sin = self.family.pent_angle.inverse_sin(pent_angle)
-
-            if inverse_sin > 0:
-                multiple = int(math.floor(delta / inverse_sin))
-                lattice_coords[pent_angle.index] = multiple
-            else:
-                multiple = int(math.ceil(delta / inverse_sin))
-                lattice_coords[pent_angle.index] = multiple - 1
-
-        return _Rhombus(self, other, tuple(lattice_coords))
-
     def rhombus(self, target_distance: float) -> _Rhombus:
         forward_rhombus = next(self.rhombi(target_distance, True))
         backward_rhombus = next(self.rhombi(target_distance, False))
