@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 
 from backend.defaults import (
     DEFAULT_ADJACENCY_MODE,
-    DEFAULT_GEOMETRY,
     DEFAULT_HEIGHT,
     DEFAULT_PATCH_DEPTH,
     DEFAULT_SPEED,
@@ -33,7 +32,6 @@ from backend.simulation.topology import (
 from backend.simulation.topology_catalog import (
     canonicalize_topology_identity,
     get_topology_definition,
-    get_topology_variant_for_geometry,
     maximum_patch_depth_for_tiling_family,
     minimum_grid_dimension_for_geometry,
     minimum_patch_depth_for_tiling_family,
@@ -175,24 +173,6 @@ class TopologySpec:
             height=normalized_height,
             patch_depth=normalized_patch_depth,
             unsafe_size_override=bool(unsafe_size_override),
-        )
-
-    @classmethod
-    def from_geometry_key(
-        cls,
-        geometry: str = DEFAULT_GEOMETRY,
-        *,
-        width: int = DEFAULT_WIDTH,
-        height: int = DEFAULT_HEIGHT,
-        patch_depth: int = DEFAULT_PATCH_DEPTH,
-    ) -> TopologySpec:
-        variant = get_topology_variant_for_geometry(str(geometry))
-        return cls.from_values(
-            tiling_family=variant.tiling_family,
-            adjacency_mode=variant.adjacency_mode,
-            width=width,
-            height=height,
-            patch_depth=patch_depth,
         )
 
     def updated(
