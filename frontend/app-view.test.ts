@@ -98,4 +98,39 @@ describe("app-view selection inspector integration", () => {
         appView.renderGrid();
         expect(state.renderCellSize).toBeGreaterThan(12);
     });
+
+    it("preserves drawer occlusion while running has auto-hidden the drawer", async () => {
+        const renderControls = vi.fn();
+        vi.doMock("./controls-view.js", () => ({
+            renderControls,
+        }));
+
+        const { createAppState } = await import("./state/simulation-state.js");
+        const { createAppView } = await import("./app-view.js");
+
+        const state = createAppState();
+        state.drawerOpen = true;
+        state.inspectorOccludesGrid = true;
+        state.isRunning = true;
+
+        const mainStage = document.createElement("main");
+        const grid = document.createElement("canvas");
+        const controlDrawer = document.createElement("aside");
+        controlDrawer.dataset.open = "false";
+
+        const appView = createAppView({
+            state,
+            elements: {
+                mainStage,
+                grid,
+                controlDrawer,
+            } as Parameters<typeof createAppView>[0]["elements"],
+            gridView: null,
+        });
+
+        appView.renderControlsPanel();
+
+        expect(state.inspectorOccludesGrid).toBe(true);
+        expect(renderControls).toHaveBeenCalledTimes(1);
+    });
 });

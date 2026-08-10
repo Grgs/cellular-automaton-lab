@@ -97,6 +97,21 @@ export function createAppView({
         const drawerVisible =
             controlDrawer.dataset.open === "true" && drawerRect.width > 0 && drawerRect.height > 0;
 
+        // A running simulation may hide an otherwise-open, occluding drawer. In
+        // that state the hidden drawer cannot be measured, but treating it as
+        // non-occluding would immediately reopen it and create a render loop:
+        // open -> measured as occluding -> hidden -> measured as clear -> open.
+        // Preserve the last visible measurement until the run ends or the user
+        // explicitly restores the overlays.
+        const drawerAutoHiddenForRun =
+            state.drawerOpen &&
+            !state.runningOverlayRestoreActive &&
+            Boolean(state.isRunning || state.overlayRunPending) &&
+            !drawerVisible;
+        if (drawerAutoHiddenForRun) {
+            return;
+        }
+
         if (stageRect.height <= 0 || gridRect.height <= 0 || !drawerVisible) {
             applyOverlayIntent(state, OVERLAY_INTENT_LAYOUT_OCCLUSION_CHANGED, {
                 inspectorOccludesGrid: false,
