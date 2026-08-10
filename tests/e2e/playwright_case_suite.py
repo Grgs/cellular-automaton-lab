@@ -1464,6 +1464,58 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
         self._expect("#status-text").to_have_text("Paused")
         case.assertGreater(self._read_generation(), initial_generation)
 
+    def test_running_does_not_reopen_an_auto_hidden_overlay_drawer(self) -> None:
+        case = self._case()
+        case.page.set_viewport_size({"width": 820, "height": 900})
+        case.assertEqual(case.page.evaluate("() => [innerWidth, innerHeight]"), [820, 900])
+        if case.page.locator("#control-drawer").get_attribute("data-open") == "true":
+            case.page.click("#drawer-toggle-btn")
+            self._expect("#control-drawer").to_have_attribute("data-open", "false")
+        if case.api is not None:
+            with case.page.expect_response(
+                lambda response: (
+                    response.request.method == "POST"
+                    and is_control_reset_response_url(response.url)
+                )
+            ) as response_info:
+                case.page.click("#random-btn")
+            case.assertEqual(response_info.value.status, 200)
+        else:
+            case.page.click("#random-btn")
+            case.page.wait_for_timeout(100)
+        self._expect("#blocking-activity-overlay").to_be_hidden()
+        randomized_pattern = self._export_pattern_payload()
+        case.assertTrue(randomized_pattern.get("cells_by_id"))
+        self._ensure_drawer_open()
+        self._expect("#control-drawer").to_have_attribute("data-open", "true")
+        case.page.evaluate(
+            """() => {
+                const drawer = document.getElementById("control-drawer");
+                if (!drawer) throw new Error("Control drawer is unavailable");
+                const transitions = [];
+                let previous = drawer.dataset.open;
+                new MutationObserver(() => {
+                    const next = drawer.dataset.open;
+                    if (next !== previous) {
+                        transitions.push(next);
+                        previous = next;
+                    }
+                }).observe(drawer, { attributes: true, attributeFilter: ["data-open"] });
+                window.__drawerRunTransitions = transitions;
+            }"""
+        )
+
+        case.page.click("#run-toggle-btn")
+
+        self._expect("#status-text").to_have_text("Running")
+        self._expect("#control-drawer").to_have_attribute("data-open", "false")
+        case.page.wait_for_timeout(750)
+        self._expect("#status-text").to_have_text("Running")
+        case.assertEqual(
+            case.page.evaluate("() => window.__drawerRunTransitions"),
+            ["false"],
+        )
+
     def test_overlay_drawer_toggle_hides_and_restores_inspector(self) -> None:
         case = self._case()
         self._expect("#control-drawer").to_have_attribute("data-open", "true")
