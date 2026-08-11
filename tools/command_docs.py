@@ -413,6 +413,16 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ),
     ),
     CommandDoc(
+        ("repo", "dead-code"),
+        "repo",
+        "Audit Python sources for actionable dead code.",
+        "Runs Vulture across the full Python surface and suppresses only repository-aware dynamic contracts such as TypedDict members, Protocol signatures, reflected names, and framework-owned assignments.",
+        (
+            "python -m tools repo dead-code",
+            "python -m tools repo dead-code --show-suppressed",
+        ),
+    ),
+    CommandDoc(
         ("repo", "python-style"),
         "repo",
         "Run repo-owned Ruff style commands for Python sources.",

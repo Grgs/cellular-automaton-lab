@@ -465,6 +465,17 @@ python -m tools repo cleanup --port 5000
 python -m tools repo cleanup --repo
 ```
 
+### `python -m tools repo dead-code`
+
+Audit Python sources for actionable dead code.
+
+Runs Vulture across the full Python surface and suppresses only repository-aware dynamic contracts such as TypedDict members, Protocol signatures, reflected names, and framework-owned assignments.
+
+```powershell
+python -m tools repo dead-code
+python -m tools repo dead-code --show-suppressed
+```
+
 ### `python -m tools repo python-style`
 
 Run repo-owned Ruff style commands for Python sources.

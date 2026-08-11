@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol
 
 from backend.contract_validation import SNAPSHOT_VERSION
 from backend.defaults import APP_DEFAULTS
@@ -16,10 +15,6 @@ from backend.simulation.aperiodic_family_manifest import (
 )
 from backend.simulation.periodic_face_tilings import describe_periodic_face_tilings
 from backend.simulation.topology_catalog import describe_topologies
-
-
-class BootstrapDataProvider(Protocol):
-    def get_payload(self) -> AppBootstrapPayload: ...
 
 
 @dataclass(frozen=True)

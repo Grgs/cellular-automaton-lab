@@ -69,7 +69,6 @@ ARCHIMEDEAN_33434_GEOMETRY = "archimedean-3-3-4-3-4"
 ARCHIMEDEAN_33344_GEOMETRY = "archimedean-3-3-3-4-4"
 ARCHIMEDEAN_33336_GEOMETRY = "archimedean-3-3-3-3-6"
 KAGOME_GEOMETRY = "trihexagonal-3-6-3-6"
-CAIRO_GEOMETRY = "cairo-pentagonal"
 RHOMBILLE_GEOMETRY = "rhombille"
 DELTOIDAL_HEXAGONAL_GEOMETRY = "deltoidal-hexagonal"
 TETRAKIS_SQUARE_GEOMETRY = "tetrakis-square"
@@ -81,57 +80,7 @@ TRIAKIS_TRIANGULAR_GEOMETRY = "triakis-triangular"
 DELTOIDAL_TRIHEXAGONAL_GEOMETRY = "deltoidal-trihexagonal"
 PRISMATIC_PENTAGONAL_GEOMETRY = "prismatic-pentagonal"
 FLORET_PENTAGONAL_GEOMETRY = "floret-pentagonal"
-TYPE_7_PENTAGONAL_GEOMETRY = "type-7-pentagonal"
 SNUB_SQUARE_DUAL_GEOMETRY = "snub-square-dual"
-KISRHOMBILLE_GEOMETRY = "kisrhombille"
-# Tiltwork is a non-canonical periodic tiling invented for this catalog:
-# a unit square with a center diamond (rotated square) inset and four
-# right-isosceles triangles in the corners. Vertex configurations are
-# (triangle, triangle, diamond, triangle, triangle, diamond) at edge
-# midpoints and (triangle, triangle, triangle, triangle) at corners.
-TILTWORK_GEOMETRY = "tiltwork"
-# Pythagorean tiling: classic two-prototile tiling by two square sizes (here
-# 1:2 ratio). Non-edge-to-edge: every long-edge midpoint is a T-junction
-# where a small square's vertex meets the middle of a big square's edge.
-# To make every edge match exactly, big squares are modeled as 8-vertex
-# polygons (four corners plus four collinear mid-edge vertices).
-PYTHAGOREAN_GEOMETRY = "pythagorean"
-# Herringbone tiling: 2:1 bricks in two orientations (horizontal and
-# vertical). Rows of horizontal bricks alternate with rows of vertical
-# bricks; each horizontal brick's long edge is met by the short edges
-# of two perpendicular vertical bricks at its midpoint (T-junctions).
-# To make adjacency match, horizontal bricks are modeled as 6-vertex
-# polygons (four corners plus two collinear mid-long-edge vertices).
-HERRINGBONE_GEOMETRY = "herringbone"
-# Basketweave tiling: 2:1 bricks in two orientations arranged so that
-# pairs of parallel bricks form 50x50 blocks, which then alternate
-# orientation in a checkerboard pattern. Non-edge-to-edge: every brick
-# has exactly one long edge whose midpoint hosts a T-junction with a
-# perpendicular brick. Each brick is modeled as a 5-vertex polygon
-# (four corners plus a single mid-edge vertex on that long edge).
-BASKETWEAVE_GEOMETRY = "basketweave"
-# Type-4 pentagonal cross motif: four congruent pentagons meet in a p4
-# cross-shaped cluster, giving the periodic catalog a visually distinct
-# pentagonal option without leaning on triangle/square subdivisions.
-PENTAGON_CROSSES_GEOMETRY = "pentagon-crosses"
-# 2-uniform tiling [3^6; 3^3.4^2]: combines pure-triangular and
-# elongated-triangular vertex types. Constructed by alternating wide
-# strips of pure triangular tiling (2 triangle rows tall, height
-# sqrt(3) at unit edge) with a single row of squares (height 1).
-# Interior vertices of the triangle strip have 6 triangles meeting
-# (3^6); vertices on the triangle/square boundary have 3 triangles
-# plus 2 squares (3^3.4^2). It's the smallest 2-uniform tiling that
-# uses only regular polygons and only two prototile shapes.
-TRIANGULAR_SQUARE_2UNIFORM_GEOMETRY = "triangular-square-2uniform"
-# 2-uniform tiling [3.6.3.6; 3^2.6^2]: combines trihexagonal vertex types
-# with "elongated trihex" vertices. Constructed from rows of pointy-top
-# hexagons that share vertical edges within each row (creating (3^2.6^2)
-# vertices at the shared corners), with diamond gaps between rows filled
-# by pairs of equilateral triangles. The vertices where adjacent rows of
-# hexes meet end-on-end are (3.6.3.6) vertices (THTH order). Edge-to-edge;
-# no T-junctions. Uses only triangles + hexagons (complements the
-# triangle+square 2-uniform).
-TRIHEX_2UNIFORM_3636_3366_GEOMETRY = "trihex-2uniform-3636-3366"
 # 2-uniform tiling #10 [3^6; 3^2.6^2]: hexagons share three alternating
 # edges in a honeycomb arrangement, leaving pure triangular-lattice gaps.
 UNIFORM_2_10_GEOMETRY = "uniform-2-10-36-3262"
@@ -148,16 +97,6 @@ UNIFORM_2_12_GEOMETRY = "uniform-2-12-3262-346"
 # Its regular triangle, square, hexagon, and dodecagon faces make it the
 # catalog's first periodic tiling with four polygon kinds in one topology.
 UNIFORM_34612_GEOMETRY = "uniform-3-4-6-12"
-# Stein-14 pentagonal: the 14th of the 15 known monohedral convex pentagonal
-# tilings, discovered by Rolf Stein (1985). Has completely determined tile
-# proportions (no degrees of freedom): 2a=2c=d=e with A=90 deg and angle B
-# satisfying sin(B) = (sqrt(57) - 3) / 8 (B obtuse ~145.34 deg). The 6-tile
-# primitive unit has p2 symmetry and is 3-isohedral (3 orbit classes of tiles
-# under p2). Genuinely SKEW LATTICE: the two translation basis vectors do
-# not span an axis-aligned rectangle, requiring the periodic_face system's
-# cumulative-skew lattice_skew_x mode (every row shifted by k*skew, not the
-# alternating-row brick semantic).
-STEIN_14_PENTAGONAL_GEOMETRY = "stein-14-pentagonal"
 
 
 @dataclass(frozen=True)

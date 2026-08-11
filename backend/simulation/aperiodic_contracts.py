@@ -35,7 +35,6 @@ class AperiodicImplementationContract:
     implementation_status: AperiodicImplementationStatus
     source_urls: tuple[str, ...]
     public_cell_kinds: tuple[str, ...]
-    metadata_fields: tuple[tuple[str, tuple[str, ...]], ...]
     depth_semantics: str
     verification_modes: tuple[str, ...]
     promotion_blocker: str | None = None
@@ -100,9 +99,6 @@ def build_aperiodic_contract(geometry: str) -> AperiodicImplementationContract:
         implementation_status=manifest_entry.implementation_status,
         source_urls=spec.source_urls,
         public_cell_kinds=manifest_entry.public_cell_kinds,
-        metadata_fields=tuple(
-            (requirement.kind, requirement.fields) for requirement in spec.required_metadata
-        ),
         depth_semantics=_depth_semantics(geometry),
         verification_modes=_verification_modes(geometry),
         promotion_blocker=manifest_entry.promotion_blocker,

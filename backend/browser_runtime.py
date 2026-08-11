@@ -75,10 +75,6 @@ class BrowserSimulationRuntime:
         result = self.command_dispatcher.dispatch(COMMAND_BY_PATH["/api/state"])
         return self._command_response(result)
 
-    def get_rules_response(self) -> str:
-        result = self.command_dispatcher.dispatch(COMMAND_BY_PATH["/api/rules"])
-        return self._command_response(result)
-
     @property
     def command_dispatcher(self) -> ApplicationCommandDispatcher:
         return ApplicationCommandDispatcher(ServiceCommandTarget(self.service, self.rule_registry))

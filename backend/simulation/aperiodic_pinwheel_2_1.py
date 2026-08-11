@@ -108,7 +108,6 @@ _ROOT_TRIANGLES: tuple[ExactTriangle, ...] = (
     ),
 )
 
-REFERENCE_ROOT_SEED_POLICY = "paired-right-triangle-rectangle"
 INFLATION_FACTOR = math.sqrt(17) / 2
 USES_EXACT_REFERENCE_PATH = True
 

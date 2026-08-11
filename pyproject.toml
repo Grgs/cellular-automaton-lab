@@ -17,6 +17,12 @@ select = ["F", "E7", "E9", "I", "B", "UP"]
 [tool.pytest.ini_options]
 cache_dir = "output/.pytest_cache"
 
+[tool.vulture]
+paths = ["app.py", "backend", "examples", "tests", "tools"]
+min_confidence = 60
+ignore_decorators = ["@api_bp.*", "@session_api_bp.*", "@page_bp.*"]
+ignore_names = ["load_tests", "log_message"]
+
 [tool.coverage.run]
 branch = true
 source = [

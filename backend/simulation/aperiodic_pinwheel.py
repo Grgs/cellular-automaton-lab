@@ -64,7 +64,6 @@ _ROOT_TRIANGLES: tuple[ExactTriangle, ...] = (
     ),
 )
 
-REFERENCE_ROOT_SEED_POLICY = "paired-right-triangle-rectangle"
 USES_EXACT_REFERENCE_PATH = True
 
 

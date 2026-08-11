@@ -27,7 +27,6 @@ import { createPaneEditHistory } from "./pane-edit-history.js";
 import { createPaneGestureController } from "./pane-gestures.js";
 import {
     createPaneRenderer,
-    fitCanvasElementToViewport,
     geometryForSpec,
     type PaneCellSizeOptions,
     type PaneViewportDimensionsOptions,

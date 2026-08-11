@@ -2,7 +2,6 @@ import { resolveTopologyVariantKey } from "./topology-catalog.js";
 import type {
     CartesianSeedCell,
     CellStateUpdate,
-    TopologyCell,
     TopologyIndex,
     TopologyPayload,
 } from "./types/domain.js";
