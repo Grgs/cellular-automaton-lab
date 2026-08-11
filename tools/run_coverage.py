@@ -69,6 +69,7 @@ def _pytest_cov(suite: SuiteSpec) -> list[str]:
         "--cov=backend",
         "--cov=tools",
         "--cov-config=pyproject.toml",
+        "--cov-context=test",
         "--cov-report=",
     ]
 

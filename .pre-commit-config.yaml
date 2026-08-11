@@ -44,6 +44,14 @@ repos:
           - ruff==0.15.11
         pass_filenames: false
         stages: [pre-commit, manual]
+      - id: python-dead-code
+        name: dead code audit (python)
+        entry: python -m tools repo dead-code
+        language: python
+        additional_dependencies:
+          - vulture==2.16
+        pass_filenames: false
+        stages: [pre-push, manual]
       - id: python-typecheck
         name: python typecheck
         entry: npm run typecheck:python

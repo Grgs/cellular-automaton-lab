@@ -311,7 +311,6 @@ class _Strip:
 @dataclass(frozen=True)
 class _RhombusVertex:
     coordinate: _Vector
-    lattice_coordinate: tuple[int, ...]
 
 
 class _Rhombus:
@@ -339,7 +338,7 @@ class _Rhombus:
             coords = list(self.lattice_coords)
             coords[self.strip_a.family.pent_angle.index] += offset_a
             coords[self.strip_b.family.pent_angle.index] += offset_b
-            vertices.append(_RhombusVertex(self._cartesian_from_lattice(coords), tuple(coords)))
+            vertices.append(_RhombusVertex(self._cartesian_from_lattice(coords)))
 
         if _ccw(vertices[0].coordinate, vertices[1].coordinate, vertices[2].coordinate) > 0:
             vertices.reverse()

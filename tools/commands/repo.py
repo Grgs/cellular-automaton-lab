@@ -4,6 +4,7 @@ import argparse
 
 from tools import (
     application_command_contract,
+    dead_code_audit,
     dev_processes,
     generated_check,
     release_check,
@@ -29,6 +30,13 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         doc=command_doc("repo", "cleanup"),
         target_main=dev_processes.cleanup_main,
         parser_factory=dev_processes.build_cleanup_parser,
+    )
+    add_passthrough_command(
+        subparsers,
+        name="dead-code",
+        doc=command_doc("repo", "dead-code"),
+        target_main=dead_code_audit.main,
+        parser_factory=dead_code_audit.build_parser,
     )
     add_passthrough_command(
         subparsers,

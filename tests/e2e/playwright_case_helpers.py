@@ -280,64 +280,6 @@ class SharedUiFlowHelpers:
         case = self._case()
         return sample_review_cell_pixel(case.page, cell_id)
 
-    def _sample_canvas_pixel_rgba(
-        self, canvas_x: float, canvas_y: float
-    ) -> tuple[int, int, int, int]:
-        case = self._case()
-        rgba = case.page.evaluate(
-            """([x, y]) => {
-                const canvas = document.getElementById("grid");
-                if (!(canvas instanceof HTMLCanvasElement)) {
-                    throw new Error("grid canvas is missing");
-                }
-                const context = canvas.getContext("2d");
-                if (!context) {
-                    throw new Error("grid context is missing");
-                }
-                const data = context.getImageData(Math.round(x), Math.round(y), 1, 1).data;
-                return Array.from(data);
-            }""",
-            [canvas_x, canvas_y],
-        )
-        if not isinstance(rgba, list) or len(rgba) != 4:
-            raise AssertionError(
-                f"canvas pixel sampling returned an invalid RGBA payload: {rgba!r}"
-            )
-        red, green, blue, alpha = (int(channel) for channel in rgba)
-        return (red, green, blue, alpha)
-
-    def _click_canvas_position(self, canvas_x: float, canvas_y: float) -> None:
-        case = self._case()
-        bbox = case.page.locator("#grid").bounding_box()
-        if bbox is None:
-            raise AssertionError("grid canvas bounding box was unavailable")
-        canvas_metrics = case.page.evaluate(
-            """() => {
-                const canvas = document.getElementById("grid");
-                if (!(canvas instanceof HTMLCanvasElement)) {
-                    throw new Error("grid canvas is missing");
-                }
-                return { width: canvas.width, height: canvas.height };
-            }""",
-        )
-        if not isinstance(canvas_metrics, dict):
-            raise AssertionError("grid canvas metrics were unavailable")
-        canvas_width = float(canvas_metrics.get("width") or 0)
-        canvas_height = float(canvas_metrics.get("height") or 0)
-        if canvas_width <= 0 or canvas_height <= 0:
-            raise AssertionError(f"grid canvas metrics were invalid: {canvas_metrics!r}")
-        css_x = bbox["x"] + (canvas_x * (bbox["width"] / canvas_width))
-        css_y = bbox["y"] + (canvas_y * (bbox["height"] / canvas_height))
-        case.page.mouse.click(css_x, css_y)
-
-    def _set_paint_state(self, state_value: int) -> None:
-        case = self._case()
-        case.page.locator(f'.paint-state-button[data-state-value="{state_value}"]').click()
-
-    def _set_editor_tool(self, editor_tool: str) -> None:
-        case = self._case()
-        case.page.locator(f'[data-editor-tool="{editor_tool}"]').click()
-
     def _patch_depth_input_state(self) -> dict[str, str | None]:
         case = self._case()
         state = case.page.evaluate(

@@ -52,7 +52,6 @@ class SimulationCoordinator:
             debounce_ms=persistence_debounce_ms,
             timer_factory=timer_factory,
         )
-        self.persistence = self.persistence_runtime.coordinator
         self.restore_runtime = SimulationCoordinatorRestore(
             logger=self.logger,
             service=self.service,

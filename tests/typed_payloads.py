@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from backend.payload_types import (
-    ApiErrorPayload,
     CellMutationDeltaPayload,
     CellStatePayload,
     RawJsonObject,
@@ -280,13 +279,6 @@ def require_rules_response_payload(value: object, *, context: str) -> RulesRespo
             require_rule_definition_payload(rule, context=f"{context}.rules[{index}]")
             for index, rule in enumerate(rules)
         ]
-    }
-
-
-def require_api_error_payload(value: object, *, context: str) -> ApiErrorPayload:
-    payload = _require_json_object(value, context=context)
-    return {
-        "error": _require_str(payload.get("error"), context=f"{context}.error"),
     }
 
 

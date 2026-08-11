@@ -40,7 +40,7 @@ def main(argv: list[str]) -> int:
     spec = REFERENCE_FAMILY_SPECS[geometry]
     print(f"Family:        {spec.geometry} ({spec.display_name})")
     print(f"Source URLs:   {spec.source_urls}")
-    print(f"Seed policy:   {spec.canonical_root_seed_policy}")
+    print(f"Seed policy:   {spec.root_seed_policy}")
     print(f"Public kinds:  {spec.allowed_public_cell_kinds}")
     print(f"Depths probed: {sorted(spec.depth_expectations)}")
     print()

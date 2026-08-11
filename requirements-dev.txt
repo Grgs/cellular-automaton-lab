@@ -1232,6 +1232,10 @@ virtualenv==21.7.3 \
     --hash=sha256:26dfda3c34f29bf1a3ca167426a67658d59979b9954e705aef60a5f724ce1773 \
     --hash=sha256:5e9e287f5c808070eea3b40403d3368248e64b24f1b60bd9a36e85ac841d2c3e
     # via pre-commit
+vulture==2.16 \
+    --hash=sha256:6e0f1c312cef1c87856957e5c2ca9608834a7c794c2180477f30bf0e4cc58eee \
+    --hash=sha256:f8d9f6e2af03011664a3c6c240c9765b3f392917d3135fddca6d6a68d359f717
+    # via -r requirements-dev.in
 
 # The following packages are considered to be unsafe in a requirements file:
 pip==26.2.1 \

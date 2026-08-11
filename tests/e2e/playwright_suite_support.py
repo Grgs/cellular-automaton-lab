@@ -1,5 +1,4 @@
 import inspect
-import json
 import sys
 import unittest
 from collections import OrderedDict
@@ -59,9 +58,7 @@ class PlaywrightSuiteDefinition:
     name: str
     label: str
     module: str
-    includes_standalone: bool
     requires_standalone_build: bool
-    shardable: bool
     env: tuple[tuple[str, str], ...] = ()
 
     def payload(self) -> dict[str, object]:
@@ -197,9 +194,7 @@ def _playwright_suite_definitions() -> OrderedDict[str, PlaywrightSuiteDefinitio
                     name="all",
                     label="All browser suites",
                     module="tests.e2e.test_playwright_all",
-                    includes_standalone=True,
                     requires_standalone_build=True,
-                    shardable=False,
                 ),
             ),
             (
@@ -208,9 +203,7 @@ def _playwright_suite_definitions() -> OrderedDict[str, PlaywrightSuiteDefinitio
                     name="server",
                     label="Server-host browser suites",
                     module="tests.e2e.test_playwright_server",
-                    includes_standalone=False,
                     requires_standalone_build=False,
-                    shardable=False,
                 ),
             ),
             (
@@ -219,9 +212,7 @@ def _playwright_suite_definitions() -> OrderedDict[str, PlaywrightSuiteDefinitio
                     name="standalone",
                     label="Standalone browser suite",
                     module="tests.e2e.test_playwright_standalone_runtime",
-                    includes_standalone=True,
                     requires_standalone_build=True,
-                    shardable=False,
                 ),
             ),
             (
@@ -230,9 +221,7 @@ def _playwright_suite_definitions() -> OrderedDict[str, PlaywrightSuiteDefinitio
                     name="compare_workbench",
                     label="Compare workbench regression gate",
                     module="tests.e2e.test_playwright_compare_workbench",
-                    includes_standalone=True,
                     requires_standalone_build=True,
-                    shardable=False,
                 ),
             ),
             (
@@ -241,9 +230,7 @@ def _playwright_suite_definitions() -> OrderedDict[str, PlaywrightSuiteDefinitio
                     name="subset",
                     label="Server browser shard",
                     module="tests.e2e.playwright_chunk_subset",
-                    includes_standalone=False,
                     requires_standalone_build=False,
-                    shardable=True,
                 ),
             ),
         )
@@ -253,9 +240,7 @@ def _playwright_suite_definitions() -> OrderedDict[str, PlaywrightSuiteDefinitio
             name=feature_name,
             label=feature_name.replace("_", " "),
             module=feature_modules[feature_name],
-            includes_standalone=feature_name == "standalone_runtime",
             requires_standalone_build=feature_name == "standalone_runtime",
-            shardable=False,
         )
     return definitions
 
@@ -273,10 +258,6 @@ def resolve_playwright_suite_definition(suite_name: str) -> PlaywrightSuiteDefin
 
 def playwright_suite_manifest_payload() -> list[dict[str, object]]:
     return [definition.payload() for definition in _playwright_suite_definitions().values()]
-
-
-def playwright_suite_manifest_json() -> str:
-    return json.dumps(playwright_suite_manifest_payload(), indent=2)
 
 
 def build_named_playwright_suite(test_ids: list[str]) -> unittest.TestSuite:
@@ -348,10 +329,3 @@ def build_server_playwright_subset(
     return build_named_playwright_suite(
         iter_server_playwright_subset_test_names(subset_index, subset_count)
     )
-
-
-def build_playwright_subset(
-    subset_index: int,
-    subset_count: int = DEFAULT_PLAYWRIGHT_SUBSET_COUNT,
-) -> unittest.TestSuite:
-    return build_server_playwright_subset(subset_index, subset_count)

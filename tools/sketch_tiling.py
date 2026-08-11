@@ -140,7 +140,6 @@ class TJunction:
     vertex: tuple[float, float]
     edge_endpoints: tuple[tuple[float, float], tuple[float, float]]
     edge_cell_id: str
-    vertex_cells: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -404,7 +403,6 @@ def _check_t_junctions(
                         vertex=vertex,
                         edge_endpoints=(_round_vertex(a), _round_vertex(b)),
                         edge_cell_id=cell.id,
-                        vertex_cells=tuple(sorted(cells_here)),
                     )
                 )
     return tuple(t_junctions)
