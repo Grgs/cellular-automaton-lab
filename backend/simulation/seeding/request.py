@@ -11,6 +11,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from backend.contract_validation import parse_optional_bool
 from backend.public_errors import PublicApiError
 from backend.simulation.seeding.comparison import (
     DEFAULT_FILMSTRIP_FRAMES,
@@ -25,11 +26,13 @@ from backend.simulation.seeding.comparison import (
 )
 from backend.simulation.seeding.shapes import NAMED_PATTERNS
 from backend.simulation.seeding.traversal import DEFAULT_TRAVERSAL, TRAVERSALS
+from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES
 
 # Guard rails so a single request cannot ask for an unboundedly large sweep.
 _MAX_STEPS = 500
 _MAX_GRID_SIZE = 64
 _MAX_SEED_LENGTH = 4096
+_MAX_EXPLICIT_GEOMETRIES = len(SUPPORTED_GEOMETRIES)
 
 
 @dataclass(frozen=True)
@@ -105,7 +108,13 @@ def parse_compare_request(payload: Mapping[str, Any]) -> CompareRequest:
     if geometries_value is not None:
         if not isinstance(geometries_value, (list, tuple)):
             raise PublicApiError("'geometries' must be a list of geometry keys.")
-        collected = tuple(item for item in geometries_value if isinstance(item, str) and item)
+        if len(geometries_value) > _MAX_EXPLICIT_GEOMETRIES:
+            raise PublicApiError(
+                f"'geometries' must list at most {_MAX_EXPLICIT_GEOMETRIES} geometry keys."
+            )
+        collected = tuple(
+            dict.fromkeys(item for item in geometries_value if isinstance(item, str) and item)
+        )
         if not collected:
             raise PublicApiError("'geometries' must contain at least one geometry key.")
         geometries = collected
@@ -117,7 +126,7 @@ def parse_compare_request(payload: Mapping[str, Any]) -> CompareRequest:
         steps=steps,
         grid_size=grid_size,
         geometries=geometries,
-        include_states=bool(payload.get("include_states", False)),
+        include_states=parse_optional_bool(payload, "include_states") or False,
         pattern=pattern,
     )
 
@@ -150,6 +159,14 @@ class FilmstripRequest:
 
 
 def parse_filmstrip_request(payload: Mapping[str, Any]) -> FilmstripRequest:
+    geometries_value = payload.get("geometries")
+    if (
+        isinstance(geometries_value, (list, tuple))
+        and len(geometries_value) > MAX_FILMSTRIP_TILINGS
+    ):
+        raise PublicApiError(
+            f"'geometries' must list at most {MAX_FILMSTRIP_TILINGS} tilings for side-by-side play."
+        )
     base = parse_compare_request(payload)
 
     # The live filmstrip runs an explicit, small set of tilings side by side,

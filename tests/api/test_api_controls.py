@@ -11,6 +11,42 @@ except ModuleNotFoundError:
 
 
 class ApiControlTests(ApiTestCase):
+    def test_reset_rejects_malformed_json_without_mutating_state(self) -> None:
+        self.client.post("/api/cells/set", json={"id": "c:1:1", "state": 1})
+        before = self.get_state()
+
+        response = self.client.post(
+            "/api/control/reset",
+            data="{",
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.get_json(),
+            {"error": "Request body must contain a valid JSON object."},
+        )
+        after = self.get_state()
+        self.assertEqual(after["state_revision"], before["state_revision"])
+        self.assertEqual(after["cell_states"], before["cell_states"])
+
+    def test_reset_treats_string_false_as_false(self) -> None:
+        response = self.client.post(
+            "/api/control/reset",
+            json={
+                "topology_spec": {
+                    "tiling_family": "square",
+                    "adjacency_mode": "edge",
+                    "width": 8,
+                    "height": 8,
+                },
+                "randomize": "false",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(sum(response.get_json()["cell_states"]), 0)
+
     def test_reset_rejects_legacy_geometry_style_payloads(self) -> None:
         cases = [
             (

@@ -34,4 +34,8 @@ __all__ = [
 
 def get_payload(request: Request) -> RawJsonObject:
     payload = request.get_json(silent=True)
-    return payload if isinstance(payload, dict) else {}
+    if isinstance(payload, dict):
+        return payload
+    if not request.data:
+        return {}
+    raise RequestValidationError("Request body must contain a valid JSON object.")

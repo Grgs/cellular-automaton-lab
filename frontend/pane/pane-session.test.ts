@@ -74,6 +74,31 @@ describe("pane session", () => {
         expect(cleanup).toHaveBeenCalledOnce();
     });
 
+    it("keeps polling after a transient refresh failure", async () => {
+        vi.useFakeTimers();
+        const running = snapshot({ running: true });
+        const getState = vi
+            .fn<() => Promise<SimulationSnapshot>>()
+            .mockRejectedValueOnce(new Error("temporary outage"))
+            .mockResolvedValue(running);
+        const onSnapshot = vi.fn();
+        const onError = vi.fn();
+        const session = createPaneSession({
+            backend: { getState } as unknown as SimulationBackend,
+            onSnapshot,
+            onError,
+        });
+        session.applySnapshot(running);
+
+        await vi.advanceTimersByTimeAsync(250);
+        expect(onError).toHaveBeenCalledOnce();
+        await vi.advanceTimersByTimeAsync(250);
+
+        expect(getState).toHaveBeenCalledTimes(2);
+        expect(onSnapshot).toHaveBeenCalledTimes(2);
+        session.dispose();
+    });
+
     it("serializes pause-write-resume through the snapshot boundary", async () => {
         const events: string[] = [];
         const running = snapshot({ running: true, state_revision: 2 });

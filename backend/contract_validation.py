@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Literal, NoReturn
 
 from backend.payload_types import (
@@ -73,7 +74,7 @@ def parse_optional_float(payload: RawJsonObject, key: str) -> float | None:
     return _coerce_float(value, f"'{key}' must be a number.")
 
 
-def parse_optional_bool(payload: RawJsonObject, key: str) -> bool | None:
+def parse_optional_bool(payload: Mapping[str, object], key: str) -> bool | None:
     value = payload.get(key)
     if value in (None, ""):
         return None

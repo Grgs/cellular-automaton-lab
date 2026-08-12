@@ -232,6 +232,20 @@ class SharedCommandParityTests(unittest.TestCase):
                 with self.subTest(command=spec.command.value, payload=payload):
                     self.assert_parity(spec, payload, expected_status=400)
 
+    def test_hosts_reject_non_object_json_payloads(self) -> None:
+        session_id = f"parity-{next(self.session_counter)}"
+        self.reset_hosts(session_id)
+
+        server = self.client.post(
+            self.session_path("/api/control/reset", session_id),
+            json=[1, 2, 3],
+        )
+        browser = json.loads(handle_request("/api/control/reset", "[1, 2, 3]"))
+
+        self.assertEqual(server.status_code, 400)
+        self.assertFalse(browser["ok"])
+        self.assertEqual(server.get_json(), {"error": browser["error"]})
+
 
 if __name__ == "__main__":
     unittest.main()

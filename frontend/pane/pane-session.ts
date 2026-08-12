@@ -77,7 +77,6 @@ export function createPaneSession(options: PaneSessionOptions): PaneSession {
             applySnapshot(await backend.getState());
         } catch (error) {
             onError(error);
-            clearPoll();
         }
     }
 

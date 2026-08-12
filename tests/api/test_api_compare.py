@@ -4,9 +4,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 try:
+    from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES
     from tests.api.support import ApiTestCase
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from backend.simulation.topology_catalog import SUPPORTED_GEOMETRIES
     from tests.api.support import ApiTestCase
 
 
@@ -85,6 +87,44 @@ class ApiCompareTests(ApiTestCase):
         )
         result = response.get_json()["comparison"]["results"][0]
         self.assertNotIn("topology_spec", result)
+
+    def test_compare_treats_string_false_as_false(self) -> None:
+        response = self.client.post(
+            "/api/compare",
+            json={
+                "seed": "111",
+                "geometries": ["square"],
+                "steps": 3,
+                "include_states": "false",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        result = response.get_json()["comparison"]["results"][0]
+        self.assertNotIn("topology_spec", result)
+
+    def test_compare_deduplicates_explicit_geometries(self) -> None:
+        response = self.client.post(
+            "/api/compare",
+            json={"seed": "111", "geometries": ["square", "square"], "steps": 1},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        results = response.get_json()["comparison"]["results"]
+        self.assertEqual([result["geometry"] for result in results], ["square"])
+
+    def test_compare_rejects_oversized_explicit_geometry_lists(self) -> None:
+        response = self.client.post(
+            "/api/compare",
+            json={
+                "seed": "1",
+                "geometries": ["square"] * (len(SUPPORTED_GEOMETRIES) + 1),
+                "steps": 1,
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("must list at most", response.get_json()["error"])
 
     def test_compare_pattern_mode_seeds_a_shape_without_a_seed(self) -> None:
         response = self.client.post(
