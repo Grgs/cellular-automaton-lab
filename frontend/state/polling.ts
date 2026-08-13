@@ -33,7 +33,11 @@ export function schedulePolling(
 
     state.pollTimer = window.setTimeout(async () => {
         state.pollTimer = null;
-        await callback();
+        try {
+            await callback();
+        } finally {
+            schedulePolling(state, callback, pollDelayForSpeed(state.speed));
+        }
     }, delay);
 }
 

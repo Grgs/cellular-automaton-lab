@@ -2,6 +2,7 @@ import { createHttpSimulationBackend } from "./api.js";
 import { createAppControllerBootstrap } from "./app-controller-bootstrap.js";
 import { createAppControllerSync } from "./app-controller-sync.js";
 import { initializeAppController } from "./app-controller-startup.js";
+import { stopPolling } from "./state/polling.js";
 import type { AppActionSet } from "./types/actions.js";
 import type { AppController, CreateAppControllerOptions } from "./types/controller-app.js";
 import type { ConfigSyncController, UiSessionController } from "./types/controller-sync-session.js";
@@ -88,6 +89,8 @@ export function createAppController({
             return;
         }
         disposed = true;
+        state.isRunning = false;
+        stopPolling(state);
         viewportController?.dispose();
         configSyncController?.dispose();
         mutationRunner.dispose();

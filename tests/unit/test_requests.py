@@ -42,8 +42,20 @@ class RequestParsingTests(unittest.TestCase):
         with self.app.test_request_context(json={"width": 10}):
             self.assertEqual(get_payload(request), {"width": 10})
 
-    def test_get_payload_returns_empty_dict_for_non_object_json(self) -> None:
+    def test_get_payload_rejects_non_object_and_malformed_json(self) -> None:
         with self.app.test_request_context(json=[1, 2, 3]):
+            with self.assertRaisesRegex(RequestValidationError, "valid JSON object"):
+                get_payload(request)
+
+        with self.app.test_request_context(
+            data="{",
+            content_type="application/json",
+        ):
+            with self.assertRaisesRegex(RequestValidationError, "valid JSON object"):
+                get_payload(request)
+
+    def test_get_payload_allows_an_empty_request_body(self) -> None:
+        with self.app.test_request_context():
             self.assertEqual(get_payload(request), {})
 
     def test_parse_optional_numbers_accept_blank_values(self) -> None:

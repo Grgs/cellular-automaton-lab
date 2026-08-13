@@ -13,6 +13,7 @@ from backend.contract_validation import (
     normalize_reset_topology_spec,
     parse_cell_id,
     parse_cell_updates,
+    parse_optional_bool,
     parse_optional_float,
     parse_rule_name,
     parse_state_value,
@@ -102,7 +103,7 @@ class ApplicationCommandDispatcher:
             topology_spec=normalize_reset_topology_spec(payload),
             rule_name=parse_rule_name(payload, self.target.rules),
             speed=parse_optional_float(payload, "speed"),
-            randomize=bool(payload.get("randomize", False)),
+            randomize=parse_optional_bool(payload, "randomize") or False,
         )
         return self._snapshot_result()
 

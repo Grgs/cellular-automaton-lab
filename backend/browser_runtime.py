@@ -135,8 +135,13 @@ def handle_request(path: str, payload_json: str | None = None) -> str:
     if _RUNTIME is None:
         return _error_payload("Standalone runtime has not been initialized.")
     payload: Any = None
-    if payload_json:
-        payload = json.loads(payload_json)
+    if payload_json is not None:
+        try:
+            payload = json.loads(payload_json)
+        except (TypeError, json.JSONDecodeError):
+            return _error_payload("Request body must contain a valid JSON object.")
+        if not isinstance(payload, dict):
+            return _error_payload("Request body must contain a valid JSON object.")
     return _RUNTIME.handle_command(path, payload)
 
 
