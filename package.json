@@ -5,7 +5,7 @@
         "node": ">=22"
     },
     "overrides": {
-        "rolldown": "1.2.1"
+        "rolldown": "1.2.4"
     },
     "scripts": {
         "build:frontend": "vite build --mode server",
@@ -50,7 +50,7 @@
         "marked": "^18.0.9",
         "marked-gfm-heading-id": "^4.1.4",
         "match-sorter": "^8.3.0",
-        "oxlint": "^1.77.0",
+        "oxlint": "^1.78.0",
         "polygon-clipping": "^0.15.7",
         "prettier": "^3.9.6",
         "pyodide": "314.0.3",

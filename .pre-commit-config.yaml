@@ -33,7 +33,7 @@ repos:
         entry: python -m tools repo python-style check
         language: python
         additional_dependencies:
-          - ruff==0.15.11
+          - ruff==0.16.2
         pass_filenames: false
         stages: [pre-commit, manual]
       - id: ruff-format-python
@@ -41,7 +41,7 @@ repos:
         entry: python -m tools repo python-style format-check
         language: python
         additional_dependencies:
-          - ruff==0.15.11
+          - ruff==0.16.2
         pass_filenames: false
         stages: [pre-commit, manual]
       - id: python-dead-code

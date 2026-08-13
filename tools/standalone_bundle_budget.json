@@ -24,8 +24,8 @@
         {
             "name": "js-runtime",
             "patterns": ["assets/app-runtime-*.js"],
-            "raw": 314900,
-            "gzip": 83900
+            "raw": 344000,
+            "gzip": 92700
         },
         {
             "name": "js-standalone",
@@ -39,7 +39,7 @@
             "raw": 90000,
             "gzip": 27000
         },
-        { "name": "js-async", "patterns": ["assets/*.js"], "raw": 177000, "gzip": 50500 },
+        { "name": "js-async", "patterns": ["assets/*.js"], "raw": 147000, "gzip": 40200 },
         { "name": "css", "patterns": ["assets/*.css"], "raw": 46300, "gzip": 9100 },
         { "name": "favicon", "patterns": ["assets/favicon-*"], "raw": 5000 },
         { "name": "other", "patterns": ["*"], "raw": 1000 }

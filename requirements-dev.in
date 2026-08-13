@@ -1,5 +1,5 @@
 playwright==1.62.0
-hypothesis==6.165.2
+hypothesis==6.165.5
 networkx==3.6.1
 shapely==2.1.2
 Pillow==12.3.0
@@ -8,7 +8,7 @@ coverage==7.15.4
 pytest==9.1.1
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
-pre-commit==4.6.1
+pre-commit==4.6.2
 detect-secrets==1.5.0
 ruff==0.16.2
 vulture==2.16
