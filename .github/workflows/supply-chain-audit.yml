@@ -13,6 +13,7 @@ on:
       - "package.json"
       - "package-lock.json"
       - ".node-version"
+      - ".nvmrc"
       - ".python-version"
       - "tools/**"
       - ".github/workflows/supply-chain-audit.yml"

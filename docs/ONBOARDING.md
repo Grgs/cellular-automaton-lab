@@ -25,7 +25,8 @@ the most common scenarios.
 ## Run locally
 
 Use the exact Python and Node releases recorded in [`.python-version`](../.python-version)
-and [`.node-version`](../.node-version). In WSL, install both runtimes inside WSL; do not
+and [`.node-version`](../.node-version) (mirrored in [`.nvmrc`](../.nvmrc)). In WSL,
+install both runtimes inside WSL; do not
 point `.venv` or `PYTHON` at a Windows interpreter. From the repo root:
 
 ```

@@ -12,6 +12,23 @@ from tools import dependency_maintenance as dependencies
 
 
 class EnvironmentGuardTests(unittest.TestCase):
+    def test_node_runtime_pin_files_must_agree(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            node_version = root / ".node-version"
+            nvmrc = root / ".nvmrc"
+            package = root / "package.json"
+            node_version.write_text("22.22.2\n", encoding="utf-8")
+            nvmrc.write_text("22\n", encoding="utf-8")
+            package.write_text(json.dumps({"engines": {"node": "22.22.2"}}), encoding="utf-8")
+            with (
+                patch.object(dependencies, "NODE_VERSION_PATH", node_version),
+                patch.object(dependencies, "NVMRC_PATH", nvmrc),
+                patch.object(dependencies, "PACKAGE_PATH", package),
+                self.assertRaisesRegex(dependencies.MaintenanceError, ".nvmrc pins Node 22"),
+            ):
+                dependencies.validate_runtime_pin_files()
+
     def test_windows_python_from_wsl_is_rejected(self) -> None:
         with self.assertRaisesRegex(dependencies.MaintenanceError, "Windows Python from WSL"):
             dependencies.ensure_native_wsl_python(
@@ -185,6 +202,7 @@ class EntrypointTests(unittest.TestCase):
         stdout = io.StringIO()
         with (
             patch.object(dependencies, "ensure_native_wsl_python"),
+            patch.object(dependencies, "validate_runtime_pin_files"),
             patch.object(dependencies, "read_python_source_pins", return_value={"flask": pin}),
             patch.object(dependencies, "read_npm_source_pins", return_value={}),
             patch.object(dependencies, "validate_lock_surfaces"),

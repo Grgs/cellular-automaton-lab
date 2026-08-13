@@ -54,7 +54,7 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ("dependencies", "check"),
         "dependencies",
         "Check direct package freshness, locks, mirrored pins, Node, and optional audits.",
-        "Queries npm and PyPI release tags instead of relying on runtime-filtered outdated output, verifies source pins against both lockfiles and repository mirrors, enforces `.node-version` and `.python-version`, and can run npm audit plus pip-audit with `--audit`. Use `--offline` for deterministic structural checks and skip-version flags only in a constrained diagnostic environment.",
+        "Queries npm and PyPI release tags instead of relying on runtime-filtered outdated output, verifies source pins against both lockfiles and repository mirrors, enforces matching `.node-version`, `.nvmrc`, `package.json`, and `.python-version` pins, and can run npm audit plus pip-audit with `--audit`. Use `--offline` for deterministic structural checks and skip-version flags only in a constrained diagnostic environment.",
         (
             "python -m tools dependencies check",
             "python -m tools dependencies check --audit",

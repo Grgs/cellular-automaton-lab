@@ -135,6 +135,7 @@ def _is_generated_fixture_path(path: str) -> bool:
 def _is_dependency_path(path: str) -> bool:
     return path in {
         ".node-version",
+        ".nvmrc",
         ".python-version",
         ".pre-commit-config.yaml",
         "package.json",

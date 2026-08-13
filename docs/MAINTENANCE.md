@@ -154,8 +154,9 @@ python -m tools dependencies update --dry-run
 python -m tools dependencies update
 ```
 
-The command enforces [`.python-version`](../.python-version) and
-[`.node-version`](../.node-version), refuses Windows Python launched from WSL,
+The command enforces [`.python-version`](../.python-version) and the matching
+[`.node-version`](../.node-version), [`.nvmrc`](../.nvmrc), and `package.json` Node pins;
+it refuses Windows Python launched from WSL,
 queries direct npm/PyPI release tags in parallel, synchronizes the Ruff and Coverage
 mirrors, refreshes `package-lock.json`, bootstraps the hash-locked compiler under
 `output/dependency-tools/`, recompiles every Python lock with all-platform hashes, and

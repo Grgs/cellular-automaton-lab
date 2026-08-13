@@ -23,9 +23,14 @@ def _hook_files_pattern(hook: str) -> str:
 class RepoGuardConfigTests(unittest.TestCase):
     def test_ci_uses_repository_runtime_version_files(self) -> None:
         node_version = (ROOT / ".node-version").read_text(encoding="utf-8").strip()
+        nvm_version = (ROOT / ".nvmrc").read_text(encoding="utf-8").strip()
         python_version = (ROOT / ".python-version").read_text(encoding="utf-8").strip()
         self.assertRegex(node_version, r"^\d+\.\d+\.\d+$")
+        self.assertEqual(nvm_version, node_version)
         self.assertRegex(python_version, r"^\d+\.\d+\.\d+$")
+
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        self.assertEqual(package["engines"]["node"], node_version)
 
         for relative in (
             ".github/workflows/ci.yml",

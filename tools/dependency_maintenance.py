@@ -33,6 +33,7 @@ PYTHON_LOCK_PATHS: Final[tuple[Path, ...]] = (
 LOCK_TOOL_REQUIREMENTS: Final[Path] = ROOT_DIR / "requirements-lock.txt"
 LOCK_TOOL_ENV: Final[Path] = ROOT_DIR / "output" / "dependency-tools"
 NODE_VERSION_PATH: Final[Path] = ROOT_DIR / ".node-version"
+NVMRC_PATH: Final[Path] = ROOT_DIR / ".nvmrc"
 PYTHON_VERSION_PATH: Final[Path] = ROOT_DIR / ".python-version"
 PACKAGE_PATH: Final[Path] = ROOT_DIR / "package.json"
 PACKAGE_LOCK_PATH: Final[Path] = ROOT_DIR / "package-lock.json"
@@ -170,6 +171,20 @@ def resolve_latest_versions(
 
 def _expected_node_version() -> str:
     return NODE_VERSION_PATH.read_text(encoding="utf-8").strip()
+
+
+def validate_runtime_pin_files() -> None:
+    expected = _expected_node_version()
+    nvm_version = NVMRC_PATH.read_text(encoding="utf-8").strip()
+    if nvm_version != expected:
+        raise MaintenanceError(f".nvmrc pins Node {nvm_version}, but .node-version pins {expected}")
+    package = _load_json(PACKAGE_PATH)
+    engines = package.get("engines")
+    package_version = engines.get("node") if isinstance(engines, dict) else None
+    if package_version != expected:
+        raise MaintenanceError(
+            f"package.json engines.node is {package_version!r}, expected {expected!r}"
+        )
 
 
 def check_node_version() -> None:
@@ -413,6 +428,7 @@ def check_main(argv: list[str] | None = None) -> int:
     args = build_check_parser().parse_args(argv)
     try:
         ensure_native_wsl_python()
+        validate_runtime_pin_files()
         if not args.skip_python_check:
             check_python_version()
         if not args.skip_node_check:
@@ -456,6 +472,7 @@ def update_main(argv: list[str] | None = None) -> int:
     args = build_update_parser().parse_args(argv)
     try:
         ensure_native_wsl_python()
+        validate_runtime_pin_files()
         if not args.skip_python_check:
             check_python_version()
         if not args.skip_node_check:
