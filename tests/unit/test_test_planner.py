@@ -94,6 +94,25 @@ class TestPlannerTests(unittest.TestCase):
         self.assertIn("Before pushing:", text)
         self.assertIn("CI-owned checks:", text)
 
+    def test_dependency_changes_use_the_focused_dependency_gate(self) -> None:
+        plan = build_validation_plan(["package.json", "requirements-dev.in"])
+        commands = {check.command for check in plan.focused}
+
+        self.assertEqual(plan.local_pr_gate.command, "npm run check:dependencies")
+        self.assertTrue(
+            {
+                "python -m tools dependencies check",
+                "npm run check:python",
+                "npm run check:frontend",
+                "npm run check:bundle-size:fresh",
+            }.issubset(commands)
+        )
+
+    def test_mixed_dependency_and_source_changes_keep_the_full_pr_gate(self) -> None:
+        plan = build_validation_plan(["package-lock.json", "frontend/api.ts"])
+
+        self.assertEqual(plan.local_pr_gate.command, "npm run check:ci-local")
+
 
 if __name__ == "__main__":
     unittest.main()

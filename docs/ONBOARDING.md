@@ -24,12 +24,15 @@ the most common scenarios.
 
 ## Run locally
 
-You need Python 3.13+ and Node 22+. From the repo root:
+Use the exact Python and Node releases recorded in [`.python-version`](../.python-version)
+and [`.node-version`](../.node-version). In WSL, install both runtimes inside WSL; do not
+point `.venv` or `PYTHON` at a Windows interpreter. From the repo root:
 
 ```
 # one-time setup
 python -m venv .venv
 .venv/Scripts/activate                       # Windows: .venv\Scripts\activate.bat
+# WSL/Linux, use: source .venv/bin/activate
 pip install -r requirements-dev.txt
 npm install
 

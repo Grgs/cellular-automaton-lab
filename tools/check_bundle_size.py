@@ -25,6 +25,7 @@ import fnmatch
 import gzip
 import io
 import json
+import math
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -249,6 +250,31 @@ def _format_summary(
         f"{total_gzip_delta:>12}"
     )
 
+    if baseline is not None:
+        raw_deltas = []
+        for category in budget.categories:
+            info = sizes.get(category.name)
+            prior_raw = baseline.get(category.name, {}).get("raw_bytes")
+            if info is not None and isinstance(prior_raw, int):
+                raw_deltas.append((category.name, info.raw_bytes - prior_raw))
+        moved_in = [name for name, delta in raw_deltas if delta > 1024]
+        moved_out = [name for name, delta in raw_deltas if delta < -1024]
+        prior_total_raw = baseline.get("TOTAL", {}).get("raw_bytes")
+        if (
+            moved_in
+            and moved_out
+            and isinstance(prior_total_raw, int)
+            and abs(grand_total.raw_bytes - prior_total_raw)
+            <= max(math.ceil(prior_total_raw * 0.01), 1024)
+        ):
+            lines.extend(
+                (
+                    "",
+                    "Likely chunk redistribution: total raw size is stable while bytes moved "
+                    f"into {', '.join(moved_in)} and out of {', '.join(moved_out)}.",
+                )
+            )
+
     if uncategorised:
         lines.append("")
         lines.append("Uncategorised files (consider adding a budget category):")
@@ -312,6 +338,79 @@ def _load_baseline(path: Path) -> dict[str, dict[str, int]] | None:
     return out
 
 
+def _recalibrated_raw_budget(actual: int) -> int:
+    headroom = max(math.ceil(actual * 0.01), 1024)
+    return math.ceil((actual + headroom) / 100) * 100
+
+
+def _recalibrated_gzip_budget(actual: int) -> int:
+    return math.ceil(actual / 100) * 100
+
+
+def recalibrate_budget(
+    path: Path,
+    sizes: dict[str, CategorySizes],
+    grand_total: CategorySizes,
+    baseline: dict[str, dict[str, int]] | None,
+    categories: tuple[str, ...],
+    *,
+    allow_total_growth: bool = False,
+) -> dict[str, tuple[int | None, int | None]]:
+    if baseline is None:
+        raise ValueError("bundle recalibration requires an existing --baseline manifest")
+    if not categories:
+        raise ValueError("bundle recalibration requires at least one explicit category")
+
+    prior_total = baseline.get("TOTAL", {})
+    prior_raw = prior_total.get("raw_bytes")
+    prior_gzip = prior_total.get("gzip_bytes")
+    if not isinstance(prior_raw, int) or not isinstance(prior_gzip, int):
+        raise ValueError("baseline manifest is missing TOTAL raw/gzip measurements")
+    allowed_raw_growth = max(math.ceil(prior_raw * 0.01), 1024)
+    allowed_gzip_growth = max(math.ceil(prior_gzip * 0.01), 1024)
+    if not allow_total_growth and (
+        grand_total.raw_bytes - prior_raw > allowed_raw_growth
+        or grand_total.gzip_bytes - prior_gzip > allowed_gzip_growth
+    ):
+        raise ValueError(
+            "bundle total grew beyond the 1%/1 KiB recalibration guard; "
+            "review the regression or pass --allow-total-growth intentionally"
+        )
+
+    payload = json.loads(path.read_text(encoding="utf-8-sig"))
+    raw_categories = payload.get("categories") if isinstance(payload, dict) else None
+    if not isinstance(raw_categories, list):
+        raise ValueError(f"{path}: 'categories' must be a list")
+    requested = set(categories)
+    available = {
+        str(entry.get("name"))
+        for entry in raw_categories
+        if isinstance(entry, dict) and entry.get("name")
+    }
+    unknown = requested - available
+    if unknown:
+        raise ValueError(f"unknown bundle categories: {', '.join(sorted(unknown))}")
+
+    updated: dict[str, tuple[int | None, int | None]] = {}
+    for entry in raw_categories:
+        if not isinstance(entry, dict) or entry.get("name") not in requested:
+            continue
+        name = str(entry["name"])
+        info = sizes.get(name)
+        if info is None or info.file_count == 0:
+            raise ValueError(f"cannot recalibrate empty bundle category {name}")
+        raw_budget = _recalibrated_raw_budget(info.raw_bytes)
+        entry["raw"] = raw_budget
+        gzip_budget: int | None = None
+        if isinstance(entry.get("gzip"), int):
+            gzip_budget = _recalibrated_gzip_budget(info.gzip_bytes)
+            entry["gzip"] = gzip_budget
+        updated[name] = (raw_budget, gzip_budget)
+
+    path.write_text(json.dumps(payload, indent=4) + "\n", encoding="utf-8")
+    return updated
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -352,6 +451,18 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="exit 0 even when budget violations are present",
     )
+    parser.add_argument(
+        "--recalibrate-category",
+        action="append",
+        default=[],
+        metavar="NAME",
+        help="update one explicit category using measured headroom; requires --baseline",
+    )
+    parser.add_argument(
+        "--allow-total-growth",
+        action="store_true",
+        help="allow recalibration when total raw/gzip growth exceeds the default guard",
+    )
     return parser
 
 
@@ -371,9 +482,25 @@ def main(argv: list[str] | None = None) -> int:
         print(str(exc), file=sys.stderr)
         return 2
 
-    violations, grand_total = evaluate(sizes, budget)
-
     baseline = _load_baseline(args.baseline) if args.baseline is not None else None
+    violations, grand_total = evaluate(sizes, budget)
+    if args.recalibrate_category:
+        try:
+            updated = recalibrate_budget(
+                args.budget,
+                sizes,
+                grand_total,
+                baseline,
+                tuple(args.recalibrate_category),
+                allow_total_growth=args.allow_total_growth,
+            )
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"could not recalibrate bundle budget: {exc}", file=sys.stderr)
+            return 2
+        budget = load_budget(args.budget)
+        violations, grand_total = evaluate(sizes, budget)
+        for name, (raw, gzip_budget) in updated.items():
+            print(f"recalibrated {name}: raw={raw}, gzip={gzip_budget}", file=sys.stderr)
 
     if args.format == "json":
         rendered = json.dumps(

@@ -12,6 +12,8 @@ on:
       - "requirements*.txt"
       - "package.json"
       - "package-lock.json"
+      - ".node-version"
+      - ".python-version"
       - "tools/**"
       - ".github/workflows/supply-chain-audit.yml"
 
@@ -35,13 +37,13 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
         with:
-          node-version: "22"
+          node-version-file: ".node-version"
           cache: npm
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: "3.13"
+          python-version-file: ".python-version"
           cache: pip
           cache-dependency-path: |
             requirements.txt
@@ -52,6 +54,9 @@ jobs:
           npm ci
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Check dependency freshness and lock consistency
+        run: python -m tools dependencies check
 
       - name: Run supply-chain audit
         run: |

@@ -2,7 +2,7 @@
     "name": "cellular-automaton-lab",
     "private": true,
     "engines": {
-        "node": ">=22"
+        "node": "22.22.2"
     },
     "overrides": {
         "rolldown": "1.2.4"
@@ -21,7 +21,7 @@
         "lint:python": "node ./tools/internal/python_tools_entry.mjs repo python-style check",
         "typecheck:frontend": "tsc -p tsconfig.json --noEmit",
         "typecheck:python": "node ./tools/internal/python_exec.mjs -m mypy --config-file pyproject.toml",
-        "test:frontend": "vitest run",
+        "test:frontend": "node ./tools/internal/vitest_entry.mjs run",
         "test:e2e:playwright": "node ./tools/internal/python_tools_entry.mjs test e2e --suite all",
         "test:e2e:playwright:compare-workbench": "npm run build:frontend && node ./tools/internal/python_tools_entry.mjs test e2e --suite compare_workbench",
         "test:e2e:playwright:server": "node ./tools/internal/python_tools_entry.mjs test e2e --suite server",
@@ -36,11 +36,13 @@
         "fixtures:reference:check": "node ./tools/internal/python_tools_entry.mjs fixtures reference --all --mode both --check",
         "audit:supply-chain": "node ./tools/internal/python_tools_entry.mjs security supply-chain",
         "coverage:backend": "node ./tools/internal/python_tools_entry.mjs test coverage --fail-under 75",
-        "coverage:frontend": "vitest run --coverage",
+        "coverage:frontend": "node ./tools/internal/vitest_entry.mjs run --coverage",
         "check:bundle-size": "node ./tools/internal/python_tools_entry.mjs build bundle-size",
         "check:bundle-size:fresh": "npm run build:frontend:standalone && npm run check:bundle-size",
         "smoke:standalone": "node ./tools/internal/python_tools_entry.mjs browser smoke-standalone",
-        "check:doc-links": "node ./tools/internal/check_doc_links.mjs"
+        "check:doc-links": "node ./tools/internal/check_doc_links.mjs",
+        "dependencies:update": "node ./tools/internal/python_tools_entry.mjs dependencies update",
+        "check:dependencies": "node ./tools/internal/python_tools_entry.mjs dependencies check --audit && npm run check:python && npm run check:frontend && npm run check:bundle-size:fresh"
     },
     "devDependencies": {
         "@types/node": "^26.2.0",
@@ -56,6 +58,6 @@
         "pyodide": "314.0.3",
         "typescript": "^7.0.2",
         "vite": "^8.2.1",
-        "vitest": "^4.1.2"
+        "vitest": "^4.1.10"
     }
 }

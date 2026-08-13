@@ -35,12 +35,13 @@ python -m tools build standalone-shell output/.standalone-build-input/standalone
 
 Check standalone bundle budgets and emit optional JSON or text reports.
 
-Runs the standalone bundle budget gate against `output/standalone/` and reports raw and gzip deltas when given a prior JSON manifest.
+Runs the standalone bundle budget gate against `output/standalone/` and reports raw and gzip deltas when given a prior JSON manifest. Guarded recalibration requires both a baseline and explicit `--recalibrate-category` values; it refuses meaningful total growth unless `--allow-total-growth` is intentional.
 
 ```powershell
 python -m tools build bundle-size
 python -m tools build bundle-size --format json
 python -m tools build bundle-size --baseline output/bundle-size/standalone-bundle-size.txt.json
+python -m tools build bundle-size --baseline baseline.json --recalibrate-category js-runtime --recalibrate-category js-async
 ```
 
 ## Rules
@@ -529,4 +530,31 @@ Guards the preview-release handoff so a merged release PR is not mistaken for a 
 ```powershell
 python -m tools repo release-check --version v0.4.0 --phase pre-publish
 python -m tools repo release-check --version v0.4.0 --phase post-publish
+```
+
+## Dependencies
+
+Check and update npm, Python, lock-tool, and mirrored repository pins.
+
+### `python -m tools dependencies check`
+
+Check direct package freshness, locks, mirrored pins, Node, and optional audits.
+
+Queries npm and PyPI release tags instead of relying on runtime-filtered outdated output, verifies source pins against both lockfiles and repository mirrors, enforces `.node-version` and `.python-version`, and can run npm audit plus pip-audit with `--audit`. Use `--offline` for deterministic structural checks and skip-version flags only in a constrained diagnostic environment.
+
+```powershell
+python -m tools dependencies check
+python -m tools dependencies check --audit
+python -m tools dependencies check --offline
+```
+
+### `python -m tools dependencies update`
+
+Update direct npm/Python pins and regenerate every dependency lock.
+
+Resolves latest registry tags, synchronizes CI and pre-commit mirrors, refreshes package-lock.json, bootstraps the hash-pinned pip-tools environment under output/dependency-tools, compiles both Python locks with all-platform hashes, and runs supply-chain audits. Use `--dry-run` to preview registry changes.
+
+```powershell
+python -m tools dependencies update --dry-run
+python -m tools dependencies update
 ```

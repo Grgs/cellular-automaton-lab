@@ -13,7 +13,15 @@ Without `--changed`, the planner combines committed changes from `BASE...HEAD` w
 The output has three tiers:
 
 - Focused checks: narrow checks selected from the changed paths.
-- Before pushing: the one repository PR gate, `npm run check:ci-local`.
+- Before pushing: `npm run check:dependencies` for dependency-only changes, otherwise
+  the full repository PR gate, `npm run check:ci-local`.
 - CI-owned checks: platform coverage and clean-environment artifact work that remain in CI.
 
-The mapping follows [Testing Changes](TESTING_CHANGES.md): documentation, shared frontend UI, backend/API, standalone runtime, tiling/catalog, generated fixtures, and test-only changes each receive the matching repository commands. Shared UI and catalog changes include both server and standalone browser coverage. Script names are read from `package.json`, and browser suite names are verified against the public Playwright suite manifest.
+The mapping follows [Testing Changes](TESTING_CHANGES.md): documentation, dependencies,
+shared frontend UI, backend/API, standalone runtime, tiling/catalog, generated fixtures,
+and test-only changes each receive the matching repository commands. Dependency changes
+check registry freshness, both lock ecosystems, Python/frontend compatibility, and a
+fresh standalone bundle; the comprehensive platform matrix remains CI-owned. Shared UI
+and catalog changes include both server and standalone browser coverage. Script names are
+read from `package.json`, and browser suite names are verified against the public
+Playwright suite manifest.

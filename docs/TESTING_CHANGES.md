@@ -160,6 +160,22 @@ npm run smoke:standalone
 npm run test:e2e:playwright:standalone
 ```
 
+## If You Change Dependencies Or Runtime Versions
+
+Use native WSL/Linux runtimes matching `.python-version` and `.node-version`. Run the
+focused dependency PR gate; CI owns the clean Linux/Windows matrix and should be allowed
+to run in parallel rather than duplicating every platform suite locally.
+
+```shell
+python -m tools dependencies check
+npm run check:dependencies
+```
+
+If a bundler update moves bytes between chunks, compare with a `main` bundle manifest
+and use the guarded explicit-category recalibration described in [TESTING.md](TESTING.md).
+Do not raise a category ceiling until stable total size and the moved-out category explain
+the change.
+
 ## Updating Tests
 
 - Prefer the cheapest test layer that proves the behavior.

@@ -25,6 +25,7 @@ GROUPS = (
     "security",
     "perf",
     "repo",
+    "dependencies",
 )
 REMOVED_PUBLIC_ENTRYPOINTS = (
     "tools/build-standalone.mjs",

@@ -82,6 +82,19 @@ remain unconditional. Run the standalone guard directly with
 categories retain approximately `max(1%, 1 KiB)` of headroom; gzip ceilings
 remain tighter and should only move with an intentional, measured bundle change.
 
+For bundler upgrades that redistribute code between chunks, first compare the new JSON
+manifest with a baseline from `main`. If total raw/gzip size remains within the guard,
+recalibrate only the affected categories explicitly:
+
+```shell
+python -m tools build bundle-size --baseline baseline.json \
+  --recalibrate-category js-runtime --recalibrate-category js-async
+```
+
+Recalibration applies the repository headroom policy and refuses meaningful total growth
+by default. `--allow-total-growth` is an explicit exception for a reviewed total-size
+increase, not a way to silence an unexplained regression.
+
 Standalone cold start has a separate observed-baseline policy in
 `tools/standalone_runtime_budget.json`. CI runs three fresh Chromium processes
 with 4× CPU throttling, fails when the maximum exceeds the checked-in limit, and

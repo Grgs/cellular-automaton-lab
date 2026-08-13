@@ -5,15 +5,21 @@ import { spawnSync } from "node:child_process";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(dirname, "..", "..");
 const args = process.argv.slice(2);
+const repositoryVenvPython =
+    process.platform === "win32"
+        ? path.join(rootDir, ".venv", "Scripts", "python.exe")
+        : path.join(rootDir, ".venv", "bin", "python");
 const pythonCandidates =
     process.platform === "win32"
         ? [
               [process.env.PYTHON, []],
+              [repositoryVenvPython, []],
               ["py", ["-3"]],
               ["python", []],
           ]
         : [
               [process.env.PYTHON, []],
+              [repositoryVenvPython, []],
               ["python3", []],
               ["python", []],
           ];

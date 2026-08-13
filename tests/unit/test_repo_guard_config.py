@@ -21,6 +21,33 @@ def _hook_files_pattern(hook: str) -> str:
 
 
 class RepoGuardConfigTests(unittest.TestCase):
+    def test_ci_uses_repository_runtime_version_files(self) -> None:
+        node_version = (ROOT / ".node-version").read_text(encoding="utf-8").strip()
+        python_version = (ROOT / ".python-version").read_text(encoding="utf-8").strip()
+        self.assertRegex(node_version, r"^\d+\.\d+\.\d+$")
+        self.assertRegex(python_version, r"^\d+\.\d+\.\d+$")
+
+        for relative in (
+            ".github/workflows/ci.yml",
+            ".github/workflows/release.yml",
+            ".github/workflows/supply-chain-audit.yml",
+        ):
+            workflow = (ROOT / relative).read_text(encoding="utf-8")
+            self.assertNotIn('node-version: "22"', workflow)
+            self.assertNotIn('python-version: "3.13"', workflow)
+            self.assertIn('node-version-file: ".node-version"', workflow)
+            self.assertIn('python-version-file: ".python-version"', workflow)
+
+    def test_dependency_scripts_use_repository_tooling(self) -> None:
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        scripts = package["scripts"]
+
+        self.assertEqual(
+            scripts["dependencies:update"],
+            "node ./tools/internal/python_tools_entry.mjs dependencies update",
+        )
+        self.assertIn("dependencies check --audit", scripts["check:dependencies"])
+
     def test_fresh_bundle_guard_builds_before_measuring(self) -> None:
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         scripts = package["scripts"]

@@ -18,6 +18,7 @@ GROUP_REGISTRARS = {
     "security": "tools.commands.security",
     "perf": "tools.commands.perf",
     "repo": "tools.commands.repo",
+    "dependencies": "tools.commands.dependencies",
 }
 
 

@@ -19,10 +19,13 @@ try:
         _format_summary,
         _gzip_size,
         _load_baseline,
+        _recalibrated_gzip_budget,
+        _recalibrated_raw_budget,
         evaluate,
         load_budget,
         main,
         measure,
+        recalibrate_budget,
     )
 except ModuleNotFoundError:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -37,10 +40,13 @@ except ModuleNotFoundError:
         _format_summary,
         _gzip_size,
         _load_baseline,
+        _recalibrated_gzip_budget,
+        _recalibrated_raw_budget,
         evaluate,
         load_budget,
         main,
         measure,
+        recalibrate_budget,
     )
 
 
@@ -120,6 +126,32 @@ class FormatBytesTests(unittest.TestCase):
         self.assertIn("delta gzip", rendered)
         self.assertEqual(rendered.count("+20"), 2)
         self.assertEqual(rendered.count("+10"), 2)
+
+    def test_summary_explains_stable_total_chunk_redistribution(self) -> None:
+        budget = _budget(
+            CategoryBudget("runtime", ("runtime*.js",), raw=10000, gzip=5000),
+            CategoryBudget("async", ("async*.js",), raw=10000, gzip=5000),
+        )
+        sizes = {
+            "runtime": CategorySizes("runtime", 7000, 3000),
+            "async": CategorySizes("async", 3000, 1000),
+        }
+        rendered = _format_summary(
+            sizes,
+            CategorySizes("TOTAL", 10000, 4000),
+            budget,
+            uncategorised=[],
+            violations=[],
+            baseline={
+                "runtime": {"raw_bytes": 4000, "gzip_bytes": 2000},
+                "async": {"raw_bytes": 6000, "gzip_bytes": 2000},
+                "TOTAL": {"raw_bytes": 10000, "gzip_bytes": 4000},
+            },
+        )
+
+        self.assertIn("Likely chunk redistribution", rendered)
+        self.assertIn("into runtime", rendered)
+        self.assertIn("out of async", rendered)
 
 
 class MeasureAndEvaluateTests(unittest.TestCase):
@@ -246,6 +278,70 @@ class BaselineManifestTests(unittest.TestCase):
                 "TOTAL": {"raw_bytes": 100, "gzip_bytes": 50, "file_count": 1},
             },
         )
+
+
+class RecalibrationTests(unittest.TestCase):
+    def _write_budget(self, path: Path) -> None:
+        path.write_text(
+            json.dumps(
+                {
+                    "_comment": "keep me",
+                    "categories": [
+                        {"name": "runtime", "patterns": ["*.js"], "raw": 100, "gzip": 50},
+                        {"name": "data", "patterns": ["*.json"], "raw": 5000},
+                    ],
+                    "total": {"raw": 20000, "gzip": 10000},
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    def test_budget_rounding_matches_repository_policy(self) -> None:
+        self.assertEqual(_recalibrated_raw_budget(340523), 344000)
+        self.assertEqual(_recalibrated_gzip_budget(92646), 92700)
+
+    def test_recalibration_updates_only_explicit_categories(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "budget.json"
+            self._write_budget(path)
+            updated = recalibrate_budget(
+                path,
+                {"runtime": CategorySizes("runtime", 340523, 92646, 1)},
+                CategorySizes("TOTAL", 10000, 5000, 1),
+                {"TOTAL": {"raw_bytes": 10000, "gzip_bytes": 5000}},
+                ("runtime",),
+            )
+            payload = json.loads(path.read_text(encoding="utf-8"))
+
+        self.assertEqual(updated, {"runtime": (344000, 92700)})
+        self.assertEqual(payload["categories"][1]["raw"], 5000)
+        self.assertEqual(payload["_comment"], "keep me")
+
+    def test_recalibration_requires_a_baseline(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "budget.json"
+            self._write_budget(path)
+            with self.assertRaisesRegex(ValueError, "requires an existing --baseline"):
+                recalibrate_budget(
+                    path,
+                    {"runtime": CategorySizes("runtime", 100, 50, 1)},
+                    CategorySizes("TOTAL", 100, 50, 1),
+                    None,
+                    ("runtime",),
+                )
+
+    def test_recalibration_rejects_meaningful_total_growth(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "budget.json"
+            self._write_budget(path)
+            with self.assertRaisesRegex(ValueError, "total grew"):
+                recalibrate_budget(
+                    path,
+                    {"runtime": CategorySizes("runtime", 13000, 6000, 1)},
+                    CategorySizes("TOTAL", 13000, 6000, 1),
+                    {"TOTAL": {"raw_bytes": 10000, "gzip_bytes": 4000}},
+                    ("runtime",),
+                )
 
 
 class MainEntrypointTests(unittest.TestCase):

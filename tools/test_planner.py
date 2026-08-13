@@ -132,6 +132,25 @@ def _is_generated_fixture_path(path: str) -> bool:
     }
 
 
+def _is_dependency_path(path: str) -> bool:
+    return path in {
+        ".node-version",
+        ".python-version",
+        ".pre-commit-config.yaml",
+        "package.json",
+        "package-lock.json",
+        "requirements.in",
+        "requirements.txt",
+        "requirements-dev.in",
+        "requirements-dev.txt",
+        "requirements-lock.in",
+        "requirements-lock.txt",
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
+        ".github/workflows/supply-chain-audit.yml",
+    }
+
+
 def _append_unique(checks: list[PlannedCheck], command: str, reason: str) -> None:
     if all(check.command != command for check in checks):
         checks.append(PlannedCheck(command, reason))
@@ -140,6 +159,21 @@ def _append_unique(checks: list[PlannedCheck], command: str, reason: str) -> Non
 def build_validation_plan(paths: list[str] | tuple[str, ...]) -> ValidationPlan:
     changed_paths = _normalise_paths(paths)
     focused: list[PlannedCheck] = []
+
+    dependency_changed = any(_is_dependency_path(path) for path in changed_paths)
+    if dependency_changed:
+        _append_unique(
+            focused,
+            "python -m tools dependencies check",
+            "registry freshness and lock consistency",
+        )
+        _append_unique(focused, _npm_script("check:python"), "Python tooling compatibility")
+        _append_unique(focused, _npm_script("check:frontend"), "Node tooling compatibility")
+        _append_unique(
+            focused,
+            _npm_script("check:bundle-size:fresh"),
+            "bundler output and standalone budgets",
+        )
 
     if any(_is_docs_path(path) for path in changed_paths):
         _append_unique(focused, _npm_script("check:doc-links"), "documentation links")
@@ -244,10 +278,18 @@ def build_validation_plan(paths: list[str] | tuple[str, ...]) -> ValidationPlan:
             "CI: frontend and standalone artifact packaging", "clean-environment build artifacts"
         ),
     )
+    dependency_only = bool(changed_paths) and all(
+        _is_dependency_path(path) for path in changed_paths
+    )
+    local_gate = (
+        PlannedCheck(_npm_script("check:dependencies"), "the dependency-update PR gate")
+        if dependency_only
+        else PlannedCheck(_npm_script("check:ci-local"), "the repository local PR gate")
+    )
     return ValidationPlan(
         changed_paths=changed_paths,
         focused=tuple(focused),
-        local_pr_gate=PlannedCheck(_npm_script("check:ci-local"), "the repository local PR gate"),
+        local_pr_gate=local_gate,
         ci=ci,
     )
 
