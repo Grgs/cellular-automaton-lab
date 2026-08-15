@@ -196,6 +196,40 @@ class LockValidationTests(unittest.TestCase):
                 )
 
 
+class LockToolBootstrapTests(unittest.TestCase):
+    def test_runtime_and_tool_locks_are_installed_together(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runtime_lock = root / "requirements.txt"
+            tool_lock = root / "requirements-lock.txt"
+            python = root / "python"
+            runtime_lock.write_text("colorama==0.4.6\n", encoding="utf-8")
+            tool_lock.write_text("pip-tools==7.6.1\n", encoding="utf-8")
+            python.touch()
+            with (
+                patch.object(dependencies, "RUNTIME_REQUIREMENTS", runtime_lock),
+                patch.object(dependencies, "LOCK_TOOL_REQUIREMENTS", tool_lock),
+                patch.object(dependencies, "_lock_tool_python", return_value=python),
+                patch.object(dependencies, "_run") as run,
+            ):
+                result = dependencies.bootstrap_lock_tool()
+
+        self.assertEqual(result, python)
+        run.assert_called_once_with(
+            [
+                str(python),
+                "-m",
+                "pip",
+                "install",
+                "--require-hashes",
+                "-r",
+                str(runtime_lock),
+                "-r",
+                str(tool_lock),
+            ]
+        )
+
+
 class EntrypointTests(unittest.TestCase):
     def test_offline_check_can_skip_local_node_selection(self) -> None:
         pin = dependencies.DependencyPin("python", "Flask", "3.1.3", "requirements.in")

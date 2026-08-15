@@ -31,6 +31,7 @@ PYTHON_LOCK_PATHS: Final[tuple[Path, ...]] = (
     ROOT_DIR / "requirements-lock.txt",
 )
 LOCK_TOOL_REQUIREMENTS: Final[Path] = ROOT_DIR / "requirements-lock.txt"
+RUNTIME_REQUIREMENTS: Final[Path] = ROOT_DIR / "requirements.txt"
 LOCK_TOOL_ENV: Final[Path] = ROOT_DIR / "output" / "dependency-tools"
 NODE_VERSION_PATH: Final[Path] = ROOT_DIR / ".node-version"
 NVMRC_PATH: Final[Path] = ROOT_DIR / ".nvmrc"
@@ -354,6 +355,8 @@ def _lock_tool_python() -> Path:
 def bootstrap_lock_tool() -> Path:
     if not LOCK_TOOL_REQUIREMENTS.exists():
         raise MaintenanceError("requirements-lock.txt is missing; regenerate the lock-tool lock")
+    if not RUNTIME_REQUIREMENTS.exists():
+        raise MaintenanceError("requirements.txt is missing; regenerate the runtime lock")
     python = _lock_tool_python()
     if not python.exists():
         venv.EnvBuilder(with_pip=True).create(LOCK_TOOL_ENV)
@@ -364,6 +367,8 @@ def bootstrap_lock_tool() -> Path:
             "pip",
             "install",
             "--require-hashes",
+            "-r",
+            str(RUNTIME_REQUIREMENTS),
             "-r",
             str(LOCK_TOOL_REQUIREMENTS),
         ]

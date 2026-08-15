@@ -195,7 +195,7 @@ async function handleRequest(request: StandaloneRequestMessage): Promise<void> {
             {
                 request_path: request.path,
                 payload_json:
-                    request.payload === undefined ? null : JSON.stringify(request.payload),
+                    request.payload === undefined ? "{}" : JSON.stringify(request.payload),
             },
         );
         const payload = decodeRequestResponse(raw);
