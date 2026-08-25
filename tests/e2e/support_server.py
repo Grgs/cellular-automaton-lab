@@ -149,7 +149,7 @@ class JsonApiClient:
 
     def get_state(self) -> SimulationStatePayload:
         return require_simulation_state_payload(
-            self.request_json("/api/state"),
+            self.request_json("/api/state?include_topology=true"),
             context="browser support backend state",
         )
 

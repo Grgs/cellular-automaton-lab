@@ -5,6 +5,7 @@ import type {
     SeedComparisonResult,
     SeedFilmstripResult,
     SimulationSnapshot,
+    SimulationStateUpdate,
     TopologyPreview,
 } from "../types/domain.js";
 import type {
@@ -45,7 +46,7 @@ export interface StandaloneSuccessResponse {
     type: "response";
     requestId: string;
     ok: true;
-    snapshot?: SimulationSnapshot;
+    snapshot?: SimulationStateUpdate | SimulationSnapshot;
     rules?: RulesResponse["rules"];
     comparison?: SeedComparisonResult;
     filmstrip?: SeedFilmstripResult;

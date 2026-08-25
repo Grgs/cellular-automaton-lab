@@ -62,6 +62,7 @@ Important rules:
 - `static/dist/` is generated build output.
 - `output/standalone/` is generated static-site output.
 - Snapshots from the active runtime host are authoritative for topology, rule, speed, running state, generation, cell states, and the monotonic `state_revision` within a live session.
+- State polling is compact after bootstrap: the frontend caches the full topology, merges state-only updates only when `topology_revision` matches, and requests one full snapshot after a mismatch. Epoch/revision ordering prevents stale compact or recovery responses from replacing newer state.
 - Frontend edits and control changes are explicit mutations. Controls return the next canonical snapshot; cell writes return a revisioned delta that the frontend applies to its cached snapshot or rejects in favor of a full-state resynchronization.
 - `state_revision` advances exactly once for each effective observable mutation. It is intentionally ephemeral: persistence omits it and a new or restored runtime begins at revision zero.
 - `state_epoch` identifies the runtime lifetime that minted a revision. Every freshly constructed state (initial build, restore, replace) takes a strictly larger epoch within its hosting process — wall-clock microseconds with a same-process monotonic floor — so clients can order snapshots across revision resets while that runtime is live. The epoch is not a persistent cross-process clock and, like the revision, is never persisted.

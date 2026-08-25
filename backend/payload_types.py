@@ -183,7 +183,11 @@ class TopologyPayload(TypedDict):
     cells: list[TopologyCellPayload]
 
 
-class SimulationStatePayload(TypedDict):
+class StateGetRequestPayload(TypedDict, total=False):
+    include_topology: bool
+
+
+class SimulationStateUpdatePayload(TypedDict):
     topology_spec: TopologySpecPayload
     speed: float
     running: bool
@@ -193,6 +197,9 @@ class SimulationStatePayload(TypedDict):
     rule: RuleDefinitionPayload
     topology_revision: str
     cell_states: list[int]
+
+
+class SimulationStatePayload(SimulationStateUpdatePayload):
     topology: TopologyPayload
 
 

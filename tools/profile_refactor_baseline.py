@@ -14,6 +14,7 @@ from tools import check_bundle_size
 from tools._common import ROOT_DIR, write_text_lf
 from tools.profile_tiling_latency import (
     CASES,
+    _request_json_bytes,
     benchmark_topology_build_ms,
     default_reset_payload,
     post_reset,
@@ -78,6 +79,12 @@ def collect_baseline(*, repeats: int, bundle_dir: Path) -> dict[str, object]:
                 raise RuntimeError(f"{geometry} baseline topology did not contain cells")
             toggle_id = str(cells[0]["id"])
             _, toggle_bytes, toggle_ms = post_toggle(server.base_url, toggle_id)
+            _, compact_poll_bytes, compact_poll_ms = _request_json_bytes(
+                server.base_url, "/api/state"
+            )
+            _, full_poll_bytes, full_poll_ms = _request_json_bytes(
+                server.base_url, "/api/state?include_topology=true"
+            )
             topology_cases.append(
                 {
                     "geometry": geometry,
@@ -91,6 +98,11 @@ def collect_baseline(*, repeats: int, bundle_dir: Path) -> dict[str, object]:
                     "reset_bytes": reset_bytes,
                     "single_toggle_ms": toggle_ms,
                     "single_toggle_bytes": toggle_bytes,
+                    "compact_poll_ms": compact_poll_ms,
+                    "compact_poll_bytes": compact_poll_bytes,
+                    "full_poll_ms": full_poll_ms,
+                    "full_poll_bytes": full_poll_bytes,
+                    "poll_payload_reduction_ratio": 1 - compact_poll_bytes / full_poll_bytes,
                 }
             )
     finally:
@@ -141,7 +153,9 @@ def render_summary(payload: dict[str, object]) -> str:
         typed_case = dict(case)
         lines.append(
             "{geometry:28s} cells={cell_count:5d} build={cold_build_median_ms:7.1f}ms "
-            "toggle={single_toggle_ms:7.1f}ms/{single_toggle_bytes:7d}B".format(**typed_case)
+            "toggle={single_toggle_ms:7.1f}ms/{single_toggle_bytes:7d}B "
+            "poll={compact_poll_bytes:7d}B/{full_poll_bytes:7d}B "
+            "reduction={poll_payload_reduction_ratio:6.1%}".format(**typed_case)
         )
     comparison = cast(dict[str, Any], payload["comparison"])
     filmstrip = cast(dict[str, Any], payload["filmstrip"])

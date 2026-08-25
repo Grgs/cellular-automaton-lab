@@ -1,4 +1,12 @@
 import type {
+    CellTargetRequest,
+    CellUpdateRequest,
+    CellUpdatesRequest,
+    ConfigSyncBody,
+    ResetControlBody,
+    StateGetRequest,
+} from "./types/controller-api.js";
+import type {
     CellMutationDelta,
     CompareRequest,
     FilmstripRequest,
@@ -6,16 +14,10 @@ import type {
     SeedComparisonResult,
     SeedFilmstripResult,
     SimulationSnapshot,
+    SimulationStateUpdate,
     TopologyPreview,
     TopologyPreviewRequest,
 } from "./types/domain.js";
-import type {
-    CellTargetRequest,
-    CellUpdateRequest,
-    CellUpdatesRequest,
-    ConfigSyncBody,
-    ResetControlBody,
-} from "./types/controller-api.js";
 
 /**
  * Generated from backend/application_commands/contracts.py.
@@ -27,7 +29,10 @@ interface CommandContract<TRequest, TResult> {
 }
 
 export interface ApplicationCommandMap {
-    "state.get": CommandContract<undefined, SimulationSnapshot>;
+    "state.get": CommandContract<
+        StateGetRequest | undefined,
+        SimulationStateUpdate | SimulationSnapshot
+    >;
     "rules.list": CommandContract<undefined, { rules: RuleDefinition[] }>;
     "compare.run": CommandContract<CompareRequest, { comparison: SeedComparisonResult }>;
     "filmstrip.run": CommandContract<FilmstripRequest, { filmstrip: SeedFilmstripResult }>;
@@ -64,6 +69,7 @@ export interface ApplicationCommandPathMap {
 }
 
 export type StandaloneRequestPayload =
+    | StateGetRequest
     | CompareRequest
     | FilmstripRequest
     | TopologyPreviewRequest

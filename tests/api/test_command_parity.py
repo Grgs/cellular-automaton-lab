@@ -41,7 +41,10 @@ class CommandParityScenario:
 
 
 PARITY_SCENARIOS: dict[ApplicationCommand, CommandParityScenario] = {
-    ApplicationCommand.STATE_GET: CommandParityScenario(None),
+    ApplicationCommand.STATE_GET: CommandParityScenario(
+        {"include_topology": True},
+        ({"include_topology": "yes"},),
+    ),
     ApplicationCommand.RULES_LIST: CommandParityScenario(None),
     ApplicationCommand.COMPARE_RUN: CommandParityScenario(
         {"seed": "11", "rule": "conway", "geometries": ["square"], "steps": 3},
@@ -123,11 +126,14 @@ class SharedCommandParityTests(unittest.TestCase):
         session_id: str,
     ) -> tuple[int, Any]:
         routed_path = self.session_path(spec.transport_path, session_id)
-        response = (
-            self.client.get(routed_path)
-            if spec.http_method == "GET"
-            else self.client.post(routed_path, json=payload)
-        )
+        if spec.http_method == "GET":
+            query_payload = {
+                key: str(value).lower() if isinstance(value, bool) else value
+                for key, value in (payload or {}).items()
+            }
+            response = self.client.get(routed_path, query_string=query_payload)
+        else:
+            response = self.client.post(routed_path, json=payload)
         return response.status_code, self.normalize(response.get_json())
 
     @staticmethod
@@ -231,6 +237,19 @@ class SharedCommandParityTests(unittest.TestCase):
             for payload in PARITY_SCENARIOS[spec.command].invalid_payloads:
                 with self.subTest(command=spec.command.value, payload=payload):
                     self.assert_parity(spec, payload, expected_status=400)
+
+    def test_state_get_compact_and_full_forms_have_transport_parity(self) -> None:
+        state_spec = next(
+            spec for spec in COMMAND_SPECS if spec.command is ApplicationCommand.STATE_GET
+        )
+        payloads: tuple[dict[str, object] | None, ...] = (
+            None,
+            {"include_topology": False},
+            {"include_topology": True},
+        )
+        for payload in payloads:
+            with self.subTest(payload=payload):
+                self.assert_parity(state_spec, payload, expected_status=200)
 
     def test_hosts_reject_non_object_json_payloads(self) -> None:
         session_id = f"parity-{next(self.session_counter)}"

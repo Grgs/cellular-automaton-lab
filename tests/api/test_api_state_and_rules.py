@@ -53,6 +53,54 @@ class ApiStateAndRulesTests(ApiTestCase):
         self.assertNotIn("instance_path", payload)
         self.assertNotIn("started_at", payload)
 
+    def test_state_endpoint_is_compact_by_default_and_supports_explicit_full_snapshot(self) -> None:
+        compact = self.client.get("/api/state")
+        full = self.client.get("/api/state?include_topology=true")
+        explicit_compact = self.client.get("/api/state?include_topology=false")
+
+        self.assertEqual(compact.status_code, 200)
+        self.assertEqual(full.status_code, 200)
+        self.assertEqual(explicit_compact.status_code, 200)
+        compact_payload = compact.get_json()
+        full_payload = full.get_json()
+        self.assertNotIn("topology", compact_payload)
+        self.assertNotIn("topology", explicit_compact.get_json())
+        self.assertIn("topology", full_payload)
+        self.assertEqual(
+            compact_payload,
+            {key: value for key, value in full_payload.items() if key != "topology"},
+        )
+
+    def test_state_endpoint_rejects_invalid_include_topology_query(self) -> None:
+        response = self.client.get("/api/state?include_topology=yes")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.get_json()["error"], "'include_topology' must be a boolean.")
+
+    def test_compact_mixed_topology_state_is_at_least_95_percent_smaller(self) -> None:
+        reset = self.client.post(
+            "/api/control/reset",
+            json={
+                "topology_spec": {
+                    "tiling_family": "trihexagonal-3-6-3-6",
+                    "adjacency_mode": "edge",
+                    "sizing_mode": "grid",
+                    "width": 48,
+                    "height": 32,
+                    "patch_depth": 0,
+                },
+                "rule": "kagome-life",
+                "speed": 5,
+                "randomize": False,
+            },
+        )
+        self.assertEqual(reset.status_code, 200)
+
+        compact = self.client.get("/api/state")
+        full = self.client.get("/api/state?include_topology=true")
+
+        self.assertLess(len(compact.data), len(full.data) * 0.05)
+
     def test_rules_and_initial_state(self) -> None:
         rules = self.get_rules()
         payload = self.get_state()

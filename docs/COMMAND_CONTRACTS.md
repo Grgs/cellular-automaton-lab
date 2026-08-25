@@ -21,6 +21,12 @@ Flask and the standalone Pyodide runtime share one transport-neutral command lay
 | `cell.set` | `/api/cells/set` | cell delta | yes |
 | `cells.set_many` | `/api/cells/set-many` | cell delta | yes |
 
+`state.get` accepts the optional `{ include_topology: boolean }` request. It returns a
+compact state update by default; callers that do not already hold the matching
+`topology_revision` request a full snapshot with `include_topology: true`. The HTTP form is
+`GET /api/state?include_topology=true`, including session-scoped routes. Control commands
+continue to return full snapshots.
+
 `backend/application_commands/contracts.py` is the executable inventory. It owns each semantic id, transport method/path, backend payload name, and frontend request/result expression. `frontend/application-command-contract.ts` is generated from that registry and also exports the transport-path map used by the standalone worker protocol.
 
 After changing the registry, regenerate the frontend surface with:

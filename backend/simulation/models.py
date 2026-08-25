@@ -22,6 +22,7 @@ from backend.payload_types import (
     CellStatePayload,
     RuleDefinitionPayload,
     SimulationStatePayload,
+    SimulationStateUpdatePayload,
     TopologySpecInput,
     TopologySpecPayload,
 )
@@ -471,6 +472,12 @@ class SimulationSnapshot:
 
     def to_dict(self) -> SimulationStatePayload:
         return {
+            **self.to_update_dict(),
+            "topology": self.topology.to_dict(),
+        }
+
+    def to_update_dict(self) -> SimulationStateUpdatePayload:
+        return {
             "topology_spec": self.config.topology_spec.to_dict(),
             "speed": self.config.speed,
             "running": self.running,
@@ -480,7 +487,6 @@ class SimulationSnapshot:
             "rule": self.rule.to_dict(),
             "topology_revision": self.topology.topology_revision,
             "cell_states": self.cell_states,
-            "topology": self.topology.to_dict(),
         }
 
 

@@ -19,6 +19,7 @@ from backend.contract_validation import (
     parse_state_value,
 )
 from backend.payload_types import RawJsonObject
+from backend.public_errors import PublicApiError
 from backend.simulation.seeding import run_compare_request, run_filmstrip_request
 from backend.simulation.topology_preview import build_topology_preview
 
@@ -55,8 +56,15 @@ class ApplicationCommandDispatcher:
     def _snapshot_result(self) -> CommandResult:
         return CommandResult(CommandResultKind.SNAPSHOT, self.target.get_state().to_dict())
 
-    def _get_state(self, _payload: RawJsonObject) -> CommandResult:
-        return self._snapshot_result()
+    def _get_state(self, payload: RawJsonObject) -> CommandResult:
+        snapshot = self.target.get_state()
+        raw_include_topology = payload.get("include_topology", False)
+        if not isinstance(raw_include_topology, bool):
+            raise PublicApiError("'include_topology' must be a boolean.")
+        return CommandResult(
+            CommandResultKind.SNAPSHOT,
+            snapshot.to_dict() if raw_include_topology else snapshot.to_update_dict(),
+        )
 
     def _list_rules(self, _payload: RawJsonObject) -> CommandResult:
         return CommandResult(

@@ -72,7 +72,9 @@ class BrowserSimulationRuntime:
         self.service.replace_state(next_state)
 
     def get_state_response(self) -> str:
-        result = self.command_dispatcher.dispatch(COMMAND_BY_PATH["/api/state"])
+        result = self.command_dispatcher.dispatch(
+            COMMAND_BY_PATH["/api/state"], {"include_topology": True}
+        )
         return self._command_response(result)
 
     @property

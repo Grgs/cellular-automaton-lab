@@ -143,6 +143,8 @@ Browser UI
   `applySimulationSnapshot(...)`
 - [frontend/simulation-reconciler.ts](../frontend/simulation-reconciler.ts)
   `createSimulationReconciler(...)`
+- [frontend/simulation-snapshot-cache.ts](../frontend/simulation-snapshot-cache.ts)
+  Rehydrates compact state polls with cached topology and guards epoch/revision ordering.
 - [frontend/state/selectors.ts](../frontend/state/selectors.ts)
   `currentEditorRule(...)`, `currentDimensions(...)`, `topologyRenderPayload(...)`
 - [frontend/state/sizing-state.ts](../frontend/state/sizing-state.ts)

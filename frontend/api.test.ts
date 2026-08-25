@@ -131,6 +131,8 @@ describe("HTTP simulation backend cell deltas", () => {
         const backend = createHttpSimulationBackend();
         await backend.getState();
 
+        expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/state?include_topology=true");
+
         await expect(backend.setCell({ id: "c:0:0" }, 1)).resolves.toMatchObject({
             state_revision: 1,
             state_epoch: 1,
@@ -161,6 +163,7 @@ describe("HTTP simulation backend cell deltas", () => {
 
         await expect(backend.setCell({ id: "c:0:0" }, 1)).resolves.toEqual(refreshed);
         expect(fetchMock).toHaveBeenCalledTimes(3);
+        expect(fetchMock.mock.calls[2]?.[0]).toBe("/api/state?include_topology=true");
     });
 
     it("rejects malformed mutation contracts without coercion", async () => {
@@ -184,6 +187,63 @@ describe("HTTP simulation backend cell deltas", () => {
         await expect(backend.setCell({ id: "c:0:0" }, 1)).rejects.toThrow(
             "cell delta.state_revision",
         );
+    });
+});
+
+describe("HTTP simulation backend compact polling", () => {
+    afterEach(() => vi.unstubAllGlobals());
+
+    it("requests topology once and rehydrates ordinary polls from the cache", async () => {
+        const initial = snapshot();
+        const { topology: _topology, ...compact } = {
+            ...snapshot(1),
+            cell_states: [1],
+        };
+        const fetchMock = vi
+            .fn<typeof fetch>()
+            .mockResolvedValueOnce(jsonResponse(initial))
+            .mockResolvedValueOnce(jsonResponse(compact));
+        vi.stubGlobal("fetch", fetchMock);
+        const backend = createHttpSimulationBackend();
+
+        const first = await backend.getState();
+        const second = await backend.getState();
+
+        expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+            "/api/state?include_topology=true",
+            "/api/state",
+        ]);
+        expect(second.topology).toBe(first.topology);
+        expect(second.cell_states).toEqual([1]);
+    });
+
+    it("refetches topology exactly once when a compact poll changes revision", async () => {
+        const initial = snapshot();
+        const { topology: _topology, ...mismatched } = {
+            ...snapshot(1),
+            topology_revision: "rev-2",
+        };
+        const replacement = {
+            ...snapshot(2),
+            topology_revision: "rev-2",
+            topology: { ...snapshot().topology, topology_revision: "rev-2" },
+        };
+        const fetchMock = vi
+            .fn<typeof fetch>()
+            .mockResolvedValueOnce(jsonResponse(initial))
+            .mockResolvedValueOnce(jsonResponse(mismatched))
+            .mockResolvedValueOnce(jsonResponse(replacement));
+        vi.stubGlobal("fetch", fetchMock);
+        const backend = createHttpSimulationBackend();
+
+        await backend.getState();
+        await expect(backend.getState()).resolves.toEqual(replacement);
+
+        expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+            "/api/state?include_topology=true",
+            "/api/state",
+            "/api/state?include_topology=true",
+        ]);
     });
 });
 

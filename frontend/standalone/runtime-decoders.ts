@@ -6,6 +6,7 @@ import type {
     SeedComparisonResult,
     SeedFilmstripResult,
     SimulationSnapshot,
+    SimulationStateUpdate,
     TopologyPayload,
     TopologyPreview,
     TopologySpec,
@@ -28,7 +29,7 @@ export interface DecodedInitResponse {
 
 export interface DecodedRequestResponse extends RuntimeErrorDetails {
     ok: boolean;
-    snapshot?: SimulationSnapshot;
+    snapshot?: SimulationStateUpdate | SimulationSnapshot;
     rules?: RulesResponse["rules"];
     comparison?: SeedComparisonResult;
     filmstrip?: SeedFilmstripResult;
@@ -243,7 +244,10 @@ function topology(value: unknown, context: string): TopologyPayload {
     };
 }
 
-function optionalSnapshot(value: unknown, context: string): SimulationSnapshot | undefined {
+function optionalStateUpdate(
+    value: unknown,
+    context: string,
+): SimulationStateUpdate | SimulationSnapshot | undefined {
     if (value === undefined) {
         return undefined;
     }
@@ -251,7 +255,7 @@ function optionalSnapshot(value: unknown, context: string): SimulationSnapshot |
     const cellStates = array(payload.cell_states, context, "simulation snapshot.cell_states").map(
         (entry) => number(entry, context, "simulation cell state"),
     );
-    return {
+    const update: SimulationStateUpdate = {
         topology_spec: topologySpec(payload.topology_spec, context),
         speed: number(payload.speed, context, "simulation snapshot.speed"),
         running: boolean(payload.running, context, "simulation snapshot.running"),
@@ -268,9 +272,19 @@ function optionalSnapshot(value: unknown, context: string): SimulationSnapshot |
             context,
             "simulation snapshot.topology_revision",
         ),
-        topology: topology(payload.topology, context),
         cell_states: cellStates,
     };
+    return payload.topology === undefined
+        ? update
+        : { ...update, topology: topology(payload.topology, context) };
+}
+
+function optionalSnapshot(value: unknown, context: string): SimulationSnapshot | undefined {
+    const update = optionalStateUpdate(value, context);
+    if (update === undefined) {
+        return undefined;
+    }
+    return "topology" in update ? update : invalid(context, "simulation snapshot.topology");
 }
 
 function optionalPersistedSnapshot(
@@ -537,7 +551,7 @@ export function decodeInitResponse(raw: string): DecodedInitResponse {
 export function decodeRequestResponse(raw: string): DecodedRequestResponse {
     const context = "Standalone request";
     const payload = runtimeJson(raw, context);
-    const snapshot = optionalSnapshot(payload.snapshot, context);
+    const snapshot = optionalStateUpdate(payload.snapshot, context);
     const rules = optionalRules(payload.rules, context);
     const comparison = optionalComparison(payload.comparison, context);
     const filmstrip = optionalFilmstrip(payload.filmstrip, context);

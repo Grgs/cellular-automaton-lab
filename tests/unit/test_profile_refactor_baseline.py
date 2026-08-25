@@ -38,6 +38,9 @@ class RefactorBaselineProfileTests(unittest.TestCase):
                         "cold_build_median_ms": 1.25,
                         "single_toggle_ms": 2.5,
                         "single_toggle_bytes": 512,
+                        "compact_poll_bytes": 64,
+                        "full_poll_bytes": 2048,
+                        "poll_payload_reduction_ratio": 0.96875,
                     }
                 ],
                 "comparison": {"median_ms": 3.0, "payload_bytes": 1024},
@@ -48,6 +51,8 @@ class RefactorBaselineProfileTests(unittest.TestCase):
 
         self.assertIn("square", summary)
         self.assertIn("toggle=", summary)
+        self.assertIn("poll=", summary)
+        self.assertIn("reduction= 96.9%", summary)
         self.assertIn("comparison", summary)
         self.assertIn("filmstrip", summary)
         self.assertIn("bundle", summary)

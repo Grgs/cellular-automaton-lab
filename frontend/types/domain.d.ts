@@ -365,7 +365,7 @@ export interface ResolvedPresetSelection {
     presetId: string | null;
 }
 
-export interface ApiSimulationSnapshot {
+export interface SimulationStateUpdate {
     topology_spec: TopologySpec;
     speed: number;
     running: boolean;
@@ -374,8 +374,11 @@ export interface ApiSimulationSnapshot {
     state_epoch: number;
     rule: RuleDefinition;
     topology_revision: string;
-    topology: TopologyPayload;
     cell_states: number[];
+}
+
+export interface ApiSimulationSnapshot extends SimulationStateUpdate {
+    topology: TopologyPayload;
 }
 
 export type SimulationSnapshot = ApiSimulationSnapshot;

@@ -3073,7 +3073,11 @@ class CellularAutomatonUITests(SharedUiFlowMixin, BrowserAppTestCase):
         if self.api is None:
             raise AssertionError("server browser tests require an API client")
 
-        self.page.select_option("#rule-select", "highlife")
+        with self.page.expect_response(
+            lambda response: response.request.method == "POST" and response.url.endswith("/config")
+        ) as response_info:
+            self.page.select_option("#rule-select", "highlife")
+        self.assertEqual(response_info.value.status, 200)
         self._expect("#rule-select").to_have_value("highlife")
 
         self.host.restart()

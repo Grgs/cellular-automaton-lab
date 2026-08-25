@@ -126,10 +126,16 @@ PAYLOAD_FIELD_CONTRACTS: tuple[PayloadFieldContract, ...] = (
     PayloadFieldContract("TopologyPreviewRequestPayload", "TopologyPreviewRequest"),
     PayloadFieldContract("TopologyPreviewCellPayload", "TopologyPreviewCell"),
     PayloadFieldContract("TopologyPreviewPayload", "TopologyPreview"),
+    PayloadFieldContract("SimulationStateUpdatePayload", "SimulationStateUpdate"),
     PayloadFieldContract("SimulationStatePayload", "ApiSimulationSnapshot"),
     PayloadFieldContract("CellMutationDeltaPayload", "CellMutationDelta"),
     PayloadFieldContract("PersistedSimulationSnapshotV5", "PersistedSimulationSnapshotV5"),
     PayloadFieldContract("PatternPayload", "PatternPayload"),
+    PayloadFieldContract(
+        "StateGetRequestPayload",
+        "StateGetRequest",
+        frontend_path=CONTROLLER_API_FRONTEND_PATH,
+    ),
     PayloadFieldContract(
         "ConfigTopologySpecPatchPayload",
         "ConfigTopologySpecPatch",
@@ -347,6 +353,7 @@ PAYLOAD_TYPE_UNION_CONTRACTS: tuple[PayloadTypeUnionContract, ...] = (
     PayloadTypeUnionContract(
         type_name="StandaloneRequestPayload",
         members=(
+            "StateGetRequest",
             "ResetControlBody",
             "ConfigSyncBody",
             "CellTargetRequest",

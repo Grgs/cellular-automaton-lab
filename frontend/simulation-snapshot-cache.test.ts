@@ -5,7 +5,11 @@ import {
     persistedSnapshotFrom,
     SimulationSnapshotCache,
 } from "./simulation-snapshot-cache.js";
-import type { CellMutationDelta, SimulationSnapshot } from "./types/domain.js";
+import type {
+    CellMutationDelta,
+    SimulationSnapshot,
+    SimulationStateUpdate,
+} from "./types/domain.js";
 
 function snapshot(revision = 0, generation = 0): SimulationSnapshot {
     const topologySpec = {
@@ -61,6 +65,98 @@ function delta(overrides: Partial<CellMutationDelta> = {}): CellMutationDelta {
         ...overrides,
     };
 }
+
+function update(
+    revision = 1,
+    overrides: Partial<SimulationStateUpdate> = {},
+): SimulationStateUpdate {
+    const { topology: _topology, ...compact } = snapshot(revision);
+    return { ...compact, ...overrides };
+}
+
+describe("compact state updates", () => {
+    it("rehydrates a same-revision update with the cached topology identity", async () => {
+        const cache = new SimulationSnapshotCache();
+        const initial = snapshot();
+        cache.install(initial, null);
+
+        const reconciled = await cache.reconcileUpdate(update(1), initial, async () => {
+            throw new Error("full refresh should not be requested");
+        });
+
+        expect(reconciled).toMatchObject({ state_revision: 1 });
+        expect(reconciled.topology).toBe(initial.topology);
+    });
+
+    it("recovers a topology mismatch through one full refresh", async () => {
+        const cache = new SimulationSnapshotCache();
+        const initial = snapshot();
+        cache.install(initial, null);
+        const replacement = {
+            ...snapshot(2),
+            topology_revision: "square:replacement",
+            topology: {
+                ...snapshot().topology,
+                topology_revision: "square:replacement",
+            },
+        };
+        let refreshCount = 0;
+
+        const reconciled = await cache.reconcileUpdate(
+            update(1, { topology_revision: "square:replacement" }),
+            initial,
+            async () => {
+                refreshCount += 1;
+                return replacement;
+            },
+        );
+
+        expect(refreshCount).toBe(1);
+        expect(reconciled).toBe(replacement);
+    });
+
+    it("does not let stale compact or recovery responses replace newer cached state", async () => {
+        const cache = new SimulationSnapshotCache();
+        const initial = snapshot();
+        cache.install(initial, null);
+        const newer = snapshot(3);
+        cache.install(newer, initial);
+
+        await expect(
+            cache.reconcileUpdate(update(1), initial, async () => snapshot(1)),
+        ).resolves.toBe(newer);
+
+        let resolveRefresh!: (value: SimulationSnapshot) => void;
+        const refresh = new Promise<SimulationSnapshot>((resolve) => {
+            resolveRefresh = resolve;
+        });
+        const recovery = cache.reconcileUpdate(
+            update(4, { topology_revision: "square:replacement" }),
+            newer,
+            () => refresh,
+        );
+        const newest = snapshot(5);
+        cache.install(newest, newer);
+        resolveRefresh(snapshot(4));
+
+        await expect(recovery).resolves.toBe(newest);
+        expect(cache.current()).toBe(newest);
+    });
+
+    it("accepts a newer runtime epoch even when its revision resets", async () => {
+        const cache = new SimulationSnapshotCache();
+        const initial = snapshot(8);
+        cache.install(initial, null);
+
+        const reconciled = await cache.reconcileUpdate(
+            update(0, { state_epoch: 2 }),
+            initial,
+            async () => snapshot(),
+        );
+
+        expect(reconciled).toMatchObject({ state_epoch: 2, state_revision: 0 });
+    });
+});
 
 describe("cell mutation deltas", () => {
     it("applies changed cells without replacing topology identity", () => {

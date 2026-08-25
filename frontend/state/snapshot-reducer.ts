@@ -79,7 +79,6 @@ export function applySimulationSnapshot(
     const topologySpec = describeTopologySpec(
         simulationState.topology_spec || DEFAULT_TOPOLOGY_SPEC,
     );
-    const normalizedTopology = normalizeIncomingTopology(simulationState, topologySpec);
     setTopologySpec(state, topologySpec);
     setPatchDepth(state, topologySpec.patch_depth, topologySpec.tiling_family, {
         preserveOutOfRange: true,
@@ -96,9 +95,17 @@ export function applySimulationSnapshot(
             topologySpec.tiling_family,
         );
     }
-    state.width = Number(topologySpec.width) || Number(normalizedTopology.topology_spec.width) || 0;
-    state.height =
-        Number(topologySpec.height) || Number(normalizedTopology.topology_spec.height) || 0;
-    setTopology(state, normalizedTopology, simulationState.cell_states);
+    if (state.topology === null || state.topologyRevision !== simulationState.topology_revision) {
+        const normalizedTopology = normalizeIncomingTopology(simulationState, topologySpec);
+        state.width =
+            Number(topologySpec.width) || Number(normalizedTopology.topology_spec.width) || 0;
+        state.height =
+            Number(topologySpec.height) || Number(normalizedTopology.topology_spec.height) || 0;
+        setTopology(state, normalizedTopology, simulationState.cell_states);
+    } else {
+        state.width = Number(topologySpec.width) || state.width;
+        state.height = Number(topologySpec.height) || state.height;
+        state.cellStates = simulationState.cell_states;
+    }
     setActiveRule(state, simulationState.rule);
 }
