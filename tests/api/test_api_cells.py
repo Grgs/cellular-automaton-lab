@@ -32,7 +32,7 @@ class ApiCellTests(ApiTestCase):
                     },
                 )
                 self.assertEqual(reset.status_code, 200)
-                full_snapshot_bytes = len(self.client.get("/api/state").data)
+                full_snapshot_bytes = len(self.client.get("/api/state?include_topology=true").data)
 
                 delta = self.client.post("/api/cells/set", json={"id": cell_id, "state": 1})
 

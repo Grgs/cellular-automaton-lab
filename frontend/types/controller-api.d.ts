@@ -37,6 +37,10 @@ export interface ResetControlBody {
     randomize: boolean;
 }
 
+export interface StateGetRequest {
+    include_topology?: boolean;
+}
+
 export type CellTargetRequest = CellIdentifier;
 
 export type CellUpdateRequest = CellStateUpdate;

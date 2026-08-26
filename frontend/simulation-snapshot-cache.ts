@@ -3,7 +3,14 @@ import type {
     CellMutationDelta,
     PersistedSimulationSnapshotV5,
     SimulationSnapshot,
+    SimulationStateUpdate,
 } from "./types/domain.js";
+
+export function isSimulationSnapshot(
+    update: SimulationStateUpdate | SimulationSnapshot,
+): update is SimulationSnapshot {
+    return "topology" in update;
+}
 
 export function applyCellMutationDelta(
     snapshot: SimulationSnapshot,
@@ -68,6 +75,31 @@ export class SimulationSnapshotCache {
         }
         this.snapshot = nextSnapshot;
         return nextSnapshot;
+    }
+
+    async reconcileUpdate(
+        update: SimulationStateUpdate | SimulationSnapshot,
+        requestBase: SimulationSnapshot | null,
+        refreshFull: () => Promise<SimulationSnapshot>,
+    ): Promise<SimulationSnapshot> {
+        if (isSimulationSnapshot(update)) {
+            return this.install(update, requestBase);
+        }
+
+        const current = this.snapshot;
+        if (current !== null && current.topology_revision === update.topology_revision) {
+            return this.install(
+                {
+                    ...update,
+                    topology: current.topology,
+                },
+                requestBase,
+            );
+        }
+
+        const refreshBase = this.snapshot;
+        const refreshed = await refreshFull();
+        return this.install(refreshed, refreshBase);
     }
 
     async reconcileDelta(

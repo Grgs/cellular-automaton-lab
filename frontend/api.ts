@@ -7,6 +7,7 @@ import type {
     SeedComparisonResult,
     SeedFilmstripResult,
     SimulationSnapshot,
+    SimulationStateUpdate,
     TopologyPreview,
     TopologyPreviewRequest,
 } from "./types/domain.js";
@@ -78,8 +79,14 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
     return response.json();
 }
 
-export function fetchState(sessionId?: string): Promise<SimulationSnapshot> {
-    return request<SimulationSnapshot>(sessionPath("/api/state", sessionId));
+export function fetchState(
+    sessionId?: string,
+    { includeTopology = false }: { includeTopology?: boolean } = {},
+): Promise<SimulationStateUpdate | SimulationSnapshot> {
+    const path = sessionPath("/api/state", sessionId);
+    return request<SimulationStateUpdate | SimulationSnapshot>(
+        includeTopology ? `${path}?include_topology=true` : path,
+    );
 }
 
 export function fetchRules(sessionId?: string): Promise<RulesResponse> {
@@ -203,10 +210,20 @@ export function createHttpSimulationBackend({
 }: HttpSimulationBackendOptions = {}): SimulationBackend {
     const snapshots = new SimulationSnapshotCache();
 
+    async function fetchFullState(): Promise<SimulationSnapshot> {
+        const snapshot = await fetchState(sessionId, { includeTopology: true });
+        if (!("topology" in snapshot)) {
+            throw new Error("Full state response did not include topology.");
+        }
+        return snapshot;
+    }
+
     async function getStateForSession(): Promise<SimulationSnapshot> {
         const requestBase = snapshots.current();
-        const nextSnapshot = await fetchState(sessionId);
-        return snapshots.install(nextSnapshot, requestBase);
+        const nextUpdate = await fetchState(sessionId, {
+            includeTopology: requestBase === null,
+        });
+        return snapshots.reconcileUpdate(nextUpdate, requestBase, fetchFullState);
     }
 
     const postControlForSession = (async (
@@ -222,7 +239,7 @@ export function createHttpSimulationBackend({
         mutation: Promise<CellMutationDelta>,
     ): Promise<SimulationSnapshot> {
         const delta = await mutation;
-        return snapshots.reconcileDelta(delta, () => fetchState(sessionId));
+        return snapshots.reconcileDelta(delta, fetchFullState);
     }
 
     return {

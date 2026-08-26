@@ -51,5 +51,19 @@ describe("snapshot reducer revisions", () => {
         applySimulationSnapshot(state, snapshot);
 
         expect(state.stateRevision).toBe(17);
+
+        const topology = state.topology;
+        const topologyIndex = state.topologyIndex;
+        const nextCellStates = [0];
+        applySimulationSnapshot(state, {
+            ...snapshot,
+            state_revision: 18,
+            cell_states: nextCellStates,
+            topology: { ...snapshot.topology },
+        });
+
+        expect(state.topology).toBe(topology);
+        expect(state.topologyIndex).toBe(topologyIndex);
+        expect(state.cellStates).toBe(nextCellStates);
     });
 });

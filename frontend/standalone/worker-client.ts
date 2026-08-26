@@ -1,4 +1,9 @@
-import type { AppBootstrapData, RulesResponse, SimulationSnapshot } from "../types/domain.js";
+import type {
+    AppBootstrapData,
+    RulesResponse,
+    SimulationSnapshot,
+    SimulationStateUpdate,
+} from "../types/domain.js";
 import type {
     AppRuntimeEnvironment,
     ConfigSyncBody,
@@ -44,11 +49,23 @@ function createRequestId(): string {
     return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-function requireSnapshot(snapshot: SimulationSnapshot | undefined): SimulationSnapshot {
+function requireStateUpdate(
+    snapshot: SimulationStateUpdate | SimulationSnapshot | undefined,
+): SimulationStateUpdate | SimulationSnapshot {
     if (!snapshot) {
         throw new Error("Standalone runtime did not return a simulation snapshot.");
     }
     return snapshot;
+}
+
+function requireSnapshot(
+    snapshot: SimulationStateUpdate | SimulationSnapshot | undefined,
+): SimulationSnapshot {
+    const update = requireStateUpdate(snapshot);
+    if (!("topology" in update)) {
+        throw new Error("Standalone runtime did not return a full simulation snapshot.");
+    }
+    return update;
 }
 
 function createStandalonePaneBackendFactory(
@@ -276,8 +293,20 @@ export async function createStandaloneEnvironment(
 
     async function fetchFullState(): Promise<SimulationSnapshot> {
         const requestBase = snapshots.current();
-        const response = await request("/api/state");
+        const response = await request("/api/state", { include_topology: true });
         const snapshot = snapshots.install(requireSnapshot(response.snapshot), requestBase);
+        await persistAcceptedSnapshot(snapshot);
+        return snapshot;
+    }
+
+    async function fetchStateUpdate(): Promise<SimulationSnapshot> {
+        const requestBase = snapshots.current();
+        const response = await request("/api/state");
+        const snapshot = await snapshots.reconcileUpdate(
+            requireStateUpdate(response.snapshot),
+            requestBase,
+            fetchFullState,
+        );
         await persistAcceptedSnapshot(snapshot);
         return snapshot;
     }
@@ -323,7 +352,7 @@ export async function createStandaloneEnvironment(
 
     const backend: SimulationBackend = {
         async getState() {
-            return fetchFullState();
+            return fetchStateUpdate();
         },
         async getRules(): Promise<RulesResponse> {
             const response = await request("/api/rules");

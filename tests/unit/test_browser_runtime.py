@@ -51,6 +51,17 @@ class BrowserRuntimeTests(unittest.TestCase):
         self.assertEqual(payload["persisted_snapshot"]["version"], 5)
         self.assertNotIn("state_revision", payload["persisted_snapshot"])
 
+    def test_state_request_is_compact_by_default_and_supports_full_snapshot(self) -> None:
+        initialize_runtime()
+
+        compact = json.loads(handle_request("/api/state"))
+        full = json.loads(handle_request("/api/state", json.dumps({"include_topology": True})))
+
+        self.assertTrue(compact["ok"])
+        self.assertTrue(full["ok"])
+        self.assertNotIn("topology", compact["snapshot"])
+        self.assertIn("topology", full["snapshot"])
+
     def test_handle_request_supports_cell_mutations_and_runtime_ticks(self) -> None:
         initialize_runtime()
 

@@ -492,6 +492,36 @@ describe("canvas-view", () => {
 
     it("delegates canvas centering to the grid viewport", async () => {
         const resize = vi.fn(() => ({ ...BASE_METRICS, cssWidth: 120, cssHeight: 60 }));
+        const buildMetrics = vi.fn(() => ({
+            ...BASE_METRICS,
+            cssWidth: 120,
+            cssHeight: 60,
+        }));
+        const resolveGeometryCache = vi.fn(() => ({
+            cacheKey: "cache",
+            geometryCache: null,
+        }));
+        let themeDeadColor = "#f8f1e5";
+        const readCanvasColors = vi.fn(() => ({
+            line: "rgba(31, 36, 48, 0.16)",
+            dead: themeDeadColor,
+            deadAlt: "#d5bb8f",
+            lineSoft: "rgba(31, 36, 48, 0.10)",
+            lineStrong: "rgba(31, 36, 48, 0.20)",
+            lineAperiodic: "rgba(31, 36, 48, 0.24)",
+            live: "#1f2430",
+            accent: "#bf5a36",
+            accentStrong: "#8a3d20",
+            toneCream: "#f8f1e5",
+            toneLinen: "#ead6b6",
+            toneSand: "#efe4d0",
+            toneFlax: "#e1cdac",
+            toneTan: "#e5c089",
+            toneStone: "#d5bb8f",
+            toneRose: "#dbc1b2",
+            toneClay: "#c88d4b",
+            toneShadow: "#b89a6e",
+        }));
         const drawCommittedLayer = vi.fn();
         const drawCommittedCells = vi.fn();
 
@@ -514,13 +544,13 @@ describe("canvas-view", () => {
         }));
         vi.doMock("./geometry/registry.js", () => ({
             getGeometryAdapter: () => ({
-                buildMetrics: () => ({ ...BASE_METRICS, cssWidth: 120, cssHeight: 60 }),
+                buildMetrics,
                 family: "mixed",
             }),
             isSupportedGeometry: () => true,
         }));
         vi.doMock("./canvas/cache.js", () => ({
-            resolveGeometryCache: () => ({ cacheKey: "cache", geometryCache: null }),
+            resolveGeometryCache,
         }));
         vi.doMock("./canvas/render-style.js", () => ({
             DEFAULT_COLORS: {
@@ -544,26 +574,7 @@ describe("canvas-view", () => {
                 toneShadow: "#b89a6e",
             },
             buildStateColorLookup: () => new Map([[0, "#f8f1e5"]]),
-            readCanvasColors: () => ({
-                line: "rgba(31, 36, 48, 0.16)",
-                dead: "#f8f1e5",
-                deadAlt: "#d5bb8f",
-                lineSoft: "rgba(31, 36, 48, 0.10)",
-                lineStrong: "rgba(31, 36, 48, 0.20)",
-                lineAperiodic: "rgba(31, 36, 48, 0.24)",
-                live: "#1f2430",
-                accent: "#bf5a36",
-                accentStrong: "#8a3d20",
-                toneCream: "#f8f1e5",
-                toneLinen: "#ead6b6",
-                toneSand: "#efe4d0",
-                toneFlax: "#e1cdac",
-                toneTan: "#e5c089",
-                toneStone: "#d5bb8f",
-                toneRose: "#dbc1b2",
-                toneClay: "#c88d4b",
-                toneShadow: "#b89a6e",
-            }),
+            readCanvasColors,
             resolveCanvasRenderStyle: () => ({
                 mode: "standard",
                 geometry: "square",
@@ -590,10 +601,21 @@ describe("canvas-view", () => {
         const canvas = document.createElement("canvas");
         viewport.append(canvas);
         document.body.append(viewport);
-        Object.defineProperty(viewport, "clientWidth", { configurable: true, value: 220 });
-        Object.defineProperty(viewport, "clientHeight", { configurable: true, value: 160 });
+        let viewportWidth = 220;
+        let viewportHeight = 160;
+        Object.defineProperty(viewport, "clientWidth", {
+            configurable: true,
+            get: () => viewportWidth,
+        });
+        Object.defineProperty(viewport, "clientHeight", {
+            configurable: true,
+            get: () => viewportHeight,
+        });
 
-        const view = createCanvasGridView({ canvas });
+        let dpr = 1;
+
+        const view = createCanvasGridView({ canvas, getDevicePixelRatio: () => dpr });
+        buildMetrics.mockClear();
 
         const pinwheelTopology = {
             ...topologyPayload(),
@@ -614,6 +636,9 @@ describe("canvas-view", () => {
         );
 
         expect(canvas.style.margin).toBe("0px");
+        expect(buildMetrics).toHaveBeenCalledTimes(1);
+        expect(resolveGeometryCache).toHaveBeenCalledTimes(1);
+        expect(resize).toHaveBeenCalledTimes(1);
 
         view.render(
             {
@@ -628,6 +653,83 @@ describe("canvas-view", () => {
 
         expect(drawCommittedLayer).toHaveBeenCalledTimes(2);
         expect(drawCommittedCells).not.toHaveBeenCalled();
+        expect(buildMetrics).toHaveBeenCalledTimes(1);
+        expect(resolveGeometryCache).toHaveBeenCalledTimes(1);
+        expect(resize).toHaveBeenCalledTimes(1);
+
+        view.render(
+            {
+                topology: pinwheelTopology,
+                cellStates: [1],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "pinwheel",
+        );
+        expect(drawCommittedLayer).toHaveBeenCalledTimes(2);
+        expect(drawCommittedCells).not.toHaveBeenCalled();
+
+        themeDeadColor = "#101820";
+        view.render(
+            {
+                topology: pinwheelTopology,
+                cellStates: [1],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "pinwheel",
+        );
+        expect(drawCommittedLayer).toHaveBeenCalledTimes(3);
+        expect(buildMetrics).toHaveBeenCalledTimes(1);
+        expect(resolveGeometryCache).toHaveBeenCalledTimes(1);
+        expect(resize).toHaveBeenCalledTimes(1);
+
+        dpr = 2;
+        view.render(
+            {
+                topology: pinwheelTopology,
+                cellStates: [1],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "pinwheel",
+        );
+        expect(buildMetrics).toHaveBeenCalledTimes(2);
+        expect(resolveGeometryCache).toHaveBeenCalledTimes(2);
+        expect(resize).toHaveBeenCalledTimes(2);
+
+        viewportWidth = 200;
+        viewportHeight = 140;
+        view.render(
+            {
+                topology: pinwheelTopology,
+                cellStates: [1],
+                previewCellStatesById: null,
+            },
+            12,
+            [],
+            "pinwheel",
+        );
+        expect(buildMetrics).toHaveBeenCalledTimes(3);
+        expect(resolveGeometryCache).toHaveBeenCalledTimes(3);
+        expect(resize).toHaveBeenCalledTimes(3);
+
+        view.render(
+            {
+                topology: pinwheelTopology,
+                cellStates: [1],
+                previewCellStatesById: null,
+            },
+            13,
+            [],
+            "pinwheel",
+        );
+        expect(buildMetrics).toHaveBeenCalledTimes(4);
+        expect(resolveGeometryCache).toHaveBeenCalledTimes(4);
+        expect(resize).toHaveBeenCalledTimes(4);
 
         view.render(
             {
@@ -635,12 +737,15 @@ describe("canvas-view", () => {
                 cellStates: [0],
                 previewCellStatesById: null,
             },
-            12,
+            13,
             [],
             "square",
         );
 
         expect(canvas.style.margin).toBe("0px");
+        expect(buildMetrics).toHaveBeenCalledTimes(5);
+        expect(resolveGeometryCache).toHaveBeenCalledTimes(5);
+        expect(resize).toHaveBeenCalledTimes(5);
     });
 
     it("exposes deterministic render diagnostics for polygon topologies", async () => {

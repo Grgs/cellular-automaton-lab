@@ -25,7 +25,9 @@ class ApiSessionTests(ApiTestCase):
         return f"/api/sessions/{session_id}{path}"
 
     def session_state(self, session_id: str) -> SimulationStatePayload:
-        response = self.client.get(self.session_path(session_id, "/state"))
+        response = self.client.get(
+            f"{self.session_path(session_id, '/state')}?include_topology=true"
+        )
         self.assertEqual(response.status_code, 200)
         return require_simulation_state_payload(
             response.get_json(),
@@ -57,6 +59,12 @@ class ApiSessionTests(ApiTestCase):
         self.assertEqual(self.regular_cell_state(second_state, 2, 2), 1)
         self.assertEqual(first_state["state_revision"], 1)
         self.assertEqual(second_state["state_revision"], 1)
+
+    def test_session_state_is_compact_by_default(self) -> None:
+        response = self.client.get(self.session_path("s-compact", "/state"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("topology", response.get_json())
 
     def test_session_state_persists_independently(self) -> None:
         first = "s-persist-first"

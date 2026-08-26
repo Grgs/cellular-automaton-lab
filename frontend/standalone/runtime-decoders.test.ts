@@ -80,6 +80,17 @@ describe("standalone runtime decoders", () => {
         ).toMatchObject({ ok: true, stepped: true });
     });
 
+    it("accepts compact state command responses while requiring topology for initialization", () => {
+        const { topology: _topology, ...compact } = snapshot();
+
+        expect(
+            decodeRequestResponse(JSON.stringify({ ok: true, snapshot: compact })).snapshot,
+        ).toEqual(compact);
+        expect(() =>
+            decodeInitResponse(JSON.stringify({ snapshot: compact, persisted_snapshot: null })),
+        ).toThrow("topology");
+    });
+
     it("preserves structured topology-budget errors", () => {
         expect(
             decodeRequestResponse(

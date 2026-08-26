@@ -246,14 +246,23 @@ describe("standalone worker client", () => {
 
         const statePromise = environment.backend.getState();
         const requestMessage = lastRequestMessage(worker());
+        const { topology: _topology, ...compactSnapshot } = {
+            ...snapshot,
+            state_revision: 1,
+            cell_states: [1],
+        };
+        expect(requestMessage.path).toBe("/api/state");
+        expect(requestMessage).not.toHaveProperty("payload");
         worker().dispatchMessage({
             type: "response",
             requestId: requestMessage.requestId,
             ok: true,
-            snapshot,
+            snapshot: compactSnapshot,
         });
 
-        await expect(statePromise).resolves.toEqual(snapshot);
+        const polled = await statePromise;
+        expect(polled.topology).toBe(snapshot.topology);
+        expect(polled).toMatchObject({ state_revision: 1, cell_states: [1] });
     });
 
     it("rejects initialization failures and disposes the worker", async () => {
@@ -482,6 +491,7 @@ describe("standalone worker client", () => {
         });
         await vi.waitFor(() => expect(lastRequestMessage(worker()).path).toBe("/api/state"));
         const stateMessage = lastRequestMessage(worker());
+        expect(stateMessage.payload).toEqual({ include_topology: true });
         worker().dispatchMessage({
             type: "response",
             requestId: stateMessage.requestId,
@@ -494,6 +504,53 @@ describe("standalone worker client", () => {
             state_epoch: 1,
             cell_states: [1],
         });
+    });
+
+    it("recovers a compact topology mismatch with one full state request", async () => {
+        const { module, worker } = await loadWorkerClientModule();
+        const environmentPromise = module.createStandaloneEnvironment(bootstrapData);
+        await flushAsyncStartup();
+        const initMessage = lastInitMessage(worker());
+        worker().dispatchMessage({
+            type: "ready",
+            requestId: initMessage.requestId,
+            snapshot,
+            persistedSnapshot: null,
+        });
+        const environment = await environmentPromise;
+
+        const statePromise = environment.backend.getState();
+        const compactMessage = lastRequestMessage(worker());
+        const { topology: _topology, ...compact } = {
+            ...snapshot,
+            state_revision: 1,
+            topology_revision: "rev-2",
+        };
+        worker().dispatchMessage({
+            type: "response",
+            requestId: compactMessage.requestId,
+            ok: true,
+            snapshot: compact,
+        });
+
+        await vi.waitFor(() =>
+            expect(lastRequestMessage(worker()).payload).toEqual({ include_topology: true }),
+        );
+        const fullMessage = lastRequestMessage(worker());
+        const replacement = {
+            ...snapshot,
+            state_revision: 2,
+            topology_revision: "rev-2",
+            topology: { ...snapshot.topology, topology_revision: "rev-2" },
+        };
+        worker().dispatchMessage({
+            type: "response",
+            requestId: fullMessage.requestId,
+            ok: true,
+            snapshot: replacement,
+        });
+
+        await expect(statePromise).resolves.toEqual(replacement);
     });
 
     it("disposes pending requests and terminates the worker", async () => {

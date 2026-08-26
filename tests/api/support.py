@@ -118,7 +118,7 @@ class ApiTestCase(unittest.TestCase):
         )
 
     def get_state(self) -> SimulationStatePayload:
-        response = self.client.get("/api/state")
+        response = self.client.get("/api/state?include_topology=true")
         self.assertEqual(response.status_code, 200)
         return require_simulation_state_payload(
             response.get_json(),

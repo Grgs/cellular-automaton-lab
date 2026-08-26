@@ -80,7 +80,16 @@ def handle_api_request_error(exc: PublicApiError) -> tuple[Response, int]:
 
 
 def state_response(session_id: str = DEFAULT_SESSION_ID) -> Response:
-    return jsonify(dispatch_command(ApplicationCommand.STATE_GET, session_id))
+    include_topology = request.args.get("include_topology")
+    payload: dict[str, object] = {}
+    if include_topology is not None:
+        if include_topology == "true":
+            payload["include_topology"] = True
+        elif include_topology == "false":
+            payload["include_topology"] = False
+        else:
+            raise PublicApiError("'include_topology' must be a boolean.")
+    return jsonify(dispatch_command(ApplicationCommand.STATE_GET, session_id, payload=payload))
 
 
 def topology_response(session_id: str = DEFAULT_SESSION_ID) -> Response:

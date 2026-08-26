@@ -112,6 +112,7 @@ export function createCanvasCommittedRenderer({
     let geometry = DEFAULT_GEOMETRY;
     let stateDefinitions: CellStateDefinition[] = [];
     let geometryCacheKey = "";
+    let layoutKey = "";
     let geometryCache: GeometryCache | null = null;
     let canvasColors: CanvasColors = { ...DEFAULT_COLORS };
     let colorLookup = buildStateColorLookup([], canvasColors);
@@ -230,51 +231,69 @@ export function createCanvasCommittedRenderer({
         nextStateDefinitions = stateDefinitions,
         nextGeometry = geometry,
     ): void {
-        topology = nextState.topology;
-        topologyIndex = indexTopology(topology);
+        const nextTopology = nextState.topology;
+        const normalizedGeometry = normalizeGeometry(nextGeometry);
+        const width = topologyWidth(nextTopology);
+        const height = topologyHeight(nextTopology);
+        const dpr = Math.max(1, getDevicePixelRatio());
+        const viewport = canvas.parentElement;
+        const nextLayoutKey = JSON.stringify({
+            revision: nextTopology?.topology_revision ?? "",
+            geometry: normalizedGeometry,
+            width,
+            height,
+            cellSize: nextCellSize,
+            dpr,
+            viewportWidth: viewport?.clientWidth ?? 0,
+            viewportHeight: viewport?.clientHeight ?? 0,
+        });
+        const layoutChanged = nextLayoutKey !== layoutKey;
+
+        topology = nextTopology;
         cellStates = nextState.cellStates;
         tileColorsEnabled = nextState.tileColorsEnabled !== false;
         cellSize = nextCellSize;
         stateDefinitions = nextStateDefinitions || [];
-        geometry = normalizeGeometry(nextGeometry);
+        geometry = normalizedGeometry;
 
         const adapter = getGeometryAdapter(geometry);
-        const width = topologyWidth(topology);
-        const height = topologyHeight(topology);
-        const nextMetrics = adapter.buildMetrics({ width, height, cellSize, topology });
-        const dpr = Math.max(1, getDevicePixelRatio());
-        canvas.dataset.renderCellSize = String(cellSize);
-        metrics = surface.resize(nextMetrics, dpr, canvasBorderRadius(nextMetrics.gap));
-        syncCanvasViewportAlignment();
-        metrics = {
-            ...metrics,
-            width,
-            height,
-            pitch: Number(nextMetrics.pitch ?? nextMetrics.horizontalPitch ?? 0),
-        };
-        const nextCache = resolveGeometryCache({
-            existingKey: geometryCacheKey,
-            existingCache: geometryCache,
-            width,
-            height,
-            cellSize,
-            geometry,
-            metrics,
-            topology,
-        });
-        geometryCacheKey = nextCache.cacheKey;
-        geometryCache = nextCache.geometryCache;
-        renderDiagnostics = null;
-        resolvedRenderDiagnostics = null;
-        renderDiagnosticsSampled = false;
-        renderDiagnosticsContext = {
-            topology,
-            geometryCache,
-            geometry,
-            adapterFamily: adapter.family,
-            metrics,
-            cellSize,
-        };
+        if (layoutChanged) {
+            topologyIndex = indexTopology(topology);
+            const nextMetrics = adapter.buildMetrics({ width, height, cellSize, topology });
+            canvas.dataset.renderCellSize = String(cellSize);
+            metrics = surface.resize(nextMetrics, dpr, canvasBorderRadius(nextMetrics.gap));
+            syncCanvasViewportAlignment();
+            metrics = {
+                ...metrics,
+                width,
+                height,
+                pitch: Number(nextMetrics.pitch ?? nextMetrics.horizontalPitch ?? 0),
+            };
+            const nextCache = resolveGeometryCache({
+                existingKey: geometryCacheKey,
+                existingCache: geometryCache,
+                width,
+                height,
+                cellSize,
+                geometry,
+                metrics,
+                topology,
+            });
+            geometryCacheKey = nextCache.cacheKey;
+            geometryCache = nextCache.geometryCache;
+            renderDiagnostics = null;
+            resolvedRenderDiagnostics = null;
+            renderDiagnosticsSampled = false;
+            renderDiagnosticsContext = {
+                topology,
+                geometryCache,
+                geometry,
+                adapterFamily: adapter.family,
+                metrics,
+                cellSize,
+            };
+            layoutKey = nextLayoutKey;
+        }
 
         prepareCommittedStyle();
         const committedKey = JSON.stringify({
@@ -344,7 +363,7 @@ export function createCanvasCommittedRenderer({
             recordRenderOperation("full", topology?.cells.length ?? 0, changedCellIndexes.length);
         }
         previousCommittedKey = committedKey;
-        previousCellStates = cellStates.slice();
+        previousCellStates = cellStates;
     }
 
     function restoreCommittedSurface(): void {
