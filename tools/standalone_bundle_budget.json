@@ -24,14 +24,14 @@
         {
             "name": "js-runtime",
             "patterns": ["assets/app-runtime-*.js"],
-            "raw": 344000,
-            "gzip": 92700
+            "raw": 344700,
+            "gzip": 92900
         },
         {
             "name": "js-standalone",
             "patterns": ["assets/standalone-*.js", "assets/standalone-worker-*.js"],
-            "raw": 27800,
-            "gzip": 8690
+            "raw": 29100,
+            "gzip": 8800
         },
         {
             "name": "tiling-preview",
