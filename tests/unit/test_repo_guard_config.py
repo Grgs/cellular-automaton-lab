@@ -53,6 +53,27 @@ class RepoGuardConfigTests(unittest.TestCase):
         )
         self.assertIn("dependencies check --audit", scripts["check:dependencies"])
 
+    def test_frontend_package_uses_esm_for_vite_config(self) -> None:
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        self.assertEqual(package["type"], "module")
+
+    def test_supply_chain_audit_preserves_findings_when_freshness_fails(self) -> None:
+        workflow = (ROOT / ".github/workflows/supply-chain-audit.yml").read_text(encoding="utf-8")
+
+        prepare = workflow.index("- name: Prepare audit artifacts")
+        freshness = workflow.index("- name: Check dependency freshness and lock consistency")
+        audit = workflow.index("- name: Run supply-chain audit")
+        upload = workflow.index("- name: Upload audit artifacts")
+        enforce = workflow.index("- name: Enforce dependency freshness and lock consistency")
+
+        self.assertLess(prepare, freshness)
+        self.assertLess(freshness, audit)
+        self.assertLess(audit, upload)
+        self.assertLess(upload, enforce)
+        self.assertIn("id: dependency-check", workflow)
+        self.assertIn("continue-on-error: true", workflow)
+        self.assertIn("if: always() && steps.dependency-check.outcome == 'failure'", workflow)
+
     def test_fresh_bundle_guard_builds_before_measuring(self) -> None:
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         scripts = package["scripts"]

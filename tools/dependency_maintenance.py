@@ -340,8 +340,8 @@ def _sync_mirrors(updated_python: dict[str, str]) -> None:
         path.write_text(pattern.sub(f"{name}=={version}", text), encoding="utf-8")
 
 
-def _run(command: list[str]) -> None:
-    completed = subprocess.run(command, cwd=ROOT_DIR, check=False)
+def _run(command: list[str], *, environment: dict[str, str] | None = None) -> None:
+    completed = subprocess.run(command, cwd=ROOT_DIR, check=False, env=environment)
     if completed.returncode != 0:
         raise MaintenanceError(f"command failed ({completed.returncode}): {' '.join(command)}")
 
@@ -377,7 +377,13 @@ def bootstrap_lock_tool() -> Path:
 
 
 def compile_python_locks(python: Path) -> None:
+    environment = {
+        **os.environ,
+        "CUSTOM_COMPILE_COMMAND": "python -m tools dependencies update",
+    }
     for source, output in zip(PYTHON_SOURCE_PATHS, PYTHON_LOCK_PATHS, strict=True):
+        relative_source = source.relative_to(ROOT_DIR)
+        relative_output = output.relative_to(ROOT_DIR)
         _run(
             [
                 str(python),
@@ -388,9 +394,10 @@ def compile_python_locks(python: Path) -> None:
                 "--strip-extras",
                 "--generate-hashes",
                 "--allow-unsafe",
-                f"--output-file={output}",
-                str(source),
-            ]
+                f"--output-file={relative_output}",
+                str(relative_source),
+            ],
+            environment=environment,
         )
 
 
