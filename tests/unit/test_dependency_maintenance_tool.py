@@ -230,6 +230,43 @@ class LockToolBootstrapTests(unittest.TestCase):
         )
 
 
+class LockCompilationTests(unittest.TestCase):
+    def test_lock_paths_are_repository_relative(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "requirements.in"
+            output = root / "requirements.txt"
+            python = root / ".venv" / "bin" / "python"
+            with (
+                patch.object(dependencies, "ROOT_DIR", root),
+                patch.object(dependencies, "PYTHON_SOURCE_PATHS", (source,)),
+                patch.object(dependencies, "PYTHON_LOCK_PATHS", (output,)),
+                patch.object(dependencies, "_run") as run,
+            ):
+                dependencies.compile_python_locks(python)
+
+        command = run.call_args.args[0]
+        environment = run.call_args.kwargs["environment"]
+        self.assertEqual(
+            command,
+            [
+                str(python),
+                "-m",
+                "piptools",
+                "compile",
+                "--upgrade",
+                "--strip-extras",
+                "--generate-hashes",
+                "--allow-unsafe",
+                "--output-file=requirements.txt",
+                "requirements.in",
+            ],
+        )
+        self.assertEqual(
+            environment["CUSTOM_COMPILE_COMMAND"], "python -m tools dependencies update"
+        )
+
+
 class EntrypointTests(unittest.TestCase):
     def test_offline_check_can_skip_local_node_selection(self) -> None:
         pin = dependencies.DependencyPin("python", "Flask", "3.1.3", "requirements.in")
