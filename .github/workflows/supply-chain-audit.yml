@@ -59,10 +59,10 @@ jobs:
       - name: Prepare audit artifacts
         run: mkdir -p output/supply-chain-audit
 
-      - name: Check dependency freshness and lock consistency
+      - name: Check dependency lock consistency
         id: dependency-check
         continue-on-error: true
-        run: python -m tools dependencies check
+        run: python -m tools dependencies check --offline
 
       - name: Run supply-chain audit
         run: |
@@ -82,8 +82,8 @@ jobs:
           path: output/supply-chain-audit
           if-no-files-found: error
 
-      - name: Enforce dependency freshness and lock consistency
+      - name: Enforce dependency lock consistency
         if: always() && steps.dependency-check.outcome == 'failure'
         run: |
-          echo "Dependency freshness or lock consistency check failed."
+          echo "Dependency lock consistency check failed."
           exit 1

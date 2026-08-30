@@ -3,8 +3,7 @@ updates:
     - package-ecosystem: pip
       directory: "/"
       schedule:
-          interval: weekly
-          day: monday
+          interval: daily
           time: "06:00"
           timezone: Etc/UTC
       groups:
@@ -16,8 +15,7 @@ updates:
     - package-ecosystem: npm
       directory: "/"
       schedule:
-          interval: weekly
-          day: monday
+          interval: daily
           time: "06:00"
           timezone: Etc/UTC
       groups:
@@ -29,8 +27,7 @@ updates:
     - package-ecosystem: github-actions
       directory: "/"
       schedule:
-          interval: weekly
-          day: monday
+          interval: daily
           time: "06:00"
           timezone: Etc/UTC
       groups:
