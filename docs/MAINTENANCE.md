@@ -154,6 +154,15 @@ python -m tools dependencies update --dry-run
 python -m tools dependencies update
 ```
 
+GitHub automation deliberately separates updates from security alarms. Dependabot checks
+the pip, npm, and GitHub Actions ecosystems daily at 06:00 UTC, groups compatible updates,
+and opens pull requests; green minor and patch updates are eligible for the repository's
+Dependabot auto-merge workflow, while major updates remain manual. The daily Supply Chain
+Audit performs an offline pin/lock consistency check and then runs the Python and npm
+vulnerability scanners. A failed audit therefore means a malformed dependency surface or
+a security finding, not merely that a newer package release exists. Registry freshness
+remains visible through Dependabot and the explicit `dependencies check` command above.
+
 The command enforces [`.python-version`](../.python-version) and the matching
 [`.node-version`](../.node-version), [`.nvmrc`](../.nvmrc), and `package.json` Node pins;
 it refuses Windows Python launched from WSL,

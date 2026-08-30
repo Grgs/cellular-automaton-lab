@@ -57,22 +57,30 @@ class RepoGuardConfigTests(unittest.TestCase):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         self.assertEqual(package["type"], "module")
 
-    def test_supply_chain_audit_preserves_findings_when_freshness_fails(self) -> None:
+    def test_supply_chain_audit_preserves_findings_when_lock_check_fails(self) -> None:
         workflow = (ROOT / ".github/workflows/supply-chain-audit.yml").read_text(encoding="utf-8")
 
         prepare = workflow.index("- name: Prepare audit artifacts")
-        freshness = workflow.index("- name: Check dependency freshness and lock consistency")
+        consistency = workflow.index("- name: Check dependency lock consistency")
         audit = workflow.index("- name: Run supply-chain audit")
         upload = workflow.index("- name: Upload audit artifacts")
-        enforce = workflow.index("- name: Enforce dependency freshness and lock consistency")
+        enforce = workflow.index("- name: Enforce dependency lock consistency")
 
-        self.assertLess(prepare, freshness)
-        self.assertLess(freshness, audit)
+        self.assertLess(prepare, consistency)
+        self.assertLess(consistency, audit)
         self.assertLess(audit, upload)
         self.assertLess(upload, enforce)
         self.assertIn("id: dependency-check", workflow)
         self.assertIn("continue-on-error: true", workflow)
+        self.assertIn("python -m tools dependencies check --offline", workflow)
         self.assertIn("if: always() && steps.dependency-check.outcome == 'failure'", workflow)
+
+    def test_dependabot_checks_all_dependency_ecosystems_daily(self) -> None:
+        config = (ROOT / ".github/dependabot.yml").read_text(encoding="utf-8")
+
+        self.assertEqual(config.count("interval: daily"), 3)
+        self.assertNotIn("interval: weekly", config)
+        self.assertNotIn("day: monday", config)
 
     def test_fresh_bundle_guard_builds_before_measuring(self) -> None:
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
