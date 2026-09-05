@@ -39,7 +39,8 @@ PYTHON_VERSION_PATH: Final[Path] = ROOT_DIR / ".python-version"
 PACKAGE_PATH: Final[Path] = ROOT_DIR / "package.json"
 PACKAGE_LOCK_PATH: Final[Path] = ROOT_DIR / "package-lock.json"
 PIN_PATTERN: Final[re.Pattern[str]] = re.compile(
-    r"^(?P<name>[A-Za-z0-9_.-]+)==(?P<version>[^\s;\\]+)(?:\s+\\)?\s*$",
+    r"^(?P<name>[A-Za-z0-9_.-]+)(?:\[[A-Za-z0-9_,.-]+\])?=="
+    r"(?P<version>[^\s;\\]+)(?:\s+\\)?\s*$",
     re.MULTILINE,
 )
 

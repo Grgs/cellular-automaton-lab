@@ -109,6 +109,15 @@ class RegistryResolutionTests(unittest.TestCase):
 
 
 class LockValidationTests(unittest.TestCase):
+    def test_lock_extras_are_canonicalized_to_base_package(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            lock = Path(tmp) / "requirements.txt"
+            lock.write_text("coverage[toml]==7.16.0\n", encoding="utf-8")
+
+            versions = dependencies._locked_versions(lock)
+
+        self.assertEqual(versions, {"coverage": "7.16.0"})
+
     def test_direct_pins_must_match_lock_roots(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
