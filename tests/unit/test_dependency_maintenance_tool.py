@@ -112,7 +112,7 @@ class LockValidationTests(unittest.TestCase):
     def test_lock_extras_are_canonicalized_to_base_package(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             lock = Path(tmp) / "requirements.txt"
-            lock.write_text("coverage[toml]==7.16.0\\n", encoding="utf-8")
+            lock.write_text("coverage[toml]==7.16.0\n", encoding="utf-8")
 
             versions = dependencies._locked_versions(lock)
 
