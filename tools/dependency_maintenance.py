@@ -270,10 +270,6 @@ def validate_lock_surfaces(
 
 def validate_mirrored_pins(python_pins: dict[str, DependencyPin]) -> None:
     mirrors = {
-        "ruff": (
-            ROOT_DIR / ".pre-commit-config.yaml",
-            re.compile(r"ruff==(?P<version>[0-9][^\s]+)"),
-        ),
         "coverage": (
             ROOT_DIR / ".github" / "workflows" / "ci.yml",
             re.compile(r"coverage==(?P<version>[0-9][^\s]+)"),
@@ -326,7 +322,6 @@ def _write_updates(resolved: list[DependencyPin]) -> None:
 
 def _sync_mirrors(updated_python: dict[str, str]) -> None:
     replacements = (
-        ("ruff", ROOT_DIR / ".pre-commit-config.yaml", re.compile(r"ruff==[^\s]+")),
         (
             "coverage",
             ROOT_DIR / ".github" / "workflows" / "ci.yml",

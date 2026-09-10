@@ -166,12 +166,16 @@ remains visible through Dependabot and the explicit `dependencies check` command
 The command enforces [`.python-version`](../.python-version) and the matching
 [`.node-version`](../.node-version), [`.nvmrc`](../.nvmrc), and `package.json` Node pins;
 it refuses Windows Python launched from WSL,
-queries direct npm/PyPI release tags in parallel, synchronizes the Ruff and Coverage
-mirrors, refreshes `package-lock.json`, bootstraps the hash-locked compiler under
+queries direct npm/PyPI release tags in parallel, synchronizes the Coverage workflow
+mirror, refreshes `package-lock.json`, bootstraps the hash-locked compiler under
 `output/dependency-tools/`, recompiles every Python lock with all-platform hashes, and
 runs npm/Python vulnerability audits. `--skip-python-check`, `--skip-node-check`, and
 `--skip-audit` exist for constrained diagnostics; they are not the normal maintenance
 path.
+
+The Ruff pre-commit hooks run through the repository Python launcher and use the version
+from `requirements-dev.txt`. Keeping Ruff in that single dependency surface allows
+Dependabot upgrades to remain lock-consistent without a second hook-local pin.
 
 `--allow-unsafe` is required with hashes because `pip-audit` depends on `pip` itself, and hash mode needs every requirement pinned. Do not hand-edit the `.txt` files; in hash mode a single unpinned or unhashed entry makes the whole install fail.
 

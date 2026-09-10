@@ -30,18 +30,14 @@ repos:
         stages: [pre-push, manual]
       - id: ruff-python
         name: ruff (python)
-        entry: python -m tools repo python-style check
-        language: python
-        additional_dependencies:
-          - ruff==0.16.5
+        entry: node tools/internal/python_tools_entry.mjs repo python-style check
+        language: system
         pass_filenames: false
         stages: [pre-commit, manual]
       - id: ruff-format-python
         name: ruff format (python)
-        entry: python -m tools repo python-style format-check
-        language: python
-        additional_dependencies:
-          - ruff==0.16.5
+        entry: node tools/internal/python_tools_entry.mjs repo python-style format-check
+        language: system
         pass_filenames: false
         stages: [pre-commit, manual]
       - id: python-dead-code

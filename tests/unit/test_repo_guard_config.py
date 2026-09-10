@@ -53,6 +53,17 @@ class RepoGuardConfigTests(unittest.TestCase):
         )
         self.assertIn("dependencies check --audit", scripts["check:dependencies"])
 
+    def test_ruff_hooks_use_the_locked_project_environment(self) -> None:
+        config = (ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
+
+        for hook_id in ("ruff-python", "ruff-format-python"):
+            hook = _hook_config(config, hook_id)
+            self.assertIn("entry: node tools/internal/python_tools_entry.mjs", hook)
+            self.assertIn("language: system", hook)
+            self.assertNotIn("additional_dependencies", hook)
+
+        self.assertNotIn("ruff==", config)
+
     def test_frontend_package_uses_esm_for_vite_config(self) -> None:
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         self.assertEqual(package["type"], "module")
