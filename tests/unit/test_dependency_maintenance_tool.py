@@ -286,7 +286,6 @@ class EntrypointTests(unittest.TestCase):
             patch.object(dependencies, "read_python_source_pins", return_value={"flask": pin}),
             patch.object(dependencies, "read_npm_source_pins", return_value={}),
             patch.object(dependencies, "validate_lock_surfaces"),
-            patch.object(dependencies, "validate_mirrored_pins"),
             redirect_stdout(stdout),
         ):
             result = dependencies.check_main(

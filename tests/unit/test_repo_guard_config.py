@@ -5,6 +5,8 @@ import re
 import unittest
 from pathlib import Path
 
+import yaml  # type: ignore[import-untyped]
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -68,23 +70,44 @@ class RepoGuardConfigTests(unittest.TestCase):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         self.assertEqual(package["type"], "module")
 
-    def test_supply_chain_audit_preserves_findings_when_lock_check_fails(self) -> None:
-        workflow = (ROOT / ".github/workflows/supply-chain-audit.yml").read_text(encoding="utf-8")
+    def test_dependency_checks_run_independently_on_every_pr(self) -> None:
+        workflow = yaml.load(
+            (ROOT / ".github/workflows/supply-chain-audit.yml").read_text(encoding="utf-8"),
+            Loader=yaml.BaseLoader,
+        )
+        for event in ("pull_request", "merge_group"):
+            self.assertIn(event, workflow["on"])
+            self.assertFalse(workflow["on"][event])
+        self.assertIn("schedule", workflow["on"])
+        jobs = workflow["jobs"]
+        self.assertEqual(jobs["consistency"]["name"], "Dependency Lock Consistency")
+        self.assertEqual(jobs["audit"]["name"], "Dependency Vulnerability Audit")
+        for job in jobs.values():
+            self.assertNotIn("needs", job)
+            self.assertNotIn("if", job)
+            self.assertNotIn("continue-on-error", job)
+            for step in job["steps"]:
+                self.assertNotIn("continue-on-error", step)
+        consistency_commands = [step.get("run", "") for step in jobs["consistency"]["steps"]]
+        self.assertIn("python -m tools dependencies check --offline", consistency_commands)
+        audit_steps = jobs["audit"]["steps"]
+        scan = next(step for step in audit_steps if step["name"] == "Run supply-chain audit")
+        self.assertIn("--format summary", scan["run"])
+        upload = next(step for step in audit_steps if step["name"] == "Upload audit artifacts")
+        self.assertEqual(upload["if"], "always()")
+        self.assertLess(audit_steps.index(scan), audit_steps.index(upload))
 
-        prepare = workflow.index("- name: Prepare audit artifacts")
-        consistency = workflow.index("- name: Check dependency lock consistency")
-        audit = workflow.index("- name: Run supply-chain audit")
-        upload = workflow.index("- name: Upload audit artifacts")
-        enforce = workflow.index("- name: Enforce dependency lock consistency")
-
-        self.assertLess(prepare, consistency)
-        self.assertLess(consistency, audit)
-        self.assertLess(audit, upload)
-        self.assertLess(upload, enforce)
-        self.assertIn("id: dependency-check", workflow)
-        self.assertIn("continue-on-error: true", workflow)
-        self.assertIn("python -m tools dependencies check --offline", workflow)
-        self.assertIn("if: always() && steps.dependency-check.outcome == 'failure'", workflow)
+    def test_coverage_report_installs_the_hashed_project_requirements(self) -> None:
+        workflow = yaml.load(
+            (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8"),
+            Loader=yaml.BaseLoader,
+        )
+        steps = workflow["jobs"]["backend-coverage-report"]["steps"]
+        commands = "\n".join(step.get("run", "") for step in steps)
+        self.assertIn(
+            "pip install --require-hashes -r requirements.txt -r requirements-dev.txt", commands
+        )
+        self.assertNotIn("coverage==", commands)
 
     def test_dependabot_checks_all_dependency_ecosystems_daily(self) -> None:
         config = (ROOT / ".github/dependabot.yml").read_text(encoding="utf-8")

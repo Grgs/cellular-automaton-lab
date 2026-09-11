@@ -7,16 +7,7 @@ on:
     - cron: "0 6 * * *"
   workflow_dispatch:
   pull_request:
-    paths:
-      - "requirements*.in"
-      - "requirements*.txt"
-      - "package.json"
-      - "package-lock.json"
-      - ".node-version"
-      - ".nvmrc"
-      - ".python-version"
-      - "tools/**"
-      - ".github/workflows/supply-chain-audit.yml"
+  merge_group:
 
 concurrency:
   group: supply-chain-${{ github.workflow }}-${{ github.ref }}
@@ -26,8 +17,29 @@ permissions:
   contents: read
 
 jobs:
+  consistency:
+    name: Dependency Lock Consistency
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          node-version-file: ".node-version"
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version-file: ".python-version"
+
+      - name: Check dependency lock consistency
+        run: python -m tools dependencies check --offline
+
   audit:
-    name: pip-audit + npm audit
+    name: Dependency Vulnerability Audit
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -59,11 +71,6 @@ jobs:
       - name: Prepare audit artifacts
         run: mkdir -p output/supply-chain-audit
 
-      - name: Check dependency lock consistency
-        id: dependency-check
-        continue-on-error: true
-        run: python -m tools dependencies check --offline
-
       - name: Run supply-chain audit
         run: |
           python -m tools security supply-chain \
@@ -81,9 +88,3 @@ jobs:
           name: supply-chain-audit
           path: output/supply-chain-audit
           if-no-files-found: error
-
-      - name: Enforce dependency lock consistency
-        if: always() && steps.dependency-check.outcome == 'failure'
-        run: |
-          echo "Dependency lock consistency check failed."
-          exit 1

@@ -268,23 +268,6 @@ def validate_lock_surfaces(
             )
 
 
-def validate_mirrored_pins(python_pins: dict[str, DependencyPin]) -> None:
-    mirrors = {
-        "coverage": (
-            ROOT_DIR / ".github" / "workflows" / "ci.yml",
-            re.compile(r"coverage==(?P<version>[0-9][^\s]+)"),
-        ),
-    }
-    for name, (path, pattern) in mirrors.items():
-        expected = python_pins[name].current
-        versions = {match.group("version") for match in pattern.finditer(path.read_text())}
-        if versions != {expected}:
-            relative = path.relative_to(ROOT_DIR)
-            raise MaintenanceError(
-                f"{relative} mirrors {name} as {sorted(versions)}, expected {expected}"
-            )
-
-
 def _replace_python_pin(text: str, name: str, version: str) -> str:
     pattern = re.compile(rf"^{re.escape(name)}==[^\s;\\]+\s*$", re.MULTILINE | re.IGNORECASE)
     updated, count = pattern.subn(f"{name}=={version}", text)
@@ -296,7 +279,6 @@ def _replace_python_pin(text: str, name: str, version: str) -> str:
 def _write_updates(resolved: list[DependencyPin]) -> None:
     package = _load_json(PACKAGE_PATH)
     python_text = {path: path.read_text(encoding="utf-8") for path in PYTHON_SOURCE_PATHS}
-    updated_python: dict[str, str] = {}
 
     for pin in resolved:
         if pin.latest is None or pin.latest == pin.current:
@@ -304,7 +286,6 @@ def _write_updates(resolved: list[DependencyPin]) -> None:
         if pin.ecosystem == "python":
             path = ROOT_DIR / pin.source
             python_text[path] = _replace_python_pin(python_text[path], pin.name, pin.latest)
-            updated_python[_canonical_name(pin.name)] = pin.latest
             continue
         section = pin.source.split("#", maxsplit=1)[1]
         values = package.get(section)
@@ -317,23 +298,6 @@ def _write_updates(resolved: list[DependencyPin]) -> None:
     for path, text in python_text.items():
         path.write_text(text, encoding="utf-8")
     PACKAGE_PATH.write_text(json.dumps(package, indent=4) + "\n", encoding="utf-8")
-    _sync_mirrors(updated_python)
-
-
-def _sync_mirrors(updated_python: dict[str, str]) -> None:
-    replacements = (
-        (
-            "coverage",
-            ROOT_DIR / ".github" / "workflows" / "ci.yml",
-            re.compile(r"coverage==[^\s]+"),
-        ),
-    )
-    for name, path, pattern in replacements:
-        version = updated_python.get(name)
-        if version is None:
-            continue
-        text = path.read_text(encoding="utf-8")
-        path.write_text(pattern.sub(f"{name}=={version}", text), encoding="utf-8")
 
 
 def _run(command: list[str], *, environment: dict[str, str] | None = None) -> None:
@@ -444,7 +408,6 @@ def check_main(argv: list[str] | None = None) -> int:
         python_pins = read_python_source_pins()
         npm_pins = read_npm_source_pins()
         validate_lock_surfaces(python_pins, npm_pins)
-        validate_mirrored_pins(python_pins)
         pins = list(python_pins.values()) + list(npm_pins.values())
         resolved = pins if args.offline else resolve_latest_versions(pins)
         stale = [pin for pin in resolved if not pin.is_current]
@@ -499,7 +462,6 @@ def update_main(argv: list[str] | None = None) -> int:
         python_pins = read_python_source_pins()
         npm_pins = read_npm_source_pins()
         validate_lock_surfaces(python_pins, npm_pins)
-        validate_mirrored_pins(python_pins)
         if not args.skip_audit:
             run_audits()
         print(f"\nUpdated {len(stale)} direct dependencies and regenerated all locks.")
