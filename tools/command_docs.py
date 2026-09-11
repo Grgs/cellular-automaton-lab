@@ -44,7 +44,7 @@ GROUPS: Final[tuple[GroupDoc, ...]] = (
     GroupDoc(
         "dependencies",
         "Dependencies",
-        "Check and update npm, Python, lock-tool, and mirrored repository pins.",
+        "Check and update npm, Python, and lock-tool dependency pins.",
     ),
 )
 
@@ -53,8 +53,8 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
     CommandDoc(
         ("dependencies", "check"),
         "dependencies",
-        "Check direct package freshness, locks, mirrored pins, Node, and optional audits.",
-        "Queries npm and PyPI release tags instead of relying on runtime-filtered outdated output, verifies source pins against both lockfiles and repository mirrors, enforces matching `.node-version`, `.nvmrc`, `package.json`, and `.python-version` pins, and can run npm audit plus pip-audit with `--audit`. Use `--offline` for deterministic structural checks and skip-version flags only in a constrained diagnostic environment.",
+        "Check direct package freshness, locks, Node, and optional audits.",
+        "Queries npm and PyPI release tags instead of relying on runtime-filtered outdated output, verifies source pins against their lockfiles, enforces matching `.node-version`, `.nvmrc`, `package.json`, and `.python-version` pins, and can run npm audit plus pip-audit with `--audit`. Use `--offline` for deterministic structural checks and skip-version flags only in a constrained diagnostic environment.",
         (
             "python -m tools dependencies check",
             "python -m tools dependencies check --audit",
@@ -65,7 +65,7 @@ COMMANDS: Final[tuple[CommandDoc, ...]] = (
         ("dependencies", "update"),
         "dependencies",
         "Update direct npm/Python pins and regenerate every dependency lock.",
-        "Resolves latest registry tags, synchronizes CI and pre-commit mirrors, refreshes package-lock.json, bootstraps the hash-pinned pip-tools environment under output/dependency-tools, compiles both Python locks with all-platform hashes, and runs supply-chain audits. Use `--dry-run` to preview registry changes.",
+        "Resolves latest registry tags, refreshes package-lock.json, bootstraps the hash-pinned pip-tools environment under output/dependency-tools, compiles both Python locks with all-platform hashes, and runs supply-chain audits. Use `--dry-run` to preview registry changes.",
         (
             "python -m tools dependencies update --dry-run",
             "python -m tools dependencies update",
