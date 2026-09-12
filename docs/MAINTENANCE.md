@@ -158,20 +158,28 @@ GitHub automation deliberately separates updates from security alarms. Dependabo
 the pip, npm, and GitHub Actions ecosystems daily at 06:00 UTC, groups compatible updates,
 and opens pull requests; green minor and patch updates are eligible for the repository's
 Dependabot auto-merge workflow, while major updates remain manual. The daily Supply Chain
-Audit performs an offline pin/lock consistency check and then runs the Python and npm
-vulnerability scanners. A failed audit therefore means a malformed dependency surface or
+Audit runs independent `Dependency Lock Consistency` and `Dependency Vulnerability Audit`
+jobs on every pull request, merge group, and daily schedule. Both checks must be required
+in branch protection so failed dependency updates cannot auto-merge. The consistency
+check runs offline; the vulnerability job runs the Python and npm scanners even when
+consistency fails. A failed audit therefore means a malformed dependency surface or
 a security finding, not merely that a newer package release exists. Registry freshness
 remains visible through Dependabot and the explicit `dependencies check` command above.
 
 The command enforces [`.python-version`](../.python-version) and the matching
 [`.node-version`](../.node-version), [`.nvmrc`](../.nvmrc), and `package.json` Node pins;
 it refuses Windows Python launched from WSL,
-queries direct npm/PyPI release tags in parallel, synchronizes the Ruff and Coverage
-mirrors, refreshes `package-lock.json`, bootstraps the hash-locked compiler under
+queries direct npm/PyPI release tags in parallel, refreshes `package-lock.json`, bootstraps the hash-locked compiler under
 `output/dependency-tools/`, recompiles every Python lock with all-platform hashes, and
 runs npm/Python vulnerability audits. `--skip-python-check`, `--skip-node-check`, and
 `--skip-audit` exist for constrained diagnostics; they are not the normal maintenance
 path.
+
+The Ruff pre-commit hooks run through the repository Python launcher and use the version
+from `requirements-dev.txt`. Keeping Ruff in that single dependency surface allows
+Dependabot upgrades to remain lock-consistent without a second hook-local pin. Install
+the locked development requirements before running the hooks. The Coverage report job
+also installs the hashed requirements instead of maintaining a separate Coverage pin.
 
 `--allow-unsafe` is required with hashes because `pip-audit` depends on `pip` itself, and hash mode needs every requirement pinned. Do not hand-edit the `.txt` files; in hash mode a single unpinned or unhashed entry makes the whole install fail.
 
