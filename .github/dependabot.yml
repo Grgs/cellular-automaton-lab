@@ -19,6 +19,11 @@ updates:
           time: "06:00"
           timezone: Etc/UTC
       groups:
+          # Vitest and its coverage provider require matching releases, including majors.
+          vitest:
+              patterns:
+                  - vitest
+                  - "@vitest/*"
           npm-minor-and-patch:
               update-types:
                   - minor

@@ -210,6 +210,8 @@ describe("mountWorkspaceRouter", () => {
 
     it("lands on the wall for a bare URL", async () => {
         await mount();
+        // Wait for the lazy panel import, whose cold transform can exceed waitFor's timeout.
+        await vi.dynamicImportSettled();
 
         await vi.waitFor(() => {
             expect(backdrop()).not.toBeNull();
