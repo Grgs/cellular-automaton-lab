@@ -46,7 +46,7 @@
         "check:dependencies": "node ./tools/internal/python_tools_entry.mjs dependencies check --audit && npm run check:python && npm run check:frontend && npm run check:bundle-size:fresh"
     },
     "devDependencies": {
-        "@types/node": "^26.5.0",
+        "@types/node": "^26.5.1",
         "@vitest/coverage-v8": "^5.0.0",
         "htmlparser2": "^12.0.0",
         "jsdom": "^30.0.1",
@@ -58,7 +58,7 @@
         "prettier": "^3.9.6",
         "pyodide": "314.0.6",
         "typescript": "^7.0.2",
-        "vite": "^8.2.2",
+        "vite": "^8.3.0",
         "vitest": "^5.0.0"
     }
 }
