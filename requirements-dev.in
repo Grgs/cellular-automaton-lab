@@ -1,4 +1,4 @@
-playwright==1.62.0
+playwright==1.63.0
 hypothesis==6.168.0
 networkx==3.6.1
 shapely==2.1.2
@@ -10,6 +10,6 @@ pytest-cov==7.1.0
 pytest-xdist==3.8.0
 pre-commit==4.6.2
 detect-secrets==1.5.0
-ruff==0.16.7
+ruff==0.16.8
 vulture==2.16
 pip-audit==2.10.1
