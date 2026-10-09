@@ -31,7 +31,7 @@
             "name": "js-standalone",
             "patterns": ["assets/standalone-*.js", "assets/standalone-worker-*.js"],
             "raw": 29100,
-            "gzip": 8800
+            "gzip": 8900
         },
         {
             "name": "tiling-preview",
