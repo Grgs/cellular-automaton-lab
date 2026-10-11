@@ -3327,11 +3327,17 @@ export function createComparePanelContent(
         if (!analysisOverlayOpen || event.key !== "Tab") {
             return;
         }
+        // Closed details menus contain buttons that cannot take focus. Include
+        // their summary controls, but skip the hidden menu actions.
         const focusable = [
-            ...analysisOverlay.querySelectorAll<HTMLButtonElement>(
-                'button:not([disabled]):not([tabindex="-1"])',
+            ...analysisOverlay.querySelectorAll<HTMLElement>(
+                'button:not([disabled]):not([tabindex="-1"]), summary',
             ),
-        ];
+        ].filter(
+            (element) =>
+                !element.closest("details:not([open])") ||
+                element.matches("details:not([open]) > summary"),
+        );
         const first = focusable[0];
         const last = focusable.at(-1);
         if (!first || !last) {

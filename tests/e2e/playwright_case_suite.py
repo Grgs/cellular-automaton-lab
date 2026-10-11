@@ -2013,15 +2013,14 @@ class SharedUiFlowMixin(SharedUiFlowHelpers):
             expect(workspace).to_have_attribute("inert", "")
             expect(close).to_be_focused()
 
-            # Shift+Tab wraps to the dialog's last control, and Tab wraps back
-            # to the close button instead of entering the inert wall beneath.
+            # Wait for analysis results. Closed menu actions must stay out of
+            # the focus loop, while summaries and preview buttons stay in it.
+            last_control = case.page.locator(
+                ".compare-row-actions > details > summary, .compare-row-actions > button"
+            ).last
+            expect(last_control).to_be_visible(timeout=60_000)
             case.page.keyboard.press("Shift+Tab")
-            case.assertTrue(
-                case.page.evaluate(
-                    """() => document.querySelector('.compare-analysis-overlay')
-                        ?.contains(document.activeElement) === true"""
-                )
-            )
+            expect(last_control).to_be_focused()
             case.page.keyboard.press("Tab")
             expect(close).to_be_focused()
 
