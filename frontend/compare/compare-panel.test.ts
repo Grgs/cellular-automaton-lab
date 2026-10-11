@@ -1036,6 +1036,19 @@ describe("mountComparePanel", () => {
         );
         expect(document.activeElement).toBe(run);
 
+        const details = document.createElement("details");
+        const summary = document.createElement("summary");
+        const hiddenAction = document.createElement("button");
+        details.append(summary, hiddenAction);
+        document.querySelector(".compare-analysis-body")?.append(details);
+        close?.focus();
+        close?.dispatchEvent(
+            new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true }),
+        );
+        expect(document.activeElement).toBe(summary);
+        summary.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+        expect(document.activeElement).toBe(close);
+
         close?.click();
         expect(workspace?.hasAttribute("inert")).toBe(false);
         expect(document.activeElement).toBe(opener);
