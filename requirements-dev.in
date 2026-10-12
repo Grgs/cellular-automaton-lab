@@ -1,7 +1,7 @@
 playwright==1.63.0
-hypothesis==6.168.4
+hypothesis==6.168.5
 networkx==3.7
-shapely==2.1.2
+shapely==2.2.0
 Pillow==12.3.0
 mypy==2.4.0
 coverage==7.16.2
