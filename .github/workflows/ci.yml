@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v6
         with:
           node-version-file: ".node-version"
           cache: npm
@@ -100,7 +100,7 @@ jobs:
 
       - name: Upload bundle-size reports
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: standalone-bundle-size
           path: output/bundle-size
@@ -112,13 +112,13 @@ jobs:
           tar -czf standalone-output.tgz output/standalone
 
       - name: Upload frontend dist artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: frontend-dist-tarball
           path: frontend-dist.tgz
 
       - name: Upload standalone output artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: standalone-output-tarball
           path: standalone-output.tgz
@@ -133,7 +133,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v6
         with:
           node-version-file: ".node-version"
           cache: npm
@@ -246,7 +246,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v6
         with:
           node-version-file: ".node-version"
 
@@ -282,7 +282,7 @@ jobs:
           python -m coverage report -m --data-file=.coverage.unit | tee -a coverage-unit.txt
 
       - name: Upload backend unit coverage data
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: backend-coverage-unit
           include-hidden-files: true
@@ -300,7 +300,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v6
         with:
           node-version-file: ".node-version"
 
@@ -352,7 +352,7 @@ jobs:
           python -m pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Download frontend dist artifact
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: frontend-dist-tarball
 
@@ -367,7 +367,7 @@ jobs:
             -n auto --dist loadfile | tee coverage-api.txt
 
       - name: Upload backend API coverage data
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: backend-coverage-api
           include-hidden-files: true
@@ -399,13 +399,13 @@ jobs:
           python -m pip install --require-hashes -r requirements.txt -r requirements-dev.txt
 
       - name: Download backend unit coverage data
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: backend-coverage-unit
           path: coverage-artifacts/unit
 
       - name: Download backend API coverage data
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: backend-coverage-api
           path: coverage-artifacts/api
@@ -420,7 +420,7 @@ jobs:
           python -m coverage xml -o coverage-unit-api.xml
 
       - name: Upload backend coverage artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: backend-coverage
           path: |
@@ -459,7 +459,7 @@ jobs:
           python -m pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Download frontend dist artifact
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: frontend-dist-tarball
 
@@ -482,7 +482,7 @@ jobs:
 
       - name: Upload Playwright server artifacts
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: playwright-server
           path: ${{ github.workspace }}/e2e-artifacts/server-browser
@@ -520,7 +520,7 @@ jobs:
           python -m pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Download standalone output artifact
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: standalone-output-tarball
 
@@ -543,7 +543,7 @@ jobs:
 
       - name: Upload standalone smoke artifact
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: standalone-smoke
           path: output/standalone-smoke
@@ -559,7 +559,7 @@ jobs:
 
       - name: Upload standalone runtime profile
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: standalone-runtime-profile
           path: output/standalone-runtime-profile
@@ -572,7 +572,7 @@ jobs:
 
       - name: Upload standalone Playwright artifacts
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: playwright-standalone-browser
           path: ${{ github.workspace }}/e2e-artifacts/standalone-browser
@@ -595,7 +595,7 @@ jobs:
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
 
       - name: Download standalone output artifact
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: standalone-output-tarball
 
