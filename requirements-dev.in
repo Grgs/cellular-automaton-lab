@@ -2,7 +2,7 @@ playwright==1.64.0
 hypothesis==6.170.1
 networkx==3.7
 shapely==2.2.0
-Pillow==12.3.0
+Pillow==13.0.0
 mypy==2.4.0
 coverage==7.16.2
 pytest==9.1.1
