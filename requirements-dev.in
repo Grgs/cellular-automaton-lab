@@ -13,3 +13,5 @@ detect-secrets==1.5.0
 ruff==0.17.1
 vulture==2.16
 pip-audit==2.10.1
+filelock==4.2.1
+virtualenv==21.14.10
