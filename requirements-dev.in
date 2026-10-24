@@ -1,5 +1,5 @@
 playwright==1.64.0
-hypothesis==6.170.2
+hypothesis==6.170.5
 networkx==3.7
 shapely==2.2.0
 Pillow==13.0.0
