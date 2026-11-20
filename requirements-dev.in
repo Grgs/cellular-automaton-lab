@@ -14,4 +14,4 @@ ruff==0.17.5
 vulture==2.16
 pip-audit==2.10.1
 filelock==4.2.10
-virtualenv==21.15.6
+virtualenv==21.15.7
