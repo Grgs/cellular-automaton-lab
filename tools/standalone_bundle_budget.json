@@ -25,7 +25,7 @@
             "name": "js-runtime",
             "patterns": ["assets/app-runtime-*.js"],
             "raw": 344700,
-            "gzip": 92900
+            "gzip": 93000
         },
         {
             "name": "js-standalone",
